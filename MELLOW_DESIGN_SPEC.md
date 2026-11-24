@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.10.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.11.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -264,3 +264,13 @@ choice. Put dismissal, notes, and alternative evidence under More options
 when they are secondary to the immediate task. Next record remains a
 navigation action. Keep controls at least 44px high with the same padding
 at rest, hover, and focus. Hover changes the fill without moving the label.
+
+## Version 1.11 evidence entry guidance
+
+Show brief, case-specific source examples only when the reviewer opens Add
+evidence. Name the record being reviewed. Ask where the reviewer found the
+evidence and what it shows. Describe how to identify the source and what to
+copy in persistent, accessible field hints. When sources conflict, also
+ask which record the reviewer trusts and why. Near the decision, state the
+next missing requirement if the draft is incomplete. This preview accepts
+a text reference and excerpt.

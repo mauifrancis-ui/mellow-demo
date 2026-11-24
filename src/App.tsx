@@ -58,6 +58,14 @@ function ReviewDrawing({ kind }: { kind: "package" | "receipt" }) {
   );
 }
 
+function evidenceExamples(task: Task) {
+  const examples = [];
+  if (task.sample || /batch or lot/i.test(task.observation)) examples.push("a package label or receiving log");
+  if (/transfer/i.test(task.observation)) examples.push("a transfer manifest or receiving receipt");
+  if (/expiration/i.test(task.observation)) examples.push("a dated package label or supplier record");
+  return examples.length ? [...new Set(examples)].join(", or ") : "a receiving log, package label, or inventory record";
+}
+
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
   return <section className="comparison" aria-label="Evidence">
     <div className="comparison-grid" data-single={!review.source}>
@@ -114,6 +122,11 @@ export default function App() {
       : review?.evidence ? "If neither record lists a lot number, record the issue."
         : review?.source ? "The records disagree. Leave this for a manager to check the label."
           : "Only the import is available. Add a supporting record or leave this for a manager.";
+  const missingEvidence = !draft.reference.trim() && !draft.excerpt.trim() ? "Add the source and what it shows."
+    : !draft.reference.trim() ? "Add where you found it."
+      : !draft.excerpt.trim() ? "Add what the source shows."
+        : needsRationale && !draft.note.trim() ? "Explain which record you trust and why."
+          : "";
   const evidenceAction = hasManualEvidence ? "Review saved evidence" : "Add evidence";
   const hasDraft = Object.values(draft).some((value) => value.trim());
 
@@ -295,15 +308,26 @@ export default function App() {
                   <h3>Evidence you’re adding</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
+                <p className="evidence-hint">Use {evidenceExamples(active)} for <strong>{active.record}</strong>. Enter the details from the record.</p>
                 <div className="evidence-fields">
-                  <label>Evidence source<input ref={evidenceInput} value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
-                  <label>Supporting excerpt<textarea rows={2} value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
-                  {needsRationale && <label>How does this evidence resolve the conflict?<textarea rows={2} value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} /></label>}
+                  <label>Where did you find it?
+                    <input ref={evidenceInput} aria-describedby="evidence-source-hint" value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} />
+                    <small id="evidence-source-hint">Enter a file name, record ID, or link so someone else can find it.</small>
+                  </label>
+                  <label>What does it show?
+                    <textarea rows={2} aria-describedby="evidence-excerpt-hint" value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} />
+                    <small id="evidence-excerpt-hint">Copy the relevant line, or write exactly what the record shows.</small>
+                  </label>
+                  {needsRationale && <label>How does this evidence resolve the conflict?
+                    <textarea rows={2} aria-describedby="evidence-conflict-hint" value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} />
+                    <small id="evidence-conflict-hint">Say which record you trust and why.</small>
+                  </label>}
                 </div>
+                {missingEvidence && <p className="evidence-hint" id="evidence-missing">{missingEvidence} Then you can record the issue.</p>}
               </section>}
               <div className="decision-footer" id="review-decision" role="group" aria-label="Decision controls">
                 <div className="actions">
-                  {primaryAction === "record" && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
+                  {primaryAction === "record" && <button className="solid" aria-describedby={editing && missingEvidence ? "evidence-missing" : "evidence-help"} disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
                   {primaryAction === "evidence" && <button className="solid" onClick={openEvidence}>{evidenceAction}</button>}
                   {!pendingManager && <button className={primaryAction === "manager" ? "solid" : "secondary"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
                   <details className="review-options" key={active.id}>

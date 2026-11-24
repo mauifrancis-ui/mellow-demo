@@ -364,3 +364,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 @media (hover: hover) {
   .review-options summary:hover { background: var(--selected); }
 }
+
+.evidence-hint { color: var(--muted); font-size: 14px; }
+.evidence-fields label small { margin-top: 0; font-weight: normal; }
