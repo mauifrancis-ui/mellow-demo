@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.20.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.21.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -395,3 +395,19 @@ sentence such as “We compared eight packages across inventory and receiving
 records.” Write with warmth and calm confidence. Explain gaps plainly, give
 one useful next action, and avoid slang or reassurance that implies the
 issue is resolved. The preview wording still needs confirmation with staff.
+
+## Version 1.21 skim, dip, dive
+
+- Skim shows the comparison result, how many packages had a difference or
+  gap, and the first actionable next check. Use the actual evidence in the
+  explanation. Prioritize a disagreement over an incomplete record.
+- Dip lets the reviewer choose a result group. Show why that group needs
+  attention and which source to check, accounting for missing inventory
+  rows, missing receiving rows, and two blank lot fields separately.
+- Dive expands the actual source records within the chosen group. Preserve
+  the distinction between a blank lot field and an absent source row.
+
+Apply the same layers to sample and user-selected files. The comparison
+reports source differences and makes no source changes. Keep live
+readiness claims and guesses about which source is correct out of the
+summary.

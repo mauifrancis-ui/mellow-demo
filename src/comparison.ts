@@ -41,7 +41,7 @@ export function lotInsight(row: LotCheck): { title: string; detail: string } {
     const difference = row.inventory === "" ? "Inventory has no lot number, but receiving does."
       : row.receiving === "" ? "Receiving has no lot number, but inventory does."
         : "Inventory and receiving list different lot numbers.";
-    return { title: `Check the label on ${row.packageId}`, detail: `${difference} Verify the number on the original package label.` };
+    return { title: `Check the original package label for ${row.packageId}`, detail: difference };
   }
   if (row.state === "missing") {
     if (row.receiving === null) {
@@ -53,4 +53,16 @@ export function lotInsight(row: LotCheck): { title: string; detail: string } {
     return { title: `Verify the lot number for ${row.packageId}`, detail: "Neither record lists a lot number. Check the package label or the original receiving paperwork." };
   }
   return { title: `The lot numbers match for ${row.packageId}`, detail: "Both files list the same number. No follow-up for this comparison." };
+}
+
+export function summarizeLots(rows: LotCheck[]) {
+  const different = rows.filter(({ state }) => state === "different");
+  const missing = rows.filter(({ state }) => state === "missing");
+  return {
+    checked: rows.length,
+    different,
+    missing,
+    matched: rows.length - different.length - missing.length,
+    first: different[0] ?? missing[0],
+  };
 }

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { compareLots, lotInsight, lotRecords, sampleComparison } from "../src/comparison.ts";
+import { compareLots, lotInsight, lotRecords, sampleComparison, summarizeLots } from "../src/comparison.ts";
 
 test("read-only comparison distinguishes matched, different, blank, and unpaired rows", () => {
   const inventory = lotRecords("package_id,lot_number\nA,101\nB,\nC,\nD,400");
@@ -25,7 +25,17 @@ test("duplicate IDs and unsupported CSV columns fail instead of silently matchin
 test("briefing identifies which record is missing or disagrees", () => {
   const mismatch = sampleComparison.find(({ packageId }) => packageId === "PKG-443");
   assert.match(lotInsight(mismatch).detail, /Inventory has no lot number, but receiving does/);
-  assert.match(lotInsight(mismatch).detail, /original package label/);
+  assert.match(lotInsight(mismatch).title, /original package label/);
   assert.match(lotInsight(sampleComparison.find(({ packageId }) => packageId === "PKG-552")).title, /Find the receiving record/);
   assert.match(lotInsight(sampleComparison.find(({ packageId }) => packageId === "PKG-221")).detail, /Neither record lists a lot number/);
+});
+
+test("skim prioritizes a mismatch over gaps and stays quiet on matching records", () => {
+  const summary = summarizeLots(sampleComparison);
+  assert.equal(summary.checked, 8);
+  assert.equal(summary.matched, 5);
+  assert.equal(summary.different.length, 1);
+  assert.equal(summary.missing.length, 2);
+  assert.equal(summary.first.packageId, "PKG-443");
+  assert.equal(summarizeLots(sampleComparison.filter(({ state }) => state === "match")).first, undefined);
 });
