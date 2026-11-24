@@ -32,3 +32,22 @@ Proposed contract for the eventual application server. Adapt route and types to 
 The model has no decision-writing tools. Approval remains a separate application endpoint with server-side role and evidence checks, a transaction, duplicate-submit protection, and an audit event. Reopening records a new event and restores the applicable review state. A feature flag defaults to off until knowledge, privacy, security, and evaluation gates pass.
 
 See [knowledge/README.md](knowledge/README.md) for transfer requirements and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for acceptance gates.
+
+## First integration slice
+
+Start with one record type and one approved evidence source, such as an
+inventory export paired with the corresponding batch record. On record open,
+the authenticated server resolves the record and finds eligible evidence using
+its stable identifiers. The model summarizes cited passages, explains the
+observation, and identifies gaps. The response carries evidence IDs, so the
+reviewer can inspect and select stored evidence without copying it into a form.
+A dedicated decision endpoint validates evidence IDs and actor permissions at
+write time. When sources disagree or are absent, show the gap and preserve
+manual review.
+
+Activation requires the approved custom GPT Instructions, original Knowledge
+files, one de-identified record and matching evidence example, and a confirmed
+server, identity, and storage setup. Use approved fixtures to test attribution,
+unsupported claims, source mismatches, and the quality of the proposed next step
+before expanding to other record types. Keep the provider credential in
+server-only environment settings.

@@ -43,9 +43,9 @@ export default function App() {
   const canApprove = hasEvidence(draft);
   const hasDraft = Object.values(draft).some((value) => value.trim());
   const evidenceNeeded = !draft.reference.trim() && !draft.excerpt.trim()
-    ? "Add a source reference and supporting excerpt to enable approval."
-    : !draft.reference.trim() ? "Add a source reference to enable approval."
-      : "Add a supporting excerpt to enable approval.";
+    ? "Approval needs an evidence source and an excerpt."
+    : !draft.reference.trim() ? "Approval needs an evidence source."
+      : "Approval needs a supporting excerpt.";
 
   function save(update: (current: Workspace) => Workspace) {
     try {
@@ -153,8 +153,7 @@ export default function App() {
                 <h2 id="task-title" tabIndex={-1} ref={editor}>{active.record}</h2>
                 <p className="observation">{active.observation}</p>
                 <dl className="provenance">
-                  <div><dt>Source</dt><dd>{active.source}</dd></div>
-                  <div><dt>CSV position</dt><dd>Record {active.line}{active.sample ? " · Sample" : ""}</dd></div>
+                  <div><dt className="sr-only">Source and record position</dt><dd>{active.source} · Record {active.line}</dd></div>
                 </dl>
               </div>
               <div className="evidence">
@@ -163,17 +162,17 @@ export default function App() {
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
                 <div className="evidence-fields">
-                  <label>Source reference<input value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
-                  <label>Supporting excerpt<textarea value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
+                  <label>Evidence source<input value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
+                  <label>Supporting excerpt<textarea rows={2} value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
                 </div>
-                <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />
                 <div className="decision-footer">
                   <p id="evidence-help" className="evidence-status" data-ready={canApprove}>{canApprove ? "Evidence added. Confirm it supports your decision." : evidenceNeeded}</p>
                   <div className="actions">
                     <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record demo approval</button>
                     <button disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Flag for manager review</button>
-                    <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss observation</button>
+                    <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss</button>
                   </div>
+                  <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />
                 </div>
               </div>
             </section> : <section className="panel empty"><h2>No open observations</h2><p>Import a demo CSV or reopen a decision from Activity.</p></section>}

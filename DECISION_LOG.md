@@ -34,3 +34,12 @@ and short motion tied to pressing, opening a note, or switching records.
 Moved evidence context and approval eligibility into the visible workflow after
 the simulated board review. Publish revisions on the Preview branch for founder
 feedback.
+
+## Version 1.2 review feedback
+
+Reduced the height of the review header and moved optional notes beneath the
+decision controls. Aligned the evidence fields and limited teal to action and
+state cues after feedback about scrolling, field alignment, and the green
+palette. Scoped the first assisted review to one verified evidence source and
+record type. Live activation still depends on approved GPT materials and
+server-side identity and evidence storage.

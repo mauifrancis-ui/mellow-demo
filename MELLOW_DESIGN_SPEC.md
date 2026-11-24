@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.1.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.2.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -69,3 +69,20 @@ matters, and let them set the pace.
   Avoid automatic dismissal, animation loops, and motion tied to scrolling.
 - **Reduced motion.** Disable transitions and movement for reduced-motion
   preferences. Preserve the same content, focus, and feedback.
+
+## Version 1.2 review layout
+
+Use a warm neutral record surface and charcoal text. Reserve muted teal for
+action, focus, and selection. Reduce the heading and record block so decisions
+sit nearer to the observation. Align evidence controls using matching field
+heights. Keep the optional decision note below the actions.
+
+## Assisted review target
+
+When a record opens, Mellow should retrieve eligible evidence already connected
+to the record and prepare a short review with cited observations, an explicit
+recommendation, and any gaps. Show the source and supporting passage inline.
+Let the reviewer inspect or change the evidence and confirm the decision.
+Manual entry is available for missing sources and overrides. Keep the existing
+approval gate and clear separation between model advice and a recorded decision.
+See the activation prerequisites in [MELLOW_CORE.md](MELLOW_CORE.md).
