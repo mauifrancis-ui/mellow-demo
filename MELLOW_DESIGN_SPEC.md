@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.12.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.13.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -286,3 +286,12 @@ field names independent of their hints. Retain Mellow's rounded outlines.
 
 Use self-hosted Nunito Variable for body text, labels, and controls.
 Keep Georgia for editorial headings and the wordmark.
+
+## Version 1.13 evidence editor rhythm
+
+Use 24px before the editor, 12px between its heading and introduction, 20px
+between field groups, and 8px from label to field and field to supporting text.
+Inset both labels and hints 12px to align with typed content. Use a single
+inset focus outline so its geometry stays within the field and clear of the
+hint. In Forest field guide, use the third swatch, #A9CC7A, as the editor
+heading rule. Keep the dark palette role for text and focus contrast.

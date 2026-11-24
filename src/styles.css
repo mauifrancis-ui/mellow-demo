@@ -299,6 +299,7 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   --accent: #1e3b24; --focus: #365d36; --selected: #a9cc7a; --line: #c4d3b5;
   --mast: #1e3b24; --mast-hover: #345938; --signature: #a9cc7a;
   --observation: #eff5e4; --observation-edge: #5e9c4c; --subtle-surface: #f2f7e9;
+  --editor-accent: #a9cc7a;
 }
 .shell[data-palette="field"] .masthead { --focus: #a9cc7a; }
 .shell[data-palette="field"] .actions .solid:enabled:hover { background: #315837; }
@@ -365,7 +366,22 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   .review-options summary:hover { background: var(--selected); }
 }
 
+.evidence {
+  gap: 12px;
+  padding: 24px var(--review-inset) 20px;
+}
+.evidence-header {
+  min-height: 24px;
+  padding-inline-start: 12px;
+  border-inline-start: 4px solid var(--editor-accent, var(--observation-edge));
+}
 .evidence-hint { color: var(--muted); font-size: 14px; }
-.evidence-fields { gap: 16px; }
-.evidence-field { display: grid; gap: 4px; }
-.evidence-field .supporting-text { padding-inline: 12px; font-size: 12px; line-height: 16px; color: var(--muted); }
+.evidence .evidence-fields { gap: 20px; margin-block: 4px; }
+.evidence-field { display: grid; gap: 8px; }
+.evidence-field label, .evidence-field .supporting-text { padding-inline: 12px; }
+.evidence-field .supporting-text { font-size: 12px; line-height: 16px; color: var(--muted); }
+.evidence-field :is(input, textarea):focus {
+  border-color: transparent;
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}

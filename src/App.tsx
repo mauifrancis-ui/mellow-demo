@@ -305,10 +305,10 @@ export default function App() {
               <SourceComparison key={active.id} task={active} review={review} />
               {editing && <section className="evidence" aria-label="Add supporting evidence">
                 <div className="evidence-header">
-                  <h3>Evidence you’re adding</h3>
+                  <h3>Add evidence</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
-                <p className="evidence-hint">Use {evidenceExamples(active)} for <strong>{active.record}</strong>. Enter the details from the record.</p>
+                <p className="evidence-hint">Use {evidenceExamples(active)} for <strong>{active.record}</strong>.</p>
                 <div className="evidence-fields">
                   <div className="evidence-field">
                     <label htmlFor="evidence-source">Where did you find it?</label>
@@ -326,7 +326,7 @@ export default function App() {
                     <p className="supporting-text" id="evidence-conflict-hint">Say which record you trust and why.</p>
                   </div>}
                 </div>
-                {missingEvidence && <p className="evidence-hint" id="evidence-missing">{missingEvidence} Then you can record the issue.</p>}
+                {missingEvidence && <p className="evidence-hint" id="evidence-missing">{missingEvidence}</p>}
               </section>}
               <div className="decision-footer" id="review-decision" role="group" aria-label="Decision controls">
                 <div className="actions">
