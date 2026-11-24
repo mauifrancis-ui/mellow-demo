@@ -1,4 +1,5 @@
 import { useRef, useState, type ChangeEvent } from "react";
+import { ReceivingCheck } from "./ReceivingCheck";
 
 import {
   emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, workQueue,
@@ -104,6 +105,7 @@ export default function App() {
   const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
   const reviewedCount = workspace.tasks.length - queue.length - manager.length;
+  const sampleMismatch = [...queue, ...manager].find(({ id, sample }) => sample && id === "PKG-443");
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
@@ -288,6 +290,7 @@ export default function App() {
             </dl>
           </>}
         </header>
+        {tab === "Today" && <ReceivingCheck openSample={sampleMismatch ? () => openTask(sampleMismatch) : undefined} />}
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="review-layout">

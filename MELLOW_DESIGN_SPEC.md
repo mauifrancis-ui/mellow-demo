@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.13.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.14.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -295,3 +295,23 @@ Inset both labels and hints 12px to align with typed content. Use a single
 inset focus outline so its geometry stays within the field and clear of the
 hint. In Forest field guide, use the third swatch, #A9CC7A, as the editor
 heading rule. Keep the dark palette role for text and focus contrast.
+
+## Version 1.14 receiving check
+
+Compare an inventory export and a receiving export by exact package ID.
+Classify nonblank equal lot numbers as Match, unequal lot numbers as
+Different, and absent source rows or two blank lot numbers as Missing
+information. Reject duplicate IDs. Compare records read-only and keep
+source data distinct from decisions.
+
+Today shows a segmented count visualization with an adjacent text key.
+The simulated example uses eight fictional packages and links directly
+to the reviewable label mismatch. Routine matches stay out of the work
+queue. The exception list can be expanded to see actual source values.
+An optional browser-local comparison accepts two de-identified CSV files
+with package_id and lot_number columns. It does not persist results or
+create tasks. Metrc and POS remain separate live retrieval integrations.
+
+The supplied strain catalog is a potential Learn source after provenance,
+rights, and content checks. Product names and strain descriptions do not
+identify a store package or establish its lot number.
