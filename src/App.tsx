@@ -1,11 +1,12 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { ReceivingMonitor } from "./ReceivingMonitor";
 import { Briefing, Conversation } from "./AskMellow";
 import { ActivityPage } from "./ActivityPage";
 import { LearnPage } from "./LearnPage";
 import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextPanel";
-import { panelFor, queueView, type PanelView } from "./panel";
+import { panelFor, queueView, sameView, type PanelView } from "./panel";
 import { ask, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -17,6 +18,17 @@ import {
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
+
+// Morph between states with the browser's view transitions where available.
+// "page" cross-fades both columns; "panel" morphs only the side panel and
+// lets the reading column hold still.
+function smooth(update: () => void, kind: "page" | "panel" = "page") {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce || typeof document.startViewTransition !== "function") { update(); return; }
+  document.documentElement.dataset.vt = kind;
+  const transition = document.startViewTransition(() => flushSync(update));
+  void transition.finished.finally(() => { delete document.documentElement.dataset.vt; });
+}
 
 const tabs = ["Today", "Activity", "Learn"] as const;
 const panelKey = "mellow.panel";
@@ -279,30 +291,37 @@ export default function App() {
   }
 
   function goTo(next: Tab, question?: string) {
-    setTab(next);
-    setStatus("");
-    setError("");
-    setAskRequest(question ?? null);
-    if (question) showAnswer(ask(question, askContext));
+    const update = () => {
+      setTab(next);
+      setStatus("");
+      setError("");
+      setAskRequest(question ?? null);
+      if (question) applyView(panelFor(ask(question, askContext)));
+    };
+    if (next === tab && !question) update(); else smooth(update);
   }
 
-  function showAnswer(answer: AskAnswer) {
-    const next = panelFor(answer);
+  function applyView(next: PanelView | null) {
     if (!next) return;
     setPanelView(next);
     setFocusSeries(next.kind === "series" ? next.series : null);
   }
 
+  function showAnswer(answer: AskAnswer) {
+    const next = panelFor(answer);
+    if (!next) return;
+    if (sameView(next, panelView)) applyView(next); else smooth(() => applyView(next), "panel");
+  }
+
   function backToQueue() {
-    setPanelView(queueView);
-    setFocusSeries(null);
+    if (sameView(panelView, queueView)) { setFocusSeries(null); return; }
+    smooth(() => applyView(queueView), "panel");
   }
 
   function togglePanel() {
-    setPanelCollapsed((current) => {
-      try { localStorage.setItem(panelKey, current ? "open" : "collapsed"); } catch { /* Keep the choice for this visit. */ }
-      return !current;
-    });
+    const next = !panelCollapsed;
+    try { localStorage.setItem(panelKey, next ? "collapsed" : "open"); } catch { /* Keep the choice for this visit. */ }
+    smooth(() => setPanelCollapsed(next), "panel");
   }
 
   function openTask(task: Task) {
@@ -312,9 +331,9 @@ export default function App() {
     focusRecord();
   }
 
-  function queueRow(task: Task, kind: string, label: string) {
+  function queueRow(task: Task, kind: string, label: string, index = 0) {
     const time = task.sample && posture.lastSuccessfulRun ? clock(posture.lastSuccessfulRun.checkedAt) : "Import";
-    return <li key={task.id}>
+    return <li key={task.id} style={{ "--i": index } as CSSProperties}>
       <button className="queue-row" data-kind={kind} aria-current={active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
         <span className="queue-mark" aria-hidden="true" />
         <span className="queue-id">{task.record}</span>
@@ -450,7 +469,7 @@ export default function App() {
                 <h2 id="queue-title" className="kicker">Needs you · <span className="count" key={queue.length}>{queue.length}</span></h2>
                 {queue.length > 1 && <span>Disagreements first</span>}
               </div>
-              {ordered.length ? <ul>{ordered.map(({ task, issue }) => queueRow(task, issue.kind, issue.label))}</ul>
+              {ordered.length ? <ul>{ordered.map(({ task, issue }, index) => queueRow(task, issue.kind, issue.label, index))}</ul>
                 : <p className="empty">Nothing needs you right now.</p>}
               {manager.length > 0 && <>
                 <div className="queue-head"><h3 className="kicker">With a manager · {manager.length}</h3></div>

@@ -212,3 +212,20 @@ Back to queue, collapse to the strip at 112px with the main column at
 860px, collapse remembered after a reload, a Learn chip setting the view,
 and the phone sheet starting minimized. There were no console errors and
 reduced motion ran no animations. Founder preview approval is pending.
+
+## Version 1.32 organic motion and app shell · 2026-11-24
+
+The founder asked for smoother, more organic motion, a sticky app bar, and
+left and right columns that scroll independently. Replaced the motion tokens
+with soft ease-out, spring and longer layout timings. Added blur-settle
+reveals, staggered rows, and view transitions scoped so panel changes never
+dim the reading column. Built a fixed app shell for desktop, and kept normal
+page scrolling with a pinned bar on phones. Fixed a heavy focus box on the
+reply field. Verification: lint, type check, build, and 29 tests passed. A
+browser run confirmed the document no longer scrolls on desktop, each column
+scrolls without moving the other, the masthead stays at the top, opening a
+record scrolls it into view inside its column, the dropdown still shows
+inside the scroll area, and phones scroll under the pinned bar. View
+transitions ran for panel, collapse and tab changes, with the panel kind
+leaving the reading column still. Reduced motion ran no animations.
+Founder preview approval is pending.

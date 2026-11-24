@@ -1,0 +1,94 @@
+/* Motion v2: organic and unhurried. Things ease out like a sheet of paper
+   settling, never snap. Every movement still answers an action or a state
+   change, and reduced motion removes all timed movement. */
+:root {
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  --ease-exit: cubic-bezier(.4, 0, 1, 1);
+  --spring: cubic-bezier(.34, 1.36, .64, 1);
+  --motion-press: 160ms;
+  --motion-arrive: 260ms;
+  --motion-change: 340ms;
+  --motion-layout: 420ms;
+  --motion-travel: 8px;
+  --motion-stagger: 45ms;
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    /* A soft spring with a whisper of overshoot. */
+    --spring: linear(0, .009, .035 2.1%, .141 4.4%, .723 12.9%, .938 16.7%, 1.017 20.4%, 1.044 24.6%, 1.035 28.6%, 1.007 37.2%, .995 45.1%, 1.001 63.6%, 1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes arrive { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes settle { from { opacity: 0; filter: blur(1.5px); } to { opacity: 1; filter: blur(0); } }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(var(--motion-travel)); filter: blur(2px); }
+    to { opacity: 1; transform: none; filter: blur(0); }
+  }
+  @keyframes tick { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+
+  /* Hover and press: soft, a little slower than a click */
+  .chip, .tool, .ledger-button, .text-link, .queue-row, .answer-row, .references a, .decision-row,
+  .shell[data-palette="ledger"] .actions button, .masthead nav button {
+    transition: background-color var(--motion-press) var(--ease), border-color var(--motion-press) var(--ease),
+      color var(--motion-press) var(--ease), box-shadow var(--motion-press) var(--ease),
+      transform var(--motion-press) var(--spring);
+  }
+  .chip:active, .tool:active, .ledger-button:active, .shell[data-palette="ledger"] .actions button:active { transform: scale(.98); }
+  .ledger-button.send:hover svg { transform: translateX(3px); transition: transform 260ms var(--spring); }
+
+  /* Arrivals settle in */
+  .page { animation: arrive var(--motion-arrive) var(--ease) both; }
+  .mellow-voice { animation: settle 480ms var(--ease) both; }
+  .ledger-record-body { animation: reveal var(--motion-change) var(--ease) both; }
+
+  /* Conversation: your words land first, then Mellow's, then its rows one by one */
+  .turn-pair[data-latest] { animation: none; }
+  .turn-pair[data-latest] .turn:first-child { animation: reveal var(--motion-change) var(--ease) both; }
+  .turn-pair[data-latest] .turn:last-child { animation: reveal 420ms var(--ease) 90ms both; }
+  .turn-pair[data-latest] .answer-rows li,
+  .ledger-queue li, .decision-row, .term, .references li {
+    animation: reveal var(--motion-change) var(--ease) both;
+    animation-delay: calc(var(--i, 0) * var(--motion-stagger) + 120ms);
+  }
+  .ledger-queue li, .decision-row, .term, .references li { animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
+  .turn-pair[data-latest] .answer-next { animation: reveal var(--motion-change) var(--ease) 260ms both; }
+
+  /* Chart columns grow on a soft spring */
+  .chart-column { animation: grow 560ms var(--spring) both; animation-delay: calc(var(--i, 0) * 36ms); }
+  .chart-tip { animation: reveal 200ms var(--ease) both; }
+
+  /* Menus and disclosures open softly */
+  .shell[data-palette="ledger"] .dropdown[open] > .review-options-body { animation: reveal 220ms var(--ease) both; transform-origin: top left; }
+  .evidence-detail, .monitor-details[open] .monitor-detail-body, .handoff-notes details[open] pre { animation: reveal var(--motion-change) var(--ease) both; }
+  :is(.review-options, .monitor-details, .note) > summary::after { transition: transform var(--motion-change) var(--spring); }
+  .masthead .nav-pill { transition: transform var(--motion-layout) var(--spring), width var(--motion-layout) var(--spring); }
+  .count { animation: tick var(--motion-change) var(--spring) both; }
+
+  /* View transitions: panel changes, collapse and tab switches morph instead of cutting */
+  .masthead { view-transition-name: masthead; }
+  .ledger-main { view-transition-name: ledger-main; }
+  .ledger-side { view-transition-name: ledger-side; }
+  ::view-transition-group(*) { animation-duration: var(--motion-layout); animation-timing-function: var(--ease); }
+  ::view-transition-old(root) { animation: 160ms var(--ease-exit) both vt-out; }
+  ::view-transition-new(root) { animation: var(--motion-arrive) var(--ease) 60ms both vt-in; }
+  ::view-transition-old(ledger-side), ::view-transition-old(ledger-main) { animation: 180ms var(--ease-exit) both vt-out; }
+  ::view-transition-new(ledger-side), ::view-transition-new(ledger-main) { animation: var(--motion-change) var(--ease) 80ms both vt-in; }
+  ::view-transition-old(masthead), ::view-transition-new(masthead) { animation: none; }
+  /* Panel changes: the reading column holds still and only resizes; the panel morphs. */
+  html[data-vt="panel"]::view-transition-old(root), html[data-vt="panel"]::view-transition-new(root) { animation: none; }
+  html[data-vt="panel"]::view-transition-old(ledger-main) { display: none; }
+  html[data-vt="panel"]::view-transition-new(ledger-main) { animation: none; inline-size: auto; block-size: auto; }
+  html[data-vt="panel"]::view-transition-old(ledger-side), html[data-vt="panel"]::view-transition-new(ledger-side) { inline-size: auto; block-size: auto; overflow: clip; }
+  @keyframes vt-out { to { opacity: 0; transform: translateY(-4px); filter: blur(1.5px); } }
+  @keyframes vt-in { from { opacity: 0; transform: translateY(6px); filter: blur(2px); } }
+  /* When the browser morphs views itself, skip the older inline fades so nothing plays twice. */
+  @supports (view-transition-name: none) {
+    .panel-body, .page { animation: none; }
+    .ledger:has(> .context-panel) { transition: none; }
+  }
+}

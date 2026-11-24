@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import type { Decision, Entry, Task } from "./workspace";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -81,7 +81,7 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
         {days.map((day) => <div key={day} className="ledger-day">
           <div className="queue-head"><h2 className="kicker">{day}</h2><span>Time · Package · Decision · Evidence</span></div>
           <ul>
-            {shown.filter((entry) => dayLabel(entry.at) === day).map((entry) => {
+            {shown.filter((entry) => dayLabel(entry.at) === day).map((entry, index) => {
               const meta = decisionMeta[entry.decision];
               const newest = history.find((item) => item.task.id === entry.task.id)?.id === entry.id;
               const canReopen = newest && latest.get(entry.task.id) === entry.decision && (entry.decision === "Approved" || entry.decision === "Dismissed");
@@ -90,7 +90,7 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
               const hasDetail = Boolean(entry.evidence.reference || entry.comparedSource || entry.evidence.note);
               const open = expanded === entry.id;
               return <li key={entry.id}>
-                <div className="decision-row" data-mark={meta.mark}>
+                <div className="decision-row" data-mark={meta.mark} style={{ "--i": index } as CSSProperties}>
                   <time dateTime={entry.at}>{clock(entry.at)}</time>
                   <span className="queue-mark" aria-hidden="true" />
                   <span className="queue-id">{entry.task.record}</span>

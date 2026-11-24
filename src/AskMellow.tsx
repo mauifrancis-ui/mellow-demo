@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
+import { useRef, useState, type CSSProperties, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
 import { ask, followUps, type AskAction, type AskAnswer, type AskContext, type Brief } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -132,13 +132,13 @@ export function Conversation({ context, chips, onAction, onAnswer, onClear, init
                 <h3>{turn.answer.title}</h3>
                 <p className="mellow-voice">{turn.answer.body}</p>
                 {turn.answer.items && turn.answer.items.length > 0 && <ul className="answer-rows">
-                  {turn.answer.items.map((item) => {
+                  {turn.answer.items.map((item, index) => {
                     const body = <>
                       <span className="queue-mark" aria-hidden="true" />
                       <span className="queue-id">{item.label}</span>
                       <span className="answer-row-text"><span>{item.title ?? item.detail}</span>{item.title && <small>{item.detail}</small>}</span>
                     </>;
-                    return <li key={item.label}>{item.id && openable.has(item.id)
+                    return <li key={item.label} style={{ "--i": index } as CSSProperties}>{item.id && openable.has(item.id)
                       ? <button type="button" className="answer-row" data-kind={item.kind} onClick={() => onAction({ kind: "open", id: item.id! }, turn.answer)}>{body}<span className="answer-open">Open<span aria-hidden="true"> →</span><span className="sr-only"> {item.label}</span></span></button>
                       : <div className="answer-row" data-kind={item.kind}>{body}<span /></div>}</li>;
                   })}

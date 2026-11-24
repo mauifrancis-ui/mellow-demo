@@ -320,3 +320,32 @@ column widens to 860px. The choice is remembered. Below 900px the panel is a
 bottom sheet over the page. It starts minimized as a "3 need you" bar and
 opens to 78% of the viewport height. Views change with a 200ms fade, and
 reduced motion removes all timed movement.
+
+## Version 1.32 organic motion and the app shell
+
+**Motion v2** replaces the earlier timing values (`src/motion.css`):
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| `--ease` | cubic-bezier(.22, 1, .36, 1) | Soft ease-out for most motion |
+| `--spring` | a gentle linear() spring with slight overshoot | Presses, chart growth, chevrons, tab underline |
+| `--motion-press` | 160ms | Hover and press |
+| `--motion-arrive` | 260ms | Page arrival |
+| `--motion-change` | 340ms | Reveals and disclosure |
+| `--motion-layout` | 420ms | Panel and layout morphs |
+| `--motion-travel` | 8px | Reveal distance |
+| `--motion-stagger` | 45ms | Rows arriving one after another |
+
+- **Reveals:** content fades up from 8px with a 2px blur clearing, like ink settling. Mellow's voice settles over 480ms.
+- **Conversation order:** your words land first, Mellow's reply 90ms later, then its rows one by one, and the Next chips last.
+- **Staggered arrivals:** queue rows, decision rows, glossary terms and references arrive in sequence.
+- **Chart:** columns grow on the spring.
+- **Presses:** buttons press to 98% scale.
+
+The browser's view transitions handle state changes:
+- **Panel changes and collapse:** only the side panel morphs. The reading column stays still and only resizes.
+- **Tab switches:** both columns cross-fade.
+
+Browsers without view transitions fall back to the inline fades, and reduced motion removes all timed movement.
+
+**App shell.** The app bar is pinned. At 900px and wider the app fills the viewport, and the left and right columns scroll independently, with contained overscroll and thin scrollbars. The panel's "Showing" bar stays pinned at the top of its column. Below 900px the page scrolls normally under the pinned bar, and the panel stays a bottom sheet. Underlined fields show focus by darkening their rule to 3px black, not with a box.

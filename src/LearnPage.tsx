@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Issue } from "./ask";
 
 const words = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"];
@@ -52,7 +53,7 @@ export function LearnPage({ issues, query, onQuery, onAsk }: {
           <input id="learn-lookup" type="search" value={query} onChange={(event) => onQuery(event.target.value)} placeholder="Look up a term, like manifest or lot" />
           <span className="lookup-count" aria-live="polite">{shownTerms.length} term{shownTerms.length === 1 ? "" : "s"}</span>
         </div>
-        {shownTerms.length ? <dl className="terms">{shownTerms.map(({ term, seen: n, text }) => <div key={term} className="term">
+        {shownTerms.length ? <dl className="terms">{shownTerms.map(({ term, seen: n, text }, index) => <div key={term} className="term" style={{ "--i": index } as CSSProperties}>
           <dt><span>{term}</span>{n > 0 && <span className="seen-tag">Seen today · {n}</span>}</dt>
           <dd>{text}</dd>
         </div>)}</dl> : <p className="ledger-empty">No terms match. Try asking Mellow on Today.</p>}
@@ -66,7 +67,7 @@ export function LearnPage({ issues, query, onQuery, onAsk }: {
           <span className="kicker">Note</span>
           <p className="mellow-voice">Effective dates and license scope aren’t verified yet. Confirm with the issuing authority before you rely on a rule.</p>
         </div>
-        <ul className="references">{shownRefs.map((item) => <li key={item.url}>
+        <ul className="references">{shownRefs.map((item, index) => <li key={item.url} style={{ "--i": index } as CSSProperties}>
           <a href={item.url} target="_blank" rel="noreferrer">
             <span className="ref-scope">{item.jurisdiction}</span>
             <span className="ref-body">
