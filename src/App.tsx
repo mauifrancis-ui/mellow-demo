@@ -1,6 +1,8 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { ReceivingMonitor } from "./ReceivingMonitor";
+import { AskMellow } from "./AskMellow";
+import type { AskAction, Series } from "./ask";
 import { monitorReceiving, sampleHistory } from "./monitoring";
 import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
@@ -10,6 +12,7 @@ import {
 } from "./workspace";
 
 const palettes = [
+  { id: "evergreen", label: "Evergreen" },
   { id: "field", label: "Forest field guide" },
   { id: "solar", label: "Solar olive" },
   { id: "indigo", label: "Indigo ember" },
@@ -20,9 +23,9 @@ const paletteKey = "mellow.preview.palette";
 
 function initialPalette(): Palette {
   try {
-    return palettes.find(({ id }) => id === localStorage.getItem(paletteKey))?.id ?? "field";
+    return palettes.find(({ id }) => id === localStorage.getItem(paletteKey))?.id ?? "evergreen";
   } catch {
-    return "field";
+    return "evergreen";
   }
 }
 
@@ -102,6 +105,8 @@ export default function App() {
     const now = new Date().toISOString();
     return monitorReceiving(undefined, sampleComparison, "current", now, sampleHistory(now));
   });
+  const [focusSeries, setFocusSeries] = useState<Series | null>(null);
+  const [compareRequest, setCompareRequest] = useState(0);
   const [activeId, setActiveId] = useState("");
   const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
@@ -286,6 +291,21 @@ export default function App() {
     try { localStorage.setItem(paletteKey, value); } catch { /* Keep the current choice in memory. */ }
   }
 
+  function toggleDelay() {
+    const time = new Date().toISOString();
+    setPosture((current) => monitorReceiving(current, sampleComparison, current.receiving === "current" ? "delayed" : "current", time));
+  }
+
+  function onAsk(action: AskAction) {
+    if (action.kind === "open") {
+      const task = [...queue, ...manager].find((item) => item.id === action.id);
+      if (task) openTask(task);
+    } else if (action.kind === "tab") setTab(action.tab);
+    else if (action.kind === "compare") setCompareRequest((count) => count + 1);
+    else if (action.kind === "series") setFocusSeries(action.series);
+    else toggleDelay();
+  }
+
   useLayoutEffect(() => {
     const node = nav.current;
     if (!node) return;
@@ -318,22 +338,24 @@ export default function App() {
         </div>
       </div></header>
       <main className="page" key={tab}>
-        <header className={tab === "Today" ? "shift-header" : "page-header"}>
-          <div className="shift-briefing">
-            <h1>{tab}</h1>
-            {tab !== "Today" && <p>{tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>}
-          </div>
-          {tab === "Today" && <ReceivingCheck onCompared={addComparison} onImport={importCsv} />}
-        </header>
+        {tab === "Today" ? <AskMellow
+          context={{ queue, manager, comparison: sampleComparison, runs: posture.runs, receiving: posture.receiving }}
+          onAction={onAsk}
+          aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
+          : <header className="page-header">
+            <div className="shift-briefing">
+              <p className="kicker">{tab === "Activity" ? "Decisions and handoffs" : "Field guide"}</p>
+              <h1>{tab}</h1>
+              <p>{tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>
+            </div>
+          </header>}
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="card-surface review-layout">
           <ReceivingMonitor posture={posture} record={monitorTask?.record}
           onReview={monitorTask && active?.id !== monitorTask.id ? () => openTask(monitorTask) : undefined}
-          onToggleDelay={() => {
-            const time = new Date().toISOString();
-            setPosture((current) => monitorReceiving(current, sampleComparison, current.receiving === "current" ? "delayed" : "current", time));
-          }} />
+          focusSeries={focusSeries} onFocusSeries={setFocusSeries}
+          onToggleDelay={toggleDelay} />
           <section className="primary" aria-labelledby="task-title">
             <div className="review-heading">
               <div key={active?.id} className="record-identity">

@@ -1,4 +1,4 @@
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { compareLots, lotRecords, type LotCheck } from "./comparison";
 
 type Comparison = { rows: LotCheck[]; inventoryFile: string; receivingFile: string };
@@ -7,11 +7,15 @@ function displayValue(value: string | null) {
   return value === null ? "No matching record" : value || "No lot number";
 }
 
-export function ReceivingCheck({ onCompared, onImport }: {
+export function ReceivingCheck({ onCompared, onImport, openRequest = 0 }: {
   onCompared: (rows: LotCheck[], inventoryFile: string, receivingFile: string) => boolean;
   onImport: (file: File) => Promise<void>;
+  openRequest?: number;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (openRequest && !dialog.current?.open) dialog.current?.showModal();
+  }, [openRequest]);
   const resultSummary = useRef<HTMLParagraphElement>(null);
   const [singleFile, setSingleFile] = useState(false);
   const [comparison, setComparison] = useState<Comparison>();

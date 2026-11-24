@@ -1,10 +1,13 @@
 import { MonitorChart } from "./MonitorChart";
 import type { ReceivingPosture } from "./monitoring";
+import type { Series } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-export function ReceivingMonitor({ posture, record, onReview, onToggleDelay }: {
+export function ReceivingMonitor({ posture, record, onReview, onToggleDelay, focusSeries = null, onFocusSeries }: {
   posture: ReceivingPosture;
+  focusSeries?: Series | null;
+  onFocusSeries?: (series: Series | null) => void;
   record?: string;
   onReview?: () => void;
   onToggleDelay: () => void;
@@ -24,7 +27,7 @@ export function ReceivingMonitor({ posture, record, onReview, onToggleDelay }: {
       </div>
       {!delayed && record && onReview && <button className="manual-evidence monitor-open" onClick={onReview}>Open {record}</button>}
     </div>
-    <MonitorChart runs={posture.runs} delayedAt={delayed ? posture.delayedAt : null} />
+    <MonitorChart runs={posture.runs} delayedAt={delayed ? posture.delayedAt : null} focus={focusSeries} onFocus={onFocusSeries} />
     <details className="monitor-details">
       <summary>
         <span>What I checked</span>

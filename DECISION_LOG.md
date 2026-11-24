@@ -132,3 +132,24 @@ browser render at 1440px and 375px covered the default, hover, keyboard,
 delayed, and restored states, with no console errors. Computed styles
 confirmed the 120, 180, and 200ms timings. Reduced motion ran no
 animations. Founder preview approval is pending before merge to `main`.
+
+## Version 1.28 Evergreen look and Ask Mellow · 2026-11-24
+
+The founder asked for a look and UX in the spirit of dutchie.com/business
+and for natural-language input. Adopted Evergreen as the default palette,
+with sans headings, 10px controls, a dark masthead, and signal yellow
+accents. The design language is borrowed, with no Dutchie brand assets or
+copy. Today now starts with Ask Mellow, an input and six quick actions
+answered by a deterministic local matcher over the sample workspace. Live AI
+stays disabled per decisions 002 and 004, and the interface says so.
+Answers can open a record, open the compare dialog, switch to Activity or
+Learn, focus a chart series, or simulate and restore a source delay. The
+chart gained a day total, a focus legend, an arrival stagger, a hover lift,
+and a latest marker. Verification: lint, type check, build, and 22 tests
+passed, 5 of them new matcher tests. A browser render at 1440px and 390px
+covered the quick actions, a package answer, a gaps answer with chart
+focus, and the compare dialog opening from an answer. Reduced motion ran no
+animations. Tab order runs from navigation to compare, input, Ask, and the
+quick actions. Open item: the matcher covers receiving vocabulary only, and
+unmatched phrasing gets an honest fallback. Founder preview approval is
+pending before merge to `main`.

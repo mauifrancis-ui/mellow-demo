@@ -184,3 +184,37 @@ and a newly completed check use change timing. A new check grows from the
 baseline. Checks already present on arrival render still. Every animation
 sits inside `prefers-reduced-motion: no-preference`, so reduced motion keeps
 the same end states with no timed movement.
+
+## Version 1.28 Evergreen look and Ask Mellow
+
+Founder direction: a look, feel, and UX in the spirit of dutchie.com/business,
+where people get what they need in their own words. This section supersedes
+the earlier rules on heading type, button shape, and default palette.
+
+**Look.** Evergreen is the default palette for new visitors. Saved palette
+preferences are kept. Deep forest #062F22 masthead and primary actions, warm
+cream #FBF7EE canvas, white cards with a warm #E6DFCF line, and signal
+yellow #FFC02A for the Ask action, the wordmark dot, the latest-check marker,
+and the active queue row. Headings use Google Sans at weight 600 with tight
+negative tracking. Georgia is retired. Controls use 10px corners and cards
+use 16px. Section labels are 12px uppercase kickers with wide tracking.
+Borrow the design language only. Never use Dutchie's name, logo, wordmark,
+font files, or copy.
+
+**Ask Mellow.** Today opens with a greeting, one input, and six quick action
+cards: What needs me, Today's recap, Gaps, Disagreements, Compare files, and
+Shift handoff. People type in their own words, such as "anything wrong with
+443?", "what's on my plate", or "I got a new manifest". `src/ask.ts` matches
+that language against the sample workspace and returns one answer card with
+a title, a plain sentence, any listed packages, and next actions. A package
+ID wins over a topic. An unknown ID says so and never invents a record.
+Answers that concern gaps, differences, or matches focus that series in the
+chart. No model is called. The note under the input says answers come from
+sample records and live AI is off. Live answers replace the matcher only
+after the activation steps in [Mellow Core](MELLOW_CORE.md) are approved.
+
+**Chart.** The head leads with the day's total packages compared and the
+flagged count. The legend is a row of toggle buttons that show each result's
+day total and focus that series. The columns rise in a 28ms stagger on
+arrival, lift 2px on hover, and mark the latest check with a yellow dot and
+a bold time.

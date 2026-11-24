@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from "react";
 import type { Run } from "./monitoring";
+import type { Series } from "./ask";
 
 const series = [
   { key: "matched", label: "Matched" },
@@ -7,8 +8,8 @@ const series = [
   { key: "missing", label: "Gap" },
 ] as const;
 
-const HEIGHT = 168;
-const PAD = { top: 20, right: 4, bottom: 24, left: 28 };
+const HEIGHT = 184;
+const PAD = { top: 20, right: 4, bottom: 30, left: 28 };
 const BAR = 24;
 const SPACER = 2;
 
@@ -39,7 +40,12 @@ function niceMax(value: number) {
   return Math.max(step, Math.ceil(value / step) * step);
 }
 
-export function MonitorChart({ runs, delayedAt }: { runs: Run[]; delayedAt: string | null }) {
+export function MonitorChart({ runs, delayedAt, focus = null, onFocus }: {
+  runs: Run[];
+  delayedAt: string | null;
+  focus?: Series | null;
+  onFocus?: (series: Series | null) => void;
+}) {
   const frame = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [active, setActive] = useState<number | null>(null);
@@ -69,6 +75,8 @@ export function MonitorChart({ runs, delayedAt }: { runs: Run[]; delayedAt: stri
   const ticks = Array.from({ length: max / step + 1 }, (_, index) => index * step);
   const labelEvery = band >= 56 ? 1 : 2;
   const latestRun = runs.length - 1;
+  const totals = Object.fromEntries(series.map(({ key }) => [key, runs.reduce((sum, run) => sum + run[key], 0)])) as Record<Series, number>;
+  const total = totals.matched + totals.different + totals.missing;
   const shown = active === null ? null : slots[active];
 
   function move(event: KeyboardEvent<HTMLDivElement>) {
@@ -88,20 +96,24 @@ export function MonitorChart({ runs, delayedAt }: { runs: Run[]; delayedAt: stri
 
   return <figure className="monitor-chart" aria-labelledby="monitor-chart-title">
     <figcaption className="chart-head">
-      <span id="monitor-chart-title" className="chart-title">Packages compared per check</span>
-      <span className="chart-scope">Sample data</span>
+      <span className="kicker" id="monitor-chart-title">Sample checks today</span>
+      <span className="chart-total"><strong>{total}</strong> packages compared</span>
+      <span className="chart-sub">{totals.different + totals.missing} flagged across {plural(runs.length, "check")}</span>
     </figcaption>
-    <ul className="chart-legend" aria-hidden="true">
-      {series.map(({ key, label }) => <li key={key}><span className="chart-swatch" data-series={key} />{label}</li>)}
-      {delayedAt && <li><span className="chart-swatch" data-series="delayed" />Delayed</li>}
-    </ul>
+    <div className="chart-legend" role="group" aria-label="Focus one result">
+      {series.map(({ key, label }) => <button key={key} type="button" aria-pressed={focus === key}
+        onClick={() => onFocus?.(focus === key ? null : key)}>
+        <span className="chart-swatch" data-series={key} aria-hidden="true" />{label}<b>{totals[key]}</b>
+      </button>)}
+      {delayedAt && <span className="chart-legend-note"><span className="chart-swatch" data-series="delayed" aria-hidden="true" />Delayed</span>}
+    </div>
     <div className="chart-frame" ref={frame} tabIndex={0} role="group"
       aria-label={`Sample receiving checks, ${slots.length} shown. Use the left and right arrow keys to read each check.`}
       data-keyboard={keyboard || undefined}
       onKeyDown={move} onFocus={() => setActive((current) => current ?? slots.length - 1)}
       onBlur={() => { setActive(null); setKeyboard(false); }}
       onPointerLeave={() => { if (!keyboard) setActive(null); }}>
-      {width > 0 && <svg width={width} height={HEIGHT} aria-hidden="true" data-active={active !== null || undefined}>
+      {width > 0 && <svg width={width} height={HEIGHT} aria-hidden="true" data-active={active !== null || undefined} data-focus={focus ?? undefined}>
         {ticks.map((tick) => <g key={tick} className="chart-tick">
           <line x1={PAD.left} x2={width - PAD.right} y1={y(tick)} y2={y(tick)} />
           <text x={PAD.left - 8} y={y(tick)} dy="0.35em" textAnchor="end">{tick}</text>
@@ -116,7 +128,7 @@ export function MonitorChart({ runs, delayedAt }: { runs: Run[]; delayedAt: stri
             data-fresh={slot.kind === "run" && !initial.has(slot.run.checkedAt) ? true : undefined}
             onPointerEnter={() => { setKeyboard(false); setActive(index); }}>
             <rect className="chart-hit" x={PAD.left + band * index} y={PAD.top - 12} width={band} height={plotH + 12} />
-            {slot.kind === "run" ? <g className="chart-column" style={{ transformOrigin: `${cx}px ${y(0)}px` }}>
+            {slot.kind === "run" ? <g className="chart-column" style={{ transformOrigin: `${cx}px ${y(0)}px`, "--i": initial.has(slot.run.checkedAt) ? index : 0 } as CSSProperties}>
               {(() => {
                 let base = 0;
                 const parts = series.map(({ key }) => ({ key, value: slot.run[key] })).filter((part) => part.value > 0);
@@ -137,7 +149,8 @@ export function MonitorChart({ runs, delayedAt }: { runs: Run[]; delayedAt: stri
               <text x={cx} y={y(max * 0.45) - 6} textAnchor="middle">Delayed</text>
             </g>}
             {slot.kind === "run" && index === latestRun && !delayedAt && <text className="chart-cap" x={cx} y={y(slot.run.checked) - 6} textAnchor="middle">{slot.run.checked}</text>}
-            {showLabel && <text className="chart-time" x={cx} y={HEIGHT - 6} textAnchor="middle">{clock(time).replace(/\s?[AP]M$/i, "")}</text>}
+            {slot.kind === "run" && index === latestRun && !delayedAt && <circle className="chart-latest" cx={cx} cy={HEIGHT - 2} r={3} />}
+            {showLabel && <text className="chart-time" x={cx} y={HEIGHT - 10} textAnchor="middle">{clock(time).replace(/\s?[AP]M$/i, "")}</text>}
           </g>;
         })}
         <line className="chart-baseline" x1={PAD.left} x2={width - PAD.right} y1={y(0)} y2={y(0)} />
