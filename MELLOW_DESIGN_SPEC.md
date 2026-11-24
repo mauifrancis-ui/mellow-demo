@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.17.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.18.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -351,3 +351,17 @@ alignment, and a single divider between rows. Show package and source values
 once per row, with Blank distinguished from No record. Avoid repeated prose,
 row selection, and action buttons inside this evidence table.
 [Material data table guidance](https://m2.material.io/components/data-tables)
+
+## Version 1.18 receiving outcome
+
+In ten seconds the operator should understand how many packages were flagged,
+why, and where to see the affected records. Lead with the flagged count and
+total. Name differences and missing information in plain text. When all lot
+numbers match, show the match result and remove the exception disclosure.
+A flagged count describes the comparison result and may include records that
+have already been reviewed.
+
+Keep this summary on the page surface beneath the review. The text and source
+table answer the current question. Use a proportional chart only when
+the proportion itself supports a decision, or a time series when historical
+comparison is available and is the question the operator needs to answer.
