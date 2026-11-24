@@ -172,3 +172,19 @@ an attachment answer opening the evidence form, and the grouped queue
 updating. There were no console errors, and reduced motion ran no
 animations. Open item: attachments are not stored or read until live AI and
 evidence storage are approved. Founder preview approval is pending.
+
+## Version 1.30 conversation, Activity and Learn · 2026-11-24
+
+The director reviewed the designer's findings and proposals on the canvas
+and approved building all three. Activity groups decisions by day. The Learn
+glossary is fixed, non-regulatory copy until the approved knowledge materials
+arrive. Answer items now carry structured IDs, issues and short details, and
+`followUps()` suggests the next questions. Tab changes clear status messages,
+which fixes the banner leak. Verification: lint, type check, build, and 26
+tests passed, 1 of them new for structured answers and follow-ups. A browser
+run at 1440px and 390px covered a two-turn conversation with earlier turns
+folded, opening a record from an answer row by click and by keyboard,
+leaving a record for a manager, marking one not an issue, the Activity
+ledger with evidence expanded, Learn lookup filtering, and a Learn chip
+answering on Today. There were no console errors and reduced motion ran no
+animations. Founder preview approval is pending.

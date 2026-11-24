@@ -1,5 +1,5 @@
 import { useRef, useState, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { ask, type AskAction, type AskAnswer, type AskContext, type Brief } from "./ask";
+import { ask, followUps, type AskAction, type AskAnswer, type AskContext, type Brief } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
@@ -31,10 +31,13 @@ function formatSize(bytes: number) {
   return bytes > 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;
 }
 
-export function Conversation({ context, chips, onAction }: {
+type Turn = { id: number; question: string; answer: AskAnswer };
+
+export function Conversation({ context, chips, onAction, initialQuestion }: {
   context: AskContext;
   chips: string[];
   onAction: (action: AskAction, answer: AskAnswer) => void;
+  initialQuestion?: string;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -42,7 +45,9 @@ export function Conversation({ context, chips, onAction }: {
   const cameraInput = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
-  const [thread, setThread] = useState<{ question: string; answer: AskAnswer; id: number } | null>(null);
+  const [turns, setTurns] = useState<Turn[]>(() => initialQuestion ? [{ id: 1, question: initialQuestion, answer: ask(initialQuestion, context) }] : []);
+  const [showEarlier, setShowEarlier] = useState(false);
+  const openable = new Set([...context.queue, ...context.manager].map(({ id }) => id));
 
   function submit(question: string) {
     const trimmed = question.trim();
@@ -54,7 +59,8 @@ export function Conversation({ context, chips, onAction }: {
       actions: [{ label: "Add evidence", action: { kind: "evidence" } }],
     } : ask(trimmed, context);
     const asked = trimmed || attachment?.name || "";
-    setThread((previous) => ({ question: asked, answer, id: (previous?.id ?? 0) + 1 }));
+    setTurns((previous) => [...previous, { id: (previous.at(-1)?.id ?? 0) + 1, question: asked, answer }].slice(-6));
+    setShowEarlier(false);
     setValue("");
     setAttachment(null);
     if (answer.series) onAction({ kind: "series", series: answer.series }, answer);
@@ -101,25 +107,57 @@ export function Conversation({ context, chips, onAction }: {
   }));
 
   return <section className="conversation" aria-label="Talk with Mellow">
-    <div className="ask-result" aria-live="polite">
-      {thread && <article className="answer" key={thread.id} aria-labelledby="answer-title">
-        <p className="answer-question"><span className="sr-only">You asked: </span>{thread.question}</p>
-        <h2 id="answer-title">{thread.answer.title}</h2>
-        <p className="mellow-voice">{thread.answer.body}</p>
-        {thread.answer.items && thread.answer.items.length > 0 && <ul className="answer-items">
-          {thread.answer.items.map((item) => <li key={item.label}><strong>{item.label}</strong><span>{item.detail}</span></li>)}
-        </ul>}
-        <div className="answer-actions">
-          {thread.answer.actions.map((item, index) => <button key={item.label} className="ledger-button" data-variant={index === 0 ? "ink" : "line"}
-            onClick={() => onAction(item.action, thread.answer)}>{item.label}</button>)}
-          <button className="ledger-button" data-variant="quiet" onClick={() => { setThread(null); input.current?.focus(); }}>Clear</button>
-        </div>
-      </article>}
-    </div>
+    {turns.length > 0 && <section className="conversation-log" aria-label="Conversation">
+      <div className="log-head">
+        <span className="kicker">Conversation</span>
+        <span className="log-tools">
+          {turns.length > 1 && <button type="button" className="text-link" aria-expanded={showEarlier} onClick={() => setShowEarlier((open) => !open)}>
+            {showEarlier ? "Hide earlier" : `Earlier · ${turns.length - 1} question${turns.length === 2 ? "" : "s"}`}
+          </button>}
+          <button type="button" className="text-link" onClick={() => { setTurns([]); input.current?.focus(); }}>Clear</button>
+        </span>
+      </div>
+      <ol className="log" aria-live="polite">
+        {(showEarlier ? turns : turns.slice(-1)).map((turn) => {
+          const latest = turn.id === turns.at(-1)?.id;
+          const rowIds = new Set(turn.answer.items?.map((item) => item.id).filter(Boolean));
+          const actions = turn.answer.actions.filter(({ action }) => !(action.kind === "open" && rowIds.has(action.id)));
+          return <li key={turn.id} className="turn-pair" data-latest={latest || undefined}>
+            <div className="turn"><span className="kicker">You</span><p className="turn-question">{turn.question}</p></div>
+            <div className="turn"><span className="kicker turn-mellow">Mellow</span>
+              <article className="answer" aria-label={turn.answer.title}>
+                <h3>{turn.answer.title}</h3>
+                <p className="mellow-voice">{turn.answer.body}</p>
+                {turn.answer.items && turn.answer.items.length > 0 && <ul className="answer-rows">
+                  {turn.answer.items.map((item) => {
+                    const body = <>
+                      <span className="queue-mark" aria-hidden="true" />
+                      <span className="queue-id">{item.label}</span>
+                      <span className="answer-row-text"><span>{item.title ?? item.detail}</span>{item.title && <small>{item.detail}</small>}</span>
+                    </>;
+                    return <li key={item.label}>{item.id && openable.has(item.id)
+                      ? <button type="button" className="answer-row" data-kind={item.kind} onClick={() => onAction({ kind: "open", id: item.id! }, turn.answer)}>{body}<span className="answer-open">Open<span aria-hidden="true"> →</span><span className="sr-only"> {item.label}</span></span></button>
+                      : <div className="answer-row" data-kind={item.kind}>{body}<span /></div>}</li>;
+                  })}
+                </ul>}
+                {actions.length > 0 && <div className="answer-actions">
+                  {actions.map((item, index) => <button key={item.label} className="ledger-button" data-variant={index === 0 ? "ink" : "line"}
+                    onClick={() => onAction(item.action, turn.answer)}>{item.label}</button>)}
+                </div>}
+                {latest && <div className="answer-next" role="group" aria-label="Suggested next questions">
+                  <span className="kicker">Next</span>
+                  {followUps(turn.answer, context).map((chip) => <button key={chip} type="button" className="chip" onClick={() => submit(chip)}>{chip}</button>)}
+                </div>}
+              </article>
+            </div>
+          </li>;
+        })}
+      </ol>
+    </section>}
 
-    <div className="reply-chips" role="group" aria-label="Suggested replies">
+    {turns.length === 0 && <div className="reply-chips" role="group" aria-label="Suggested replies">
       {chips.map((chip) => <button key={chip} type="button" className="chip" onClick={() => submit(chip)}>{chip}</button>)}
-    </div>
+    </div>}
 
     <form className="composer" onSubmit={onSubmit}>
       <label htmlFor="ask-input" className="sr-only">Reply to Mellow</label>

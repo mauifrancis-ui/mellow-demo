@@ -251,3 +251,36 @@ alone.
 200ms. Chart columns grow in a 28ms stagger on arrival. Hover and press take
 120ms. Send darkens to black and its arrow moves 3px. Queue rows show an ink
 rule on hover. Reduced motion removes all timed movement.
+
+## Version 1.30 conversation, Activity and Learn
+
+These come from the design review on the Mellow Brand Concepts canvas, which the
+director approved for build.
+
+**Conversation.** Questions and answers appear in their own CONVERSATION
+section, with space between it and the record. Each turn sits on the 72px
+margin: YOU in graphite and MELLOW in ink. An answer has a serif title, a line
+in Mellow's italic voice, and then a ruled list. Each row in the list has a
+mark, the package ID, the issue, a mono detail line, and Open. Each answer
+offers its own Next chips from `followUps()`, and the briefing chips are hidden
+while a conversation is open. The log keeps the last six turns and folds the
+older ones behind "Earlier". Clear empties the log.
+
+**Activity.** The page opens with a headline built from the day's decisions and
+a note from Mellow. Below that are filter chips with counts, then one ruled
+ledger grouped by day. Each row shows the time, a mark, the package, the
+decision, the evidence and an action. The evidence expands inline. Reopen and
+Open follow the existing decision rules. The right column shows the day in
+numbers and the shift handoff, with a copy action.
+
+**Learn.** The headline is "The words behind today's checks." Mellow's note
+names the terms that came up in the queue. An underline lookup field filters
+both the glossary and the references. The glossary has eight terms with plain
+definitions and makes no regulatory claims. A SEEN TODAY tag marks the terms
+behind open records. References list their jurisdiction, issuing authority and
+a NOT YET VERIFIED status, with the verification caveat as a margin note above
+them. The ask-about-a-term chips open Today with that question already
+answered.
+
+**Status messages** clear when you change tabs, so a message from Today no
+longer shows on Activity or Learn.

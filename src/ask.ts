@@ -34,7 +34,7 @@ export type AskAnswer = {
     | "handoff" | "source" | "summary" | "learn" | "fallback";
   title: string;
   body: string;
-  items?: { label: string; detail: string }[];
+  items?: { label: string; detail: string; id?: string; title?: string; kind?: Issue["kind"] }[];
   actions: { label: string; action: AskAction }[];
   series?: Series;
 };
@@ -60,6 +60,15 @@ function lotText(value: string | null) {
 
 function describe(row: LotCheck) {
   return `Inventory has ${lotText(row.inventory)}. Receiving has ${lotText(row.receiving)}.`;
+}
+
+function short(value: string | null) {
+  return value === null ? "none" : value || "no lot";
+}
+
+export function compact(task: QueueItem, comparison: LotCheck[]) {
+  const row = task.lotComparison ?? comparison.find(({ packageId }) => packageId === task.id);
+  return row ? `inventory: ${short(row.inventory)} · receiving: ${short(row.receiving)}` : task.observation ?? "";
 }
 
 export function normalize(input: string) {
@@ -201,7 +210,7 @@ export function ask(input: string, context: AskContext): AskAnswer {
       intent: "handoff",
       title: context.manager.length ? `${plural(context.manager.length, "record")} waiting on a manager` : "Nothing is waiting on a manager",
       body: context.manager.length ? "These stay visible for the next shift until someone decides." : "When you leave a record for a manager, it shows up in Activity for the next shift.",
-      items: context.manager.map((task) => ({ label: task.record, detail: "Manager review requested" })),
+      items: context.manager.map((task) => ({ label: task.record, id: task.id, title: "Left for a manager", detail: compact(task, context.comparison) })),
       actions: [{ label: "Open shift handoff", action: { kind: "tab", tab: "Activity" } }],
     };
   }
@@ -211,7 +220,9 @@ export function ask(input: string, context: AskContext): AskAnswer {
       intent: "gaps",
       title: missing.length ? `${plural(missing.length, "package")} with a gap` : "No gaps in the latest check",
       body: "A gap means a lot number or a matching record is missing from one of the sources.",
-      items: missing.map((row) => ({ label: row.packageId, detail: describe(row) })),
+      items: missing.map((row) => ({ label: row.packageId, id: row.packageId, kind: "missing" as const,
+        title: issueOf({ id: row.packageId, record: row.packageId }, context.comparison).label,
+        detail: `inventory: ${short(row.inventory)} · receiving: ${short(row.receiving)}` })),
       actions: missing.filter((row) => context.queue.some((task) => task.id === row.packageId))
         .map((row) => ({ label: `Open ${row.packageId}`, action: { kind: "open" as const, id: row.packageId } })),
       series: "missing",
@@ -223,7 +234,8 @@ export function ask(input: string, context: AskContext): AskAnswer {
       intent: "differences",
       title: different.length ? `${plural(different.length, "package")} where the sources disagree` : "No disagreements in the latest check",
       body: different.length ? "Check the original package label. A person verifies the physical package." : "Every compared lot number matched or is listed as a gap.",
-      items: different.map((row) => ({ label: row.packageId, detail: describe(row) })),
+      items: different.map((row) => ({ label: row.packageId, id: row.packageId, kind: "different" as const, title: "Records disagree",
+        detail: `inventory: ${short(row.inventory)} · receiving: ${short(row.receiving)}` })),
       actions: different.filter((row) => context.queue.some((task) => task.id === row.packageId))
         .map((row) => ({ label: `Open ${row.packageId}`, action: { kind: "open" as const, id: row.packageId } })),
       series: "different",
@@ -234,9 +246,9 @@ export function ask(input: string, context: AskContext): AskAnswer {
     const ordered = orderQueue(context.queue, context.comparison);
     return {
       intent: "list",
-      title: `${plural(ordered.length, "package")} to check`,
+      title: `${count(ordered.length)} package${ordered.length === 1 ? "" : "s"} to check`,
       body: "Disagreements come first, then missing details.",
-      items: ordered.map(({ task, issue }) => ({ label: task.record, detail: `${issue.label}. ${issue.detail}` })),
+      items: ordered.map(({ task, issue }) => ({ label: task.record, id: task.id, kind: issue.kind, title: issue.label, detail: compact(task, context.comparison) })),
       actions: [{ label: `Open ${ordered[0].task.record}`, action: { kind: "open", id: ordered[0].task.id } }],
     };
   }
@@ -290,4 +302,28 @@ export function ask(input: string, context: AskContext): AskAnswer {
     body: "Ask me about a package ID, today’s gaps or differences, comparing files, or the shift handoff.",
     actions: [],
   };
+}
+
+// Follow-up suggestions that belong to an answer, so the conversation keeps moving.
+export function followUps(answer: AskAnswer, context: AskContext): string[] {
+  const ordered = orderQueue(context.queue, context.comparison);
+  const first = ordered[0]?.task.record;
+  const all = ordered.length > 1 ? [`Walk me through all ${count(ordered.length).toLowerCase()}`] : [];
+  const byIntent: Record<AskAnswer["intent"], string[]> = {
+    package: ["What do I check on the label?", ...all],
+    "unknown-package": ["What needs me right now?"],
+    next: ["What do I check on the label?", ...all],
+    list: [...(first ? [`Why does ${first} go first?`] : []), "What do I check on the label?"],
+    label: [...all, "What matched?"],
+    gaps: ["What counts as a gap?", "Which ones don’t match?"],
+    differences: ["What do I check on the label?", "Show me today’s gaps"],
+    matched: ["How did receiving go today?", ...all],
+    compare: ["What needs me right now?"],
+    handoff: [...all, "How did receiving go today?"],
+    source: ["What needs me right now?"],
+    summary: ["Show me today’s gaps", "What matched?"],
+    learn: ["What counts as a gap?", ...all],
+    fallback: ["What needs me right now?", "How did receiving go today?"],
+  };
+  return byIntent[answer.intent].filter((chip) => normalize(chip) !== "").slice(0, 3);
 }

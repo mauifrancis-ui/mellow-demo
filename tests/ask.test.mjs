@@ -93,3 +93,17 @@ test("label and walk-through chips answer from the queue", () => {
   assert.deepEqual(list.items.map((item) => item.label), ["PKG-443", "PKG-221", "PKG-552"]);
   assert.equal(intent("show all the gaps"), "gaps");
 });
+
+test("answers carry structured rows and their own follow-ups", async () => {
+  const { followUps } = await import("../src/ask.ts");
+  const list = ask("Walk me through all three", context);
+  assert.deepEqual(list.items[0], { label: "PKG-443", id: "PKG-443", kind: "different", title: "Records disagree", detail: "inventory: no lot · receiving: SAMPLE-6" });
+  assert.equal(list.items[2].detail, "inventory: no lot · receiving: none");
+  const gaps = ask("gaps", context);
+  assert.deepEqual(gaps.items.map((item) => item.title), ["No lot in either record", "No receiving record"]);
+  for (const input of ["Walk me through all three", "gaps", "what matched", "PKG-443", "nonsense words"]) {
+    const next = followUps(ask(input, context), context);
+    assert.ok(next.length > 0, input);
+    for (const chip of next) assert.notEqual(ask(chip, context).intent, "fallback", `${input} → ${chip}`);
+  }
+});

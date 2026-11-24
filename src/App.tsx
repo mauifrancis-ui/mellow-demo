@@ -2,6 +2,8 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { ReceivingMonitor } from "./ReceivingMonitor";
 import { Briefing, Conversation } from "./AskMellow";
+import { ActivityPage } from "./ActivityPage";
+import { LearnPage } from "./LearnPage";
 import { brief, issueOf, orderQueue, type AskAction, type Series } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -16,11 +18,6 @@ import {
 
 const tabs = ["Today", "Activity", "Learn"] as const;
 type Tab = typeof tabs[number];
-const references = [
-  { title: "USDA Hemp Program", jurisdiction: "Federal", url: "https://www.ams.usda.gov/rules-regulations/hemp" },
-  { title: "Texas DSHS Consumable Hemp Program", jurisdiction: "Texas", url: "https://www.dshs.texas.gov/consumable-hemp-program" },
-  { title: "Texas State Law Library Hemp Products Guide", jurisdiction: "Texas", url: "https://guides.sll.texas.gov/cannabis/hemp-products" },
-];
 
 function DecisionNote({ note, onChange }: { note: string; onChange: (note: string) => void }) {
   const [open, setOpen] = useState(Boolean(note));
@@ -91,6 +88,7 @@ export default function App() {
   });
   const [focusSeries, setFocusSeries] = useState<Series | null>(null);
   const [compareRequest, setCompareRequest] = useState(0);
+  const [askRequest, setAskRequest] = useState<string | null>(null);
   const [activeId, setActiveId] = useState("");
   const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
@@ -239,10 +237,17 @@ export default function App() {
     requestAnimationFrame(() => evidenceInput.current?.focus());
   }
 
+  function goTo(next: Tab, question?: string) {
+    setTab(next);
+    setStatus("");
+    setError("");
+    setAskRequest(question ?? null);
+  }
+
   function openTask(task: Task) {
     setActiveId(task.id);
     setEditRecordId("");
-    setTab("Today");
+    goTo("Today");
     focusRecord();
   }
 
@@ -277,7 +282,7 @@ export default function App() {
     if (action.kind === "open") {
       const task = [...queue, ...manager].find((item) => item.id === action.id);
       if (task) openTask(task);
-    } else if (action.kind === "tab") setTab(action.tab);
+    } else if (action.kind === "tab") goTo(action.tab);
     else if (action.kind === "compare") setCompareRequest((count) => count + 1);
     else if (action.kind === "series") setFocusSeries(action.series);
     else if (action.kind === "evidence") openEvidence();
@@ -303,19 +308,11 @@ export default function App() {
         <div className="wordmark">mellow<span aria-hidden="true">.</span></div>
         <nav aria-label="Main navigation" ref={nav} data-pill={pill ? "" : undefined}>
           {pill && <span className="nav-pill" aria-hidden="true" style={{ width: pill.width, transform: `translate(${pill.x}px, ${pill.y + pill.height - 2}px)` }} />}
-          {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item}</button>)}
+          {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => goTo(item)}>{item}</button>)}
         </nav>
         <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · Sample workspace</p>
       </div></header>
       <main className="page" key={tab}>
-        {tab === "Today" ? null
-          : <header className="page-header">
-            <div className="shift-briefing">
-              <p className="kicker">{tab === "Activity" ? "Decisions and handoffs" : "Field guide"}</p>
-              <h1>{tab}</h1>
-              <p>{tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>
-            </div>
-          </header>}
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="ledger">
@@ -379,12 +376,12 @@ export default function App() {
                   </div>
                 </> : <div className="completion">
                   <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>
-                  <button className="manual-evidence" onClick={() => setTab("Activity")}>{manager.length ? "Open shift handoff" : "See what was checked"}</button>
+                  <button className="manual-evidence" onClick={() => goTo("Activity")}>{manager.length ? "Open shift handoff" : "See what was checked"}</button>
                 </div>}
                 <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
               </div>
             </section>
-            <Conversation context={askContext} chips={briefing.chips} onAction={onAsk} />
+            <Conversation context={askContext} chips={briefing.chips} onAction={onAsk} initialQuestion={askRequest ?? undefined} />
           </div>
           <aside className="ledger-side" aria-label="Today at a glance">
             <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />
@@ -402,56 +399,15 @@ export default function App() {
               {doneToday.length > 0 && <p className="done-line">
                 <span className="kicker">Done today · {doneToday.length}</span>
                 <span>{doneToday.map(({ id, decision }) => `${id} ${decision === "Approved" ? "recorded" : "not an issue"}`).join(", ")}</span>
-                <button className="text-link" onClick={() => setTab("Activity")}>Activity</button>
+                <button className="text-link" onClick={() => goTo("Activity")}>Activity</button>
               </p>}
             </section>
           </aside>
         </div>}
-        {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">
-          <div className="handoff-header">
-            <div><h2 id="handoff-title">Shift handoff</h2><p>Give the next person the record, the gap, and the source.</p></div>
-            {handoff.length > 0 && <button className="manual-evidence" onClick={() => void copyHandoff()}>Copy handoff</button>}
-          </div>
-          <p className="handoff-status" role="status">{handoffStatus}</p>
-          {handoff.length ? <ul>{handoff.map(({ task, summary, text }) => <li className="handoff-record" key={task.id}>
-            <strong>{task.record}</strong><p>{summary}</p>
-            <details><summary>View handoff text</summary><pre>{text}</pre></details>
-            <button className="manual-evidence" onClick={() => openTask(task)}>Open {task.record}</button>
-          </li>)}</ul> : <p className="empty">Nothing waiting for a manager.</p>}
-        </section>}
-        {tab === "Activity" && <section className="panel"><h2>Decision history</h2>
-          {workspace.history.length ? <ul>{workspace.history.map((entry) => (
-            <li className="activity-row" key={entry.id}>
-              <div><strong>{entry.task.record} · {entry.decision === "Approved" ? "Issue confirmed" : entry.decision === "Manager review requested" ? "Needs a manager" : entry.decision === "Dismissed" ? "Not an issue" : entry.decision}</strong><small><time dateTime={entry.at}>{new Date(entry.at).toLocaleString()}</time> · {entry.task.source}</small>
-                {(entry.evidence.reference || entry.comparedSource) && <details>
-                  <summary>Evidence reviewed</summary>
-                  {entry.comparedSource && entry.comparedSource.reference !== entry.evidence.reference &&
-                    <><p>{entry.comparedSource.reference}</p><p>{entry.comparedSource.excerpt}</p></>}
-                  {entry.evidence.reference && <><p>{entry.evidence.reference}</p><p>{entry.evidence.excerpt}</p></>}
-                  {entry.evidence.note && <p>{entry.evidence.note}</p>}
-                </details>}
-              </div>
-              {latest.get(entry.task.id) === entry.decision && workspace.history.find((item) => item.task.id === entry.task.id)?.id === entry.id &&
-                (entry.decision === "Approved" || entry.decision === "Dismissed") &&
-                <button onClick={() => { decide(entry.task, "Reopened"); }}>Reopen <span className="sr-only">{entry.task.record}</span></button>}
-            </li>
-          ))}</ul> : <p className="empty">No decisions recorded yet.</p>}
-        </section>}
-        {tab === "Learn" && <section className="panel field-guide" aria-labelledby="guide-title">
-          <h2 id="guide-title">From receiving to the shelf</h2>
-          <div className="guide-grid">
-            <article><h3>Lot or batch number</h3><p>The identifier that helps you trace a product to the group it came from. Compare what’s on the label with what’s in your records.</p></article>
-            <article><h3>Receiving log</h3><p>The record of what showed up and what staff saw when it arrived. It gives the next person a place to start when inventory looks wrong.</p></article>
-            <article><h3>Shift handoff</h3><p>Leave the package ID, what disagrees, and where to check next. Keep the original source with the note.</p></article>
-          </div>
-        </section>}
-        {tab === "Learn" && <section className="panel learn">
-          <p>Effective dates and license applicability have yet to be verified. Use the issuing authority’s current materials to confirm what applies.</p>
-          <label>Search references<input type="search" className="search" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
-          <ul>{references.filter((item) => `${item.title} ${item.jurisdiction}`.toLowerCase().includes(query.trim().toLowerCase())).map((item) => (
-            <li key={item.url}><a className="queue-row" href={item.url}><span><strong>{item.title}</strong><small>{item.jurisdiction} · Reference</small></span><span className="chevron" aria-hidden="true">›</span></a></li>
-          ))}</ul>
-        </section>}
+        {tab === "Activity" && <ActivityPage history={workspace.history} latest={latest} handoff={handoff} open={queue.length}
+          flaggedToday={posture.runs.reduce((sum, run) => sum + run.exceptions, 0)} handoffStatus={handoffStatus}
+          onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} />}
+        {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)} />}
       </main>
     </div>
   );
