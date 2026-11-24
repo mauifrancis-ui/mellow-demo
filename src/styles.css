@@ -157,3 +157,41 @@ small { display: block; margin-top: 4px; font-size: 14px; }
     to { opacity: 1; transform: translateY(0); }
   }
 }
+
+/* Preview palette roles */
+.shell[data-palette="solar"] {
+  --canvas: #fff9e7; --surface: #fffdf7; --ink: #252c16; --muted: #555c43; --deep: #354519;
+  --accent: #485d1e; --focus: #516820; --selected: #f5eb9f; --line: #ddd7b9;
+  --mast: #526e25; --mast-hover: #40571b; --signature: #ffc538;
+  --observation: #f8efb6; --observation-edge: #7a9b24; --subtle-surface: #fbf8ed;
+}
+.shell[data-palette="indigo"] {
+  --canvas: #f5f1fa; --surface: #fffdff; --ink: #26213b; --muted: #574f67; --deep: #191351;
+  --accent: #3931a2; --focus: #463ab7; --selected: #ebe7ff; --line: #dbd3e8;
+  --mast: #191351; --mast-hover: #353081; --signature: #ffc859;
+  --observation: #eeeaff; --observation-edge: #ff6748; --subtle-surface: #f8f5fc;
+}
+.shell[data-palette="ochre"] {
+  --canvas: #faefd8; --surface: #fffbef; --ink: #302a26; --muted: #5f5347; --deep: #47413e;
+  --accent: #4e4a2d; --focus: #605a34; --selected: #f6daa1; --line: #e0d2b6;
+  --mast: #47413e; --mast-hover: #5b534c; --signature: #f3c568;
+  --observation: #f1efdc; --observation-edge: #aaa775; --subtle-surface: #faf3e5;
+}
+.shell[data-palette] { color: var(--ink); background: var(--canvas); }
+.shell[data-palette] .masthead { background: var(--mast); border-color: var(--mast); }
+.shell[data-palette] .wordmark span { color: var(--signature); }
+.shell[data-palette] .masthead nav button:hover { background: var(--mast-hover); }
+.shell[data-palette] .masthead nav button[aria-current] { background: var(--selected); color: var(--deep); }
+.shell[data-palette] .record-insight { background: var(--observation); border-inline-start-color: var(--observation-edge); }
+.shell[data-palette] :is(.evidence-fields, .decision-footer) { background: var(--subtle-surface); }
+.shell[data-palette] .queue-row[aria-current] { background: var(--selected); }
+@media (hover: hover) {
+  .shell[data-palette] :is(.queue-row, .queue-link, .next-record, .upload, .actions button:enabled:not(.solid), .activity-row button):hover { background: var(--selected); }
+  .shell[data-palette] .actions .solid:enabled:hover { background: var(--deep); }
+}
+.preview-settings { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; margin-inline-start: auto; }
+.palette-picker { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; }
+.palette-picker select {
+  color: #fffdf7; background: var(--mast); border: 1px solid #ffffff9c; border-radius: var(--pill);
+  min-height: 44px; padding: 8px 12px; font: inherit;
+}

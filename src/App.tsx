@@ -5,6 +5,22 @@ import {
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
+const palettes = [
+  { id: "solar", label: "Solar olive" },
+  { id: "indigo", label: "Indigo ember" },
+  { id: "ochre", label: "Ochre clay" },
+] as const;
+type Palette = typeof palettes[number]["id"];
+const paletteKey = "mellow.preview.palette";
+
+function initialPalette(): Palette {
+  try {
+    return palettes.find(({ id }) => id === localStorage.getItem(paletteKey))?.id ?? "indigo";
+  } catch {
+    return "indigo";
+  }
+}
+
 const tabs = ["Today", "Activity", "Learn"] as const;
 type Tab = typeof tabs[number];
 const references = [
@@ -35,6 +51,7 @@ function RecordContext({ task, pending }: { task: Task; pending: boolean }) {
 }
 
 export default function App() {
+  const [palette, setPalette] = useState(initialPalette);
   const [tab, setTab] = useState<Tab>("Today");
   const [workspace, setWorkspace] = useState(() => {
     try { return readWorkspace(); } catch { return initial; }
@@ -161,14 +178,27 @@ export default function App() {
     {manager.length ? <ul>{taskRows(manager)}</ul> : <p className="empty">No manager reviews pending.</p>}
   </section>;
 
+  function changePalette(value: Palette) {
+    setPalette(value);
+    try { localStorage.setItem(paletteKey, value); } catch { /* Keep the current choice in memory. */ }
+  }
+
   return (
-    <div className="shell">
+    <div className="shell" data-palette={palette}>
       <header className="masthead"><div className="masthead-inner">
         <div className="wordmark">mellow<span aria-hidden="true">.</span></div>
         <nav aria-label="Main navigation">
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item}</button>)}
         </nav>
-        <p className="local-label">Sample workspace</p>
+        <div className="preview-settings">
+          <span className="local-label">Sample workspace</span>
+          <label className="palette-picker">
+            <span>Palette</span>
+            <select value={palette} onChange={(event) => changePalette(event.target.value as Palette)}>
+              {palettes.map(({ id, label }) => <option value={id} key={id}>{label}</option>)}
+            </select>
+          </label>
+        </div>
       </div></header>
       <main className="page">
         <header className="page-header">

@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.3.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.4.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -121,3 +121,18 @@ reduced motion.
 Response states belong to the record that requested them. A late response for an
 earlier record must never replace the active record or its draft. See
 [Mellow Core](MELLOW_CORE.md) for server and knowledge requirements.
+
+## Palette studies
+
+Use the preview's Palette selector to compare the same record and queue in
+three treatments. The choice persists in that browser.
+
+- **Solar olive** uses a marigold signature, pale lemon observation surface,
+  and darker olive controls.
+- **Indigo ember** uses deep violet navigation, indigo controls, a coral
+  observation edge, and a marigold signature. This is the preview default.
+- **Ochre clay** uses cream paper, clay navigation, muted olive observation
+  cues, and ochre selection.
+
+Use the brighter colors for accents and grouping. Pending review and errors
+retain explicit labels across themes.

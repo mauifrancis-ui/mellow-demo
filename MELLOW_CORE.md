@@ -51,3 +51,24 @@ server, identity, and storage setup. Use approved fixtures to test attribution,
 unsupported claims, source mismatches, and the quality of the proposed next step
 before expanding to other record types. Keep the provider credential in
 server-only environment settings.
+
+## Metrc pilot
+
+OpenMetrc provides a .NET wrapper and a community-maintained OpenAPI
+specification. The Node sandbox probe uses the V2 facilities contract from
+[OpenMetrc](https://github.com/OcelliSolutions/OpenMetrc/blob/505e2ba60b3de65538939c240c271676f1ed51fd/open-metrc-swagger-v2.yaml).
+Confirm support with the jurisdiction's official Metrc documentation before
+activation.
+
+To validate a licensed sandbox, supply `METRC_SANDBOX_HOST`,
+`METRC_VENDOR_KEY`, `METRC_USER_KEY`, and `METRC_FACILITY_LICENSE` in an
+authorized server or operator environment. Run `npm run metrc:check`. The probe
+makes one read-only facilities request and reports whether the configured
+license is visible. It has no browser route. Fixture tests verify the protocol,
+host restriction, and common failure responses.
+
+The first application pilot should map one tenant to one approved facility and
+retrieve only permitted package evidence. Add authenticated tenant and facility
+authorization, state-specific endpoint validation, pagination and rate limits,
+and provenance before exposing records to the app. Keep output fields scoped
+to the review. The probe provides no package synchronization or Metrc writes.
