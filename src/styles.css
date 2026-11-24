@@ -403,3 +403,14 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 .lot-differences li { border-top: 1px solid var(--line); }
 .lot-uploads { display: flex; flex-wrap: wrap; gap: 12px; align-items: start; padding-block: 8px; }
 .lot-uploads input { max-width: 100%; }
+
+.shift-briefing { min-width: 0; }
+.shift-header .shift-briefing h1 { max-width: 21ch; font-size: clamp(32px, 5vw, 54px); }
+.shift-header .briefing-source { color: var(--accent); font-size: 14px; font-weight: 700; margin: 0 0 8px; }
+.briefing-actions:not(:empty) { margin-block-start: 12px; }
+.lot-differences { width: 100%; table-layout: fixed; border-collapse: collapse; color: var(--ink); text-align: left; }
+.lot-differences :is(th, td) { padding: 12px 8px; text-align: left; vertical-align: middle; overflow-wrap: anywhere; }
+.lot-differences tr > :first-child { padding-inline-start: 0; }
+.lot-differences thead { color: var(--muted); font-size: 14px; }
+.lot-differences tbody { border-top: 1px solid var(--line); }
+.lot-differences .lot-next-check td { padding-block-start: 0; color: var(--muted); font-size: 14px; }

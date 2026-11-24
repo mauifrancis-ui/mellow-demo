@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { compareLots, lotRecords, sampleComparison } from "../src/comparison.ts";
+import { compareLots, lotInsight, lotRecords, sampleComparison } from "../src/comparison.ts";
 
 test("read-only comparison distinguishes matched, different, blank, and unpaired rows", () => {
   const inventory = lotRecords("package_id,lot_number\nA,101\nB,\nC,\nD,400");
@@ -20,4 +20,12 @@ test("duplicate IDs and unsupported CSV columns fail instead of silently matchin
   assert.throws(() => lotRecords("package_id,lot_number\nA,1\nA,2"), /one row per package/);
   assert.throws(() => lotRecords("sku,lot_number\nA,1"), /package_id and lot_number/);
   assert.equal(sampleComparison.filter(({ state }) => state === "different").length, 1);
+});
+
+test("briefing identifies which record is missing or disagrees", () => {
+  const mismatch = sampleComparison.find(({ packageId }) => packageId === "PKG-443");
+  assert.match(lotInsight(mismatch).detail, /Inventory has no lot number, but receiving does/);
+  assert.match(lotInsight(mismatch).detail, /original package label/);
+  assert.match(lotInsight(sampleComparison.find(({ packageId }) => packageId === "PKG-552")).title, /Find the receiving record/);
+  assert.match(lotInsight(sampleComparison.find(({ packageId }) => packageId === "PKG-221")).detail, /Neither record lists a lot number/);
 });

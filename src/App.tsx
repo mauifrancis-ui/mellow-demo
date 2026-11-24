@@ -1,5 +1,6 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
+import { lotInsight, sampleComparison, type LotCheck } from "./comparison";
 
 import {
   emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, workQueue,
@@ -96,6 +97,8 @@ export default function App() {
   const [error, setError] = useState("");
   const [handoffStatus, setHandoffStatus] = useState("");
   const [query, setQuery] = useState("");
+  const [comparison, setComparison] = useState<LotCheck[]>();
+  const [showDifferences, setShowDifferences] = useState(false);
   const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
   const evidenceInput = useRef<HTMLInputElement>(null);
@@ -105,7 +108,20 @@ export default function App() {
   const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
   const reviewedCount = workspace.tasks.length - queue.length - manager.length;
-  const sampleMismatch = [...queue, ...manager].find(({ id, sample }) => sample && id === "PKG-443");
+  const sampleOpen = sampleComparison.filter((row) => row.state !== "match"
+    && queue.some((task) => task.sample && task.id === row.packageId));
+  const openComparisons = comparison?.filter((row) => row.state !== "match") ?? sampleOpen;
+  const priority = openComparisons.find((row) => row.state === "different") ?? openComparisons[0];
+  const priorityTask = !comparison && (priority
+    ? queue.find((task) => task.sample && task.id === priority.packageId)
+    : queue[0]);
+  const briefing = priority ? lotInsight(priority) : comparison
+    ? { title: "All compared lot numbers match", detail: "No label check is needed for these two files." }
+    : priorityTask
+      ? { title: `Review ${priorityTask.record}`, detail: priorityTask.observation }
+      : manager.length
+        ? { title: "Manager follow-up is ready", detail: "Open the handoff for the package, sources, and next check." }
+        : { title: "You’re caught up", detail: "Your decisions and sources are saved in Activity." };
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
@@ -218,6 +234,12 @@ export default function App() {
     }
   }
 
+  function openComparison(row: LotCheck) {
+    setShowDifferences(true);
+    const index = openComparisons.indexOf(row);
+    requestAnimationFrame(() => document.getElementById(`lot-check-${index}`)?.focus());
+  }
+
   function openEvidence() {
     if (!active) return;
     setEditRecordId(active.id);
@@ -281,7 +303,16 @@ export default function App() {
       </div></header>
       <main className="page" key={tab}>
         <header className={tab === "Today" ? "shift-header" : "page-header"}>
-          <div><h1>{tab === "Today" ? "Your shift, in focus." : tab}</h1><p>{tab === "Today" ? "See where your records disagree and leave the next shift a clear handoff." : tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p></div>
+          <div className="shift-briefing">
+            {tab === "Today" && <p className="briefing-source">{comparison ? "Your CSV comparison" : priority ? "Sample shift insight" : "Shift insight"}</p>}
+            <h1>{tab === "Today" ? briefing.title : tab}</h1>
+            <p>{tab === "Today" ? briefing.detail : tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>
+            {tab === "Today" && <div className="actions briefing-actions">
+              {comparison && priority ? <button className="solid" onClick={() => openComparison(priority)}>See source records</button>
+                : priorityTask ? <button className="solid" onClick={() => openTask(priorityTask)}>Review {priorityTask.record}</button>
+                  : !comparison && manager.length > 0 && <button className="solid" onClick={() => setTab("Activity")}>Open shift handoff</button>}
+            </div>}
+          </div>
           {tab === "Today" && <>
             <dl className="shift-counts">
               <div><dt>To check</dt><dd>{queue.length}</dd></div>
@@ -290,7 +321,7 @@ export default function App() {
             </dl>
           </>}
         </header>
-        {tab === "Today" && <ReceivingCheck openSample={sampleMismatch ? () => openTask(sampleMismatch) : undefined} />}
+        {tab === "Today" && <ReceivingCheck result={comparison} onResult={setComparison} showDifferences={showDifferences} onShowDifferences={setShowDifferences} />}
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="review-layout">

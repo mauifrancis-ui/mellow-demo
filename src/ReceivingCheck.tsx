@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { compareLots, lotRecords, sampleComparison, type LotCheck } from "./comparison";
+import { compareLots, lotInsight, lotRecords, sampleComparison, type LotCheck } from "./comparison";
 
 const categories = [
   { id: "match", label: "Match" },
@@ -7,8 +7,12 @@ const categories = [
   { id: "missing", label: "Missing information" },
 ] as const;
 
-export function ReceivingCheck({ openSample }: { openSample?: () => void }) {
-  const [result, setResult] = useState<LotCheck[]>();
+export function ReceivingCheck({ result, onResult, showDifferences, onShowDifferences }: {
+  result?: LotCheck[];
+  onResult: (rows?: LotCheck[]) => void;
+  showDifferences: boolean;
+  onShowDifferences: (open: boolean) => void;
+}) {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const rows = result ?? sampleComparison;
@@ -29,9 +33,9 @@ export function ReceivingCheck({ openSample }: { openSample?: () => void }) {
     try {
       if (inventory.size > 500_000 || receiving.size > 500_000) throw new Error("Choose CSV files of 500 KB or less.");
       const [left, right] = await Promise.all([inventory.text(), receiving.text()]);
-      setResult(compareLots(lotRecords(left), lotRecords(right)));
+      onResult(compareLots(lotRecords(left), lotRecords(right)));
     } catch (failure) {
-      setResult(undefined);
+      onResult(undefined);
       setError(failure instanceof Error ? failure.message : "Couldn’t read the files.");
     } finally {
       setBusy(false);
@@ -44,7 +48,6 @@ export function ReceivingCheck({ openSample }: { openSample?: () => void }) {
         <h2 id="receiving-title">Receiving check</h2>
         <p>{result ? "Your two CSV files" : "Simulated inventory and receiving records"} · {rows.length} packages</p>
       </div>
-      {!result && openSample && <button className="manual-evidence" onClick={openSample}>Review label mismatch</button>}
     </header>
     <div className="comparison-meter" aria-hidden="true">
       {totals.filter(({ count }) => count).map(({ id, count }) => <span key={id} data-result={id} style={{ flexGrow: count }} />)}
@@ -52,13 +55,20 @@ export function ReceivingCheck({ openSample }: { openSample?: () => void }) {
     <ul className="comparison-key" aria-label="Receiving check results">
       {totals.map(({ id, label, count }) => <li key={id} data-result={id}><strong>{count}</strong> {label}</li>)}
     </ul>
-    <details>
-      <summary>See differences and gaps</summary>
-      {exceptions.length ? <ul className="lot-differences">{exceptions.map((row) => <li key={row.packageId} className="activity-row">
-        <strong>{row.packageId}</strong>
-        <span>Inventory: {row.inventory ?? "No record"}{row.inventory === "" ? "Blank" : ""}</span>
-        <span>Receiving: {row.receiving ?? "No record"}{row.receiving === "" ? "Blank" : ""}</span>
-      </li>)}</ul> : <p>All lot numbers match across the two files.</p>}
+    <details open={showDifferences} onToggle={(event) => onShowDifferences(event.currentTarget.open)}>
+      <summary id="receiving-differences">See differences and gaps</summary>
+      {exceptions.length ? <table className="lot-differences">
+        <caption className="sr-only">Inventory and receiving lot numbers for packages that need a check</caption>
+        <thead><tr><th scope="col">Package</th><th scope="col">Inventory</th><th scope="col">Receiving</th></tr></thead>
+        {exceptions.map((row, index) => <tbody key={row.packageId}>
+          <tr>
+            <th scope="row" id={`lot-check-${index}`} tabIndex={-1}>{row.packageId}</th>
+            <td>{row.inventory === null ? "No record" : row.inventory || "Blank"}</td>
+            <td>{row.receiving === null ? "No record" : row.receiving || "Blank"}</td>
+          </tr>
+          <tr className="lot-next-check"><td colSpan={3}><strong>{lotInsight(row).title}.</strong> {lotInsight(row).detail}</td></tr>
+        </tbody>)}
+      </table> : <p>All lot numbers match across the two files.</p>}
     </details>
     <details>
       <summary>Compare your own exports</summary>
@@ -69,7 +79,7 @@ export function ReceivingCheck({ openSample }: { openSample?: () => void }) {
         <button className="manual-evidence" disabled={busy}>Compare files</button>
       </form>
       {error && <p role="alert" className="error">{error}</p>}
-      {result && <button className="manual-evidence" onClick={() => { setResult(undefined); setError(""); }}>Return to sample</button>}
+      {result && <button className="manual-evidence" onClick={() => { onResult(undefined); setError(""); }}>Return to sample</button>}
     </details>
   </section>;
 }

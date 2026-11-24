@@ -35,3 +35,22 @@ export const sampleComparison = compareLots(
   [...matched, { packageId: "PKG-221", lot: "" }, { packageId: "PKG-443", lot: "" }, { packageId: "PKG-552", lot: "" }],
   [...matched, { packageId: "PKG-221", lot: "" }, { packageId: "PKG-443", lot: "SAMPLE-6" }],
 );
+
+export function lotInsight(row: LotCheck): { title: string; detail: string } {
+  if (row.state === "different") {
+    const difference = row.inventory === "" ? "Inventory has no lot number, but receiving does."
+      : row.receiving === "" ? "Receiving has no lot number, but inventory does."
+        : "Inventory and receiving list different lot numbers.";
+    return { title: `Check the label on ${row.packageId}`, detail: `${difference} Verify the number on the original package label.` };
+  }
+  if (row.state === "missing") {
+    if (row.receiving === null) {
+      return { title: `Find the receiving record for ${row.packageId}`, detail: "There’s no matching receiving row. Look up the package before drawing a conclusion." };
+    }
+    if (row.inventory === null) {
+      return { title: `Find the inventory record for ${row.packageId}`, detail: "There’s no matching inventory row. Check the package ID in the inventory system." };
+    }
+    return { title: `Verify the lot number for ${row.packageId}`, detail: "Neither record lists a lot number. Check the package label or the original receiving paperwork." };
+  }
+  return { title: `The lot numbers match for ${row.packageId}`, detail: "Both files list the same number. No follow-up for this comparison." };
+}

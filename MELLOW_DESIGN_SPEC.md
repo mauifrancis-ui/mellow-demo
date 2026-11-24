@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.14.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.15.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -315,3 +315,17 @@ create tasks. Metrc and POS remain separate live retrieval integrations.
 The supplied strain catalog is a potential Learn source after provenance,
 rights, and content checks. Product names and strain descriptions do not
 identify a store package or establish its lot number.
+
+## Version 1.15 shift briefing
+
+Lead Today with one evidence-based action. Prioritize a disagreement over
+a gap. Name the affected package, what each source did or did not show,
+and the next check. Link the sample action to the active review and the
+file comparison action to the relevant source values. After the evidence
+queue clears, surface outstanding manager handoffs or a quiet completion.
+Label sample and file comparison insights distinctly.
+
+Render Package, Inventory, and Receiving in consistent left-aligned columns
+with shared row alignment. Pair each exception with the reason for the
+next step. Distinguish a blank field from a missing row. A finding never
+infers which source is correct or makes changes to either source.
