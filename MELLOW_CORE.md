@@ -91,3 +91,32 @@ mismatch when the linkage cannot be verified. Keep any education catalog
 out of the evidence used for package decisions. Validate provider terms
 cover use with the model before passing excerpts to it. No live connector
 was enabled in this revision.
+
+## Ambient receiving pilot scope
+
+Start with one licensed facility, one authorized inventory feed, and one
+receiving feed. Obtain the actual jurisdiction, license type, local permit
+conditions, and source access before enabling a live check. The compliance
+owner approves any rule before Mellow uses it for deadline or escalation
+prompts.
+
+For each enabled control, record the authority and citation, effective
+version and date, jurisdiction, license and activities in scope, required
+evidence, freshness criteria, the precise test, the responsible reviewer,
+and applicable escalation. Preserve the facts and timestamp of each run.
+Treat the records comparison as an operational finding. The physical
+label and physical count still require human verification.
+
+California and San Francisco were researched as examples. The product
+does not assume they apply to the pilot. California's track-and-trace
+reporting and physical reconciliation requirements have separate evidence
+and triggers. San Francisco requirements include the shop's own permit
+conditions. Federal applicability also varies by activity and license.
+[California DCC regulations](https://www.cannabis.ca.gov/cannabis-laws/dcc-regulations/text-of-regulations/) · [San Francisco permit conditions](https://codelibrary.amlegal.com/codes/san_francisco/latest/sf_police/0-0-0-50321) · [DEA scheduling actions](https://www.dea.gov/marijuana-rescheduling-regulatory-actions)
+
+A live monitor needs scheduled server execution, tenant-scoped credentials,
+last-success and per-source freshness, durable check history, retry with
+backoff, and stable findings that reuse the existing queue record. Recovery
+of a feed cannot establish a clean period unless the missing window is
+actually checked. Keep reports reviewable and source-linked. Require a
+human verify or approve any external filing.

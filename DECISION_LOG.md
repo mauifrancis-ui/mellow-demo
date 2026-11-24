@@ -91,3 +91,11 @@ Separated file setup from task navigation. Compare files opens a dialog with
 the two sources and a read-only result table. A separate Add to queue action
 stages the exceptions. The one-file check is available in the same dialog.
 The queue keeps outstanding cases and shows manager follow-up when present.
+
+## Version 1.25 sample ambient posture
+
+Today shows the finding, the scope and time of the last completed sample
+check, and a simulated delayed-source state. Delay preserves the earlier
+successful-run snapshot, and restoration runs the sample comparison again.
+The preview uses existing tasks and retains human verification. No live
+monitor, scheduled server job, or regulatory prompt was enabled.

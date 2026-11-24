@@ -393,3 +393,17 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 @media (prefers-reduced-motion: no-preference) {
   .compare-dialog[open] { animation: panel-arrival var(--reveal) var(--ease) both; }
 }
+
+.receiving-monitor {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center;
+  gap: 8px 16px; padding: 0 0 16px; border-bottom: 1px solid var(--line);
+}
+.monitor-copy p, .monitor-details p { color: var(--muted); }
+.monitor-copy .monitor-label { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.monitor-copy h2 { margin-bottom: 4px; }
+.monitor-details { grid-column: 1 / -1; }
+.monitor-details summary { min-height: var(--touch); padding-block: 12px; width: fit-content; color: var(--accent); font-weight: 650; }
+.monitor-details p { margin-bottom: 8px; }
+@media (width < 480px) {
+  .receiving-monitor { grid-template-columns: minmax(0, 1fr); }
+}

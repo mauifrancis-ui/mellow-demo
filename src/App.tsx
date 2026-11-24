@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
+import { ReceivingMonitor } from "./ReceivingMonitor";
+import { monitorReceiving } from "./monitoring";
 import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
 import {
@@ -94,6 +96,7 @@ export default function App() {
   const [workspace, setWorkspace] = useState(() => {
     try { return readWorkspace(); } catch { return initial; }
   });
+  const [posture, setPosture] = useState(() => monitorReceiving(undefined, sampleComparison, "current", new Date().toISOString()));
   const [activeId, setActiveId] = useState("");
   const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
@@ -110,6 +113,7 @@ export default function App() {
   const sampleOpen = sampleComparison.filter((row) => row.state !== "match"
     && queue.some((task) => task.sample && task.id === row.packageId));
   const priority = sampleOpen.find((row) => row.state === "different") ?? sampleOpen[0];
+  const monitorTask = queue.find((task) => task.sample && task.id === "PKG-443");
   const priorityTask = queue.find((task) => task.lotComparison?.different) ?? queue.find((task) => task.sample && task.id === priority?.packageId);
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? priorityTask ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
@@ -304,6 +308,12 @@ export default function App() {
         </header>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
+        {tab === "Today" && <ReceivingMonitor posture={posture} record={monitorTask?.record}
+          onReview={monitorTask && active?.id !== monitorTask.id ? () => openTask(monitorTask) : undefined}
+          onToggleDelay={() => {
+            const time = new Date().toISOString();
+            setPosture((current) => monitorReceiving(current, sampleComparison, current.receiving === "current" ? "delayed" : "current", time));
+          }} />}
         {tab === "Today" && <div className="card-surface review-layout">
           <section className="primary" aria-labelledby="task-title">
             <div className="review-heading">

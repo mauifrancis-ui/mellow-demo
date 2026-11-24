@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.24.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.25.0 · 2026-11-24
 
 **High standards, low stress.** Help dispensary staff see what needs attention,
 inspect the evidence, and leave the next shift a decision or a clear next
@@ -65,6 +65,21 @@ a research target.
 Keep the rail for work records. Show the To check count there once and show
 manager follow-up only while it has records. Keep intake and comparison
 controls outside the rail.
+
+## Ambient receiving pilot
+
+Today gives one short update from the monitored receiving comparison.
+Say what changed or what needs human verification. Reuse the existing
+queue item. Show its action only when a different task is active.
+“What I checked” lists the scope, count, and time of the latest
+successful check. Keep matching records quiet. If a source is delayed,
+explain what is unavailable and keep the previous successful scope and
+timestamp. Preserve any existing reviews for the next shift.
+
+The preview runs against fictional data when opened. The delay and recovery
+controls simulate coverage states. It does not run on a schedule after the
+page closes or verify a physical package. The live pilot criteria and
+evidence requirements are in [Mellow Core](MELLOW_CORE.md).
 
 ## Surface and control rules
 
