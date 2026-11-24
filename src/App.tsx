@@ -1,9 +1,9 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
-import { sampleComparison, type LotCheck } from "./comparison";
+import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
 import {
-  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, workQueue,
+  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, lotValueLabel, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, taskReference, workQueue,
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
@@ -69,17 +69,20 @@ function evidenceExamples(task: Task) {
 }
 
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
+  const sample = task.sample ? sampleComparison.find(({ packageId }) => task.id === packageId) : undefined;
+  const comparison = task.lotComparison ?? sample;
+  const secondSource = review.source || comparison;
   return <section className="comparison" aria-label="Evidence">
-    <div className="comparison-grid" data-single={!review.source}>
+    <div className="comparison-grid" data-single={!secondSource}>
       <div className="comparison-source">
-        <span className="source-label"><ReviewDrawing kind="package" />{task.sample ? "Inventory export" : "Imported file"}</span>
-        <strong>{task.observation}</strong>
-        <small>{task.source} · Record {task.line}</small>
+        <span className="source-label"><ReviewDrawing kind="package" />{secondSource ? "Inventory record" : "Imported file"}</span>
+        <strong>{comparison ? lotValueLabel(comparison.inventory) : task.observation}</strong>
+        <small>{taskReference(task)}</small>
       </div>
-      {review.source && <div className="comparison-source">
-        <span className="source-label"><ReviewDrawing kind="receipt" />Receiving log</span>
-        <strong>{review.source.excerpt}</strong>
-        <small>{review.source.reference}</small>
+      {secondSource && <div className="comparison-source">
+        <span className="source-label"><ReviewDrawing kind="receipt" />Receiving record</span>
+        <strong>{comparison ? lotValueLabel(comparison.receiving) : review.source?.excerpt}</strong>
+        <small>{review.source?.reference ?? "Sample receiving log"}</small>
       </div>}
     </div>
   </section>;
@@ -97,7 +100,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [handoffStatus, setHandoffStatus] = useState("");
   const [query, setQuery] = useState("");
-  const [comparison, setComparison] = useState<LotCheck[]>();
   const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
   const evidenceInput = useRef<HTMLInputElement>(null);
@@ -110,7 +112,7 @@ export default function App() {
   const sampleOpen = sampleComparison.filter((row) => row.state !== "match"
     && queue.some((task) => task.sample && task.id === row.packageId));
   const priority = sampleOpen.find((row) => row.state === "different") ?? sampleOpen[0];
-  const priorityTask = queue.find((task) => task.sample && task.id === priority?.packageId);
+  const priorityTask = queue.find((task) => task.lotComparison?.different) ?? queue.find((task) => task.sample && task.id === priority?.packageId);
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? priorityTask ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
@@ -119,15 +121,16 @@ export default function App() {
     && (draft.reference !== review?.evidence?.reference || draft.excerpt !== review?.evidence?.excerpt);
   const editing = active?.id === editRecordId;
   const preparedEvidence = !editing && !hasManualEvidence ? review?.evidence : undefined;
-  const needsRationale = editing && Boolean(review?.source && !review.evidence);
+  const needsRationale = editing && Boolean(review?.requiresRationale);
   const canApprove = Boolean(preparedEvidence) || (editing && hasEvidence(draft) && (!needsRationale || Boolean(draft.note.trim())));
   const pendingManager = Boolean(active && latest.get(active.id) === "Manager review requested");
   const primaryAction = editing || canApprove ? "record"
-    : hasManualEvidence || !review?.source || pendingManager ? "evidence" : "manager";
+    : hasManualEvidence || !review?.requiresRationale || pendingManager ? "evidence" : "manager";
   const instruction = pendingManager ? "Already in the manager handoff."
     : hasManualEvidence ? "Check the evidence you added before recording this issue."
       : review?.evidence ? "If neither record lists a lot number, record the issue."
-        : review?.source ? "The records disagree. Leave this for a manager to check the label."
+        : active?.lotComparison ? review?.nextStep
+          : review?.requiresRationale ? "The records disagree. Leave this for a manager to check the label."
           : "Only the import is available. Add a supporting record or leave this for a manager.";
   const missingEvidence = !draft.reference.trim() && !draft.excerpt.trim() ? "Add the source and what it shows."
     : !draft.reference.trim() ? "Add where you found it."
@@ -149,6 +152,24 @@ export default function App() {
         ? failure.message : "Couldn’t save to this browser. Check storage and try again.");
       return false;
     }
+  }
+
+  function addComparison(rows: LotCheck[], inventoryFile: string, receivingFile: string) {
+    const tasks = comparisonTasks(rows, inventoryFile, receivingFile);
+    let first: Task | undefined;
+    let added = 0;
+    const saved = save((current) => {
+      const existing = new Set(current.tasks.map(({ id }) => id));
+      const additions = tasks.filter(({ id }) => !existing.has(id));
+      first = additions[0];
+      added = additions.length;
+      return added ? { ...current, tasks: [...current.tasks, ...additions] } : current;
+    });
+    if (saved) {
+      setStatus(`Compared ${rows.length} packages. ${added ? `${added} added to To check.` : tasks.length ? "These differences are already in Mellow." : "All lot numbers match."}`);
+      if (first) openTask(first);
+    }
+    return saved;
   }
 
   async function importCsv(event: ChangeEvent<HTMLInputElement>) {
@@ -305,7 +326,7 @@ export default function App() {
             <div className="review-heading">
               <div key={active?.id} className="record-identity">
                 {active && <p className="eyebrow">{active.record}{active.sample ? " · Sample package" : " · Imported record"}</p>}
-                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.sample ? (review?.source && !review.evidence ? "Check the package label" : "Missing lot number") : active ? "Check the imported record" : "You’re caught up"}</h2>
+                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.lotComparison ? (active.lotComparison.different ? "Check the package label" : "Find the missing details") : active?.sample ? (review?.requiresRationale ? "Check the package label" : "Missing lot number") : active ? "Check the imported record" : "You’re caught up"}</h2>
               </div>
               <a className="queue-link" href="#work-queue">View queue</a>
             </div>
@@ -366,10 +387,10 @@ export default function App() {
               {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">No records awaiting review.</p>}
             </section>
             {managerPanel}
+            <ReceivingCheck onCompared={addComparison} />
             <label className="upload import-queue">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>
           </aside>
         </div>}
-        {tab === "Today" && <ReceivingCheck result={comparison} onResult={setComparison} />}
         {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">
           <div className="handoff-header">
             <div><h2 id="handoff-title">Shift handoff</h2><p>Give the next person the record, the gap, and the source.</p></div>

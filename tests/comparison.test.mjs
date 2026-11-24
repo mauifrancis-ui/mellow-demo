@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { compareLots, lotInsight, lotRecords, sampleComparison, summarizeLots } from "../src/comparison.ts";
+import { compareLots, comparisonTasks, lotInsight, lotRecords, sampleComparison, summarizeLots } from "../src/comparison.ts";
 
 test("read-only comparison distinguishes matched, different, blank, and unpaired rows", () => {
   const inventory = lotRecords("package_id,lot_number\nA,101\nB,\nC,\nD,400");
@@ -38,4 +38,27 @@ test("skim prioritizes a mismatch over gaps and stays quiet on matching records"
   assert.equal(summary.missing.length, 2);
   assert.equal(summary.first.packageId, "PKG-443");
   assert.equal(summarizeLots(sampleComparison.filter(({ state }) => state === "match")).first, undefined);
+});
+
+test("comparison queues only exceptions and gives retries stable identities", () => {
+  const tasks = comparisonTasks(sampleComparison, "inventory.csv", "receiving.csv");
+  assert.deepEqual(tasks.map(({ record }) => record), ["PKG-443", "PKG-221", "PKG-552"]);
+  assert.deepEqual(tasks.map(({ id }) => id),
+    comparisonTasks(sampleComparison, "inventory.csv", "receiving.csv").map(({ id }) => id));
+  assert.equal(tasks[0].lotComparison.receiving, "SAMPLE-6");
+  assert.equal(tasks[2].lotComparison.receiving, null);
+});
+
+test("paired differences retain both sources and need a resolution note before approval", async () => {
+  const { initial, prepareReview, recordDecision, shiftHandoff } = await import("../src/workspace.ts");
+  const [task] = comparisonTasks(sampleComparison, "inventory.csv", "receiving.csv");
+  const [,, unpaired] = comparisonTasks(sampleComparison, "inventory.csv", "receiving.csv");
+  assert.equal(prepareReview(task).requiresRationale, true);
+  assert.equal(prepareReview(unpaired).requiresRationale, false);
+  const workspace = { ...initial, tasks: [task] };
+  const evidence = { reference: "Original package label", excerpt: "Label checked", note: "" };
+  assert.throws(() => recordDecision(workspace, task, "Approved", evidence), /resolves the conflict/);
+  const escalated = recordDecision(workspace, task, "Manager review requested", evidence);
+  assert.match(shiftHandoff(escalated)[0].text, /receiving.csv: Lot number: SAMPLE-6/);
+  assert.match(shiftHandoff(escalated)[0].text, /inventory.csv/);
 });

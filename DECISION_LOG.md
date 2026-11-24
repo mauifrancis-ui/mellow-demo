@@ -73,3 +73,14 @@ The static Today markup audit confirmed two shared card surfaces, review-first
 reading order, a visible skim, a collapsed detail section, and no record
 selection controls. Build, lint, and 12 regression tests passed. The managed
 preview relay timed out on port 4173 during interactive verification.
+
+## Version 1.23 unified review queue
+
+Removed the second comparison workflow. Existing sample exceptions use the
+same queue as imported records, and comparisons of two files add only
+packages with differences or gaps. The active task shows both source
+values on arrival. Keep decisions scoped to one evidence snapshot, so an
+identical retry preserves prior decisions and changed evidence can be
+reviewed independently. Source files remain read-only. Verified the
+single card and visible sample values in rendered markup and ran the
+14 automated tests, including retry identity and conflict evidence.

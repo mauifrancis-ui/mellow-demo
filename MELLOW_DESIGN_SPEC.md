@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.22.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.23.0 · 2026-11-24
 
 **High standards, low stress.** Help dispensary staff see what needs attention,
 inspect the evidence, and leave the next shift a decision or a clear next
@@ -36,36 +36,37 @@ technology. Use the same language across entry points.
   to its heading. Keep the saved result inline. A failed decision keeps
   the active record and its draft available.
 
-## Lot numbers, side by side
+## One queue for source exceptions
 
-The comparison helps explain differences across files. It appears below the
-review and stays read-only. Match by package ID and reject duplicate IDs.
-Equal nonblank lot numbers match. Unequal values differ. Two blank fields
-or an absent source row indicate missing details. Distinguish **No lot
-number** from **No matching record** in the source table.
+A comparison supplies evidence to the review queue. It is read-only toward
+the source files. Match by package ID and reject duplicate IDs in either
+input. Only differences and gaps enter To check. The three sample exceptions
+are already represented by their sample tasks. Retry of the same package
+values from the same named source pair preserves the existing task and its
+decision. Changed evidence and separately imported records retain their
+own provenance.
 
-1. **Skim.** Show the outcome, which package to check first, and why. Give a
-   disagreement priority over missing details. For an all-match comparison,
-   show a quiet confirmation. Label sample data and user files distinctly.
-2. **Dip.** Select a result group for a short explanation and next check.
-   Selecting a group opens it. Selecting it again closes it. Do not restate
-   every cell as prose.
-3. **Dive.** Reveal exact source values in one accessible table. Align
-   Package, Inventory record, and Receiving record to the left. Use one row
-   per package, one divider between rows, and a distinct 48px header.
+- **Skim.** The queue names the package and its state. The active review opens
+  with the next check and why it matters.
+- **Dip and dive.** The two available values and source references are visible
+  when the record opens. Distinguish No lot number from No matching record.
+  Show a single source when only a one-file import is available.
+- **Act.** Use the same evidence editor, decision controls, and manager
+  handoff for all records. A comparison disagreement requires supporting
+  evidence and a resolution note before a finding can be recorded.
 
-The comparison count describes the source scan. The queue count describes
-work awaiting a decision. User files are compared in memory and do not create
-review tasks. Preserve the prior comparison if a replacement fails. Keep
-file selection secondary. The ten-second skim is a research target.
+Put Compare inventory and receiving files in the queue. Save only local
+exception tasks and their evidence snapshots, not representations of routine
+matches. Leave both original files unchanged. The ten-second skim remains
+a research target.
 
 ## Surface and control rules
 
 | Element | Rule |
 | --- | --- |
 | Canvas | The masthead shares the page background. Page introductions and supporting sections in Activity and Learn use typography and dividers. |
-| Cards | Use one shared card surface for the review workspace and the comparison. Use the same 28px radius, one neutral border, and no shadow. The shared content inset scales from 16px to 28px. |
-| Inside a card | Use flat rows, simple dividers, and quiet section backgrounds to group related material. Keep the review queue rail, evidence comparison, and source table flat within their parent surface. |
+| Cards | Use one card surface for the review workspace and its rail. Use the same 28px radius, one neutral border, and no shadow. The shared content inset scales from 16px to 28px. |
+| Inside a card | Use flat rows, simple dividers, and quiet section backgrounds to group related material. Keep the review queue rail and evidence comparison flat within their parent surface. |
 | Rows | Compact queue, activity, and table rows use 12px top and bottom padding. Align text and trailing controls on the vertical center. |
 | Actions | Use pill-shaped standalone buttons with a minimum 44px target. Give the task's main action the filled treatment. Use outlined or quiet treatments for secondary actions. Keep padding steady on hover and focus. |
 | Evidence fields | Keep a visible label, rounded outline, and one field-specific supporting line. Use 8px between label, field, and hint and 20px between field groups. Inset labels and hints 12px to align with typed text. Associate hints with fields using `aria-describedby`. Use an inset focus outline. |

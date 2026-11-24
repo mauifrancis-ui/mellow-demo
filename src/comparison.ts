@@ -1,4 +1,4 @@
-import { parseCsv } from "./workspace.ts";
+import { parseCsv, type Task } from "./workspace.ts";
 
 export type LotRecord = { packageId: string; lot: string };
 export type LotCheck = { packageId: string; inventory: string | null; receiving: string | null; state: "match" | "different" | "missing" };
@@ -65,4 +65,21 @@ export function summarizeLots(rows: LotCheck[]) {
     matched: rows.length - different.length - missing.length,
     first: different[0] ?? missing[0],
   };
+}
+
+
+export function comparisonTasks(rows: LotCheck[], inventoryFile: string, receivingFile: string): Task[] {
+  const { different, missing } = summarizeLots(rows);
+  return [...different, ...missing].map((row) => ({
+    id: JSON.stringify(["lot-comparison", inventoryFile, receivingFile, row.packageId, row.inventory, row.receiving]),
+    record: row.packageId,
+    source: inventoryFile,
+    observation: lotInsight(row).detail,
+    lotComparison: {
+      inventory: row.inventory,
+      receiving: row.receiving,
+      receivingFile,
+      different: row.state === "different",
+    },
+  }));
 }

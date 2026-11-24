@@ -1,5 +1,8 @@
 type Row = Record<string, string>;
-export type Task = { id: string; record: string; source: string; line: number; observation: string; sample?: boolean };
+export type Task = {
+  id: string; record: string; source: string; line?: number; observation: string; sample?: boolean;
+  lotComparison?: { inventory: string | null; receiving: string | null; receivingFile: string; different: boolean };
+};
 export type Draft = { reference: string; excerpt: string; note: string };
 export type Decision = "Approved" | "Manager review requested" | "Dismissed" | "Reopened";
 export type Entry = { id: string; task: Task; decision: Decision; at: string; evidence: Draft; returnToManager?: boolean; comparedSource?: Pick<Draft, "reference" | "excerpt"> };
@@ -93,7 +96,7 @@ export function recordDecision(current: Workspace, task: Task, decision: Decisio
   if (decision === "Reopened" ? !closed : closed || state === decision) return current;
   if (decision === "Approved" && !hasEvidence(evidence)) throw new Error("Supporting evidence is required.");
   const review = prepareReview(task);
-  if (decision === "Approved" && review.source && !review.evidence && !evidence.note.trim()) {
+  if (decision === "Approved" && review.requiresRationale && !evidence.note.trim()) {
     throw new Error("Explain how the added evidence resolves the conflict.");
   }
   const entry: Entry = {
@@ -118,10 +121,34 @@ export function nextRecord(tasks: Task[], queue: Task[], currentId: string) {
 
 const demoSources = {
   "PKG-221": [{ reference: "Sample receiving log · PKG-221", excerpt: "Receiving check: no batch or lot identifier was recorded for this package." }],
-  "PKG-443": [{ reference: "Sample receiving log · PKG-443", excerpt: "Receiving check: a lot identifier was present on the package label." }],
+  "PKG-443": [{ reference: "Sample receiving log · PKG-443", excerpt: "Receiving recorded sample lot SAMPLE-6 on the package label." }],
 } as const;
 
+export function lotValueLabel(value: string | null) {
+  return value === null ? "No matching record" : value ? `Lot number: ${value}` : "No lot number";
+}
+
+export function taskReference(task: Task) {
+  return task.line === undefined ? task.source : `${task.source} · Record ${task.line}`;
+}
+
 export function prepareReview(task: Task) {
+  if (task.lotComparison) {
+    const { inventory, receiving, receivingFile, different } = task.lotComparison;
+    const handoffNext = different ? "Check the original package label."
+      : inventory === null ? "Find the inventory record for this package."
+        : receiving === null ? "Find the receiving record for this package."
+          : "Check the label or receiving paperwork for a lot number.";
+    return {
+      source: { reference: receivingFile, excerpt: lotValueLabel(receiving) },
+      requiresRationale: different,
+      state: different ? "Sources disagree" : "Source needed",
+      evidence: undefined,
+      summary: task.observation,
+      nextStep: handoffNext,
+      handoffNext,
+    };
+  }
   const source = task.sample && Object.hasOwn(demoSources, task.id)
     ? demoSources[task.id as keyof typeof demoSources][0]
     : undefined;
@@ -129,6 +156,7 @@ export function prepareReview(task: Task) {
     return {
       source,
       state: "Sources agree",
+      requiresRationale: false,
       evidence: { ...source, note: "" },
       summary: "Neither record lists a lot number. Confirming saves the two sources together for the next shift.",
       nextStep: "If neither record lists a lot number, choose Record issue. It saves the finding here without changing inventory.",
@@ -139,6 +167,7 @@ export function prepareReview(task: Task) {
     return {
       source,
       state: "Sources disagree",
+      requiresRationale: true,
       evidence: undefined,
       summary: "The export is blank, but receiving saw a lot number on the label. The original label is the next place to check.",
       nextStep: "Receiving saw a number that the export doesn’t show. Leave it for a manager unless you can document which record is right.",
@@ -148,6 +177,7 @@ export function prepareReview(task: Task) {
   return {
     source: undefined,
     state: "Source needed",
+    requiresRationale: false,
     evidence: undefined,
     summary: task.sample
       ? "Only the inventory record is available. A blank export field can’t tell you what was on the label."
@@ -167,8 +197,9 @@ export function shiftHandoff(workspace: Workspace) {
     const review = prepareReview(task);
     const parts = [
       `${task.record} · Needs a manager`,
-      `${task.observation} (${task.source} · Record ${task.line})`,
-      review.summary,
+      `${task.observation} (${taskReference(task)})`,
+      task.lotComparison && `Inventory: ${lotValueLabel(task.lotComparison.inventory)}`,
+      review.summary !== task.observation && review.summary,
       `Next check: ${review.handoffNext}`,
       entry?.comparedSource && `${entry.comparedSource.reference}: ${entry.comparedSource.excerpt}`,
       entry?.evidence.reference && `${entry.evidence.reference}: ${entry.evidence.excerpt}`,
