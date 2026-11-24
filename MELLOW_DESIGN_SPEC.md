@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.11.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.12.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -274,3 +274,15 @@ copy in persistent, accessible field hints. When sources conflict, also
 ask which record the reviewer trusts and why. Near the decision, state the
 next missing requirement if the draft is incomplete. This preview accepts
 a text reference and excerpt.
+
+## Version 1.12 supporting text and body type
+
+Use the Material 3 supporting-text pattern for evidence fields. Keep each
+label visible and place one short hint 4px below the control, inset to
+align with the input text. Set supporting text at 12px with 16px line
+height and associate it with its field using `aria-describedby`. Keep
+field names independent of their hints. Retain Mellow's rounded outlines.
+[Material Web text field guidance](https://material-web.dev/components/text-field/#supporting-text)
+
+Use self-hosted Nunito Variable for body text, labels, and controls.
+Keep Georgia for editorial headings and the wordmark.

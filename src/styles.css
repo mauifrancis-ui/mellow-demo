@@ -1,6 +1,6 @@
 @import "tailwindcss";
 :root {
-  font-family: system-ui, sans-serif;
+  font-family: "Nunito Variable", system-ui, sans-serif;
   --pill: 999px;
   --gutter: clamp(16px, 4vw, 48px);
   --ease: cubic-bezier(.2, .7, .25, 1);
@@ -62,7 +62,7 @@ p { line-height: 1.55; }
 .draft-label, .evidence-status, .note span { color: var(--muted); font-size: 14px; }
 .evidence-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 248px), 1fr)); gap: 12px; }
 label { display: grid; align-content: start; gap: 4px; font-weight: 620; }
-label input:not([type="file"]), textarea {
+label input:not([type="file"]), .evidence-field input, textarea {
   width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid #858d88;
   border-radius: 8px; background: #fff; color: var(--ink); font-weight: normal;
 }
@@ -366,4 +366,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 }
 
 .evidence-hint { color: var(--muted); font-size: 14px; }
-.evidence-fields label small { margin-top: 0; font-weight: normal; }
+.evidence-fields { gap: 16px; }
+.evidence-field { display: grid; gap: 4px; }
+.evidence-field .supporting-text { padding-inline: 12px; font-size: 12px; line-height: 16px; color: var(--muted); }

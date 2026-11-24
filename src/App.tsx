@@ -310,18 +310,21 @@ export default function App() {
                 </div>
                 <p className="evidence-hint">Use {evidenceExamples(active)} for <strong>{active.record}</strong>. Enter the details from the record.</p>
                 <div className="evidence-fields">
-                  <label>Where did you find it?
-                    <input ref={evidenceInput} aria-describedby="evidence-source-hint" value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} />
-                    <small id="evidence-source-hint">Enter a file name, record ID, or link so someone else can find it.</small>
-                  </label>
-                  <label>What does it show?
-                    <textarea rows={2} aria-describedby="evidence-excerpt-hint" value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} />
-                    <small id="evidence-excerpt-hint">Copy the relevant line, or write exactly what the record shows.</small>
-                  </label>
-                  {needsRationale && <label>How does this evidence resolve the conflict?
-                    <textarea rows={2} aria-describedby="evidence-conflict-hint" value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} />
-                    <small id="evidence-conflict-hint">Say which record you trust and why.</small>
-                  </label>}
+                  <div className="evidence-field">
+                    <label htmlFor="evidence-source">Where did you find it?</label>
+                    <input id="evidence-source" ref={evidenceInput} aria-describedby="evidence-source-hint" value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} />
+                    <p className="supporting-text" id="evidence-source-hint">File name, record ID, or link.</p>
+                  </div>
+                  <div className="evidence-field">
+                    <label htmlFor="evidence-excerpt">What does it show?</label>
+                    <textarea id="evidence-excerpt" rows={2} aria-describedby="evidence-excerpt-hint" value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} />
+                    <p className="supporting-text" id="evidence-excerpt-hint">Copy the relevant line or describe exactly what you see.</p>
+                  </div>
+                  {needsRationale && <div className="evidence-field">
+                    <label htmlFor="evidence-conflict">How does this resolve the conflict?</label>
+                    <textarea id="evidence-conflict" rows={2} aria-describedby="evidence-conflict-hint" value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} />
+                    <p className="supporting-text" id="evidence-conflict-hint">Say which record you trust and why.</p>
+                  </div>}
                 </div>
                 {missingEvidence && <p className="evidence-hint" id="evidence-missing">{missingEvidence} Then you can record the issue.</p>}
               </section>}
