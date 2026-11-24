@@ -1,5 +1,5 @@
-import { useRef, useState, type CSSProperties, type ChangeEvent, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
-import { ask, followUps, type AskAction, type AskAnswer, type AskContext, type Brief } from "./ask";
+import { useRef, useState, type CSSProperties, type ChangeEvent, type Dispatch, type FormEvent, type KeyboardEvent, type ReactNode, type SetStateAction } from "react";
+import { addTurn, ask, followUps, type AskAction, type AskAnswer, type AskContext, type Brief, type Turn } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
@@ -31,15 +31,16 @@ function formatSize(bytes: number) {
   return bytes > 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;
 }
 
-type Turn = { id: number; question: string; answer: AskAnswer };
 
-export function Conversation({ context, chips, onAction, onAnswer, onClear, initialQuestion }: {
+
+export function Conversation({ context, chips, turns, onTurns, onAction, onAnswer, onClear }: {
   context: AskContext;
   chips: string[];
+  turns: Turn[];
+  onTurns: Dispatch<SetStateAction<Turn[]>>;
   onAction: (action: AskAction, answer: AskAnswer) => void;
   onAnswer?: (answer: AskAnswer) => void;
   onClear?: () => void;
-  initialQuestion?: string;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -47,7 +48,6 @@ export function Conversation({ context, chips, onAction, onAnswer, onClear, init
   const cameraInput = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState("");
   const [attachment, setAttachment] = useState<Attachment | null>(null);
-  const [turns, setTurns] = useState<Turn[]>(() => initialQuestion ? [{ id: 1, question: initialQuestion, answer: ask(initialQuestion, context) }] : []);
   const [showEarlier, setShowEarlier] = useState(false);
   const openable = new Set([...context.queue, ...context.manager].map(({ id }) => id));
 
@@ -61,7 +61,7 @@ export function Conversation({ context, chips, onAction, onAnswer, onClear, init
       actions: [{ label: "Add evidence", action: { kind: "evidence" } }],
     } : ask(trimmed, context);
     const asked = trimmed || attachment?.name || "";
-    setTurns((previous) => [...previous, { id: (previous.at(-1)?.id ?? 0) + 1, question: asked, answer }].slice(-6));
+    onTurns((previous) => addTurn(previous, asked, answer));
     setShowEarlier(false);
     setValue("");
     setAttachment(null);
@@ -117,7 +117,7 @@ export function Conversation({ context, chips, onAction, onAnswer, onClear, init
           {turns.length > 1 && <button type="button" className="text-link" aria-expanded={showEarlier} onClick={() => setShowEarlier((open) => !open)}>
             {showEarlier ? "Hide earlier" : `Earlier · ${turns.length - 1} question${turns.length === 2 ? "" : "s"}`}
           </button>}
-          <button type="button" className="text-link" onClick={() => { setTurns([]); onClear?.(); input.current?.focus(); }}>Clear</button>
+          <button type="button" className="text-link" onClick={() => { onTurns([]); onClear?.(); input.current?.focus(); }}>Clear</button>
         </span>
       </div>
       <ol className="log" aria-live="polite">

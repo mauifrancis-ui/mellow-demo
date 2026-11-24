@@ -349,3 +349,10 @@ The browser's view transitions handle state changes:
 Browsers without view transitions fall back to the inline fades, and reduced motion removes all timed movement.
 
 **App shell.** The app bar is pinned. At 900px and wider the app fills the viewport, and the left and right columns scroll independently, with contained overscroll and thin scrollbars. The panel's "Showing" bar stays pinned at the top of its column. Below 900px the page scrolls normally under the pinned bar, and the panel stays a bottom sheet. Underlined fields show focus by darkening their rule to 3px black, not with a box.
+
+## Version 1.33 Ask Mellow from anywhere
+
+- App bar: "Ask Mellow" outline control at the right end (ink fill while its drawer is open), speech-mark icon, `/` key hint on pointer devices. Below 600px it shortens to "Ask" and sits on the wordmark row.
+- Today: the control scrolls the conversation into view and focuses the reply field. No second copy of the conversation.
+- Activity and Learn: a paper drawer, 460px wide, 1px ink border, 4px corners, a floating-layer shadow, pinned under the app bar on the right. It scrolls internally and opens with the spring. Below 900px it's a bottom sheet at up to 82% of the viewport height. It closes with Escape, the close button or the control, and focus returns to the control.
+- One thread shared by both surfaces (keeps the latest six turns).

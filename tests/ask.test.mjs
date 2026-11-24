@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { ask, suggestions } from "../src/ask.ts";
+import { addTurn, ask, suggestions } from "../src/ask.ts";
 import { sampleComparison } from "../src/comparison.ts";
 import { monitorReceiving, sampleHistory } from "../src/monitoring.ts";
 
@@ -106,4 +106,12 @@ test("answers carry structured rows and their own follow-ups", async () => {
     assert.ok(next.length > 0, input);
     for (const chip of next) assert.notEqual(ask(chip, context).intent, "fallback", `${input} → ${chip}`);
   }
+});
+
+test("addTurn keeps the six most recent turns with rising ids", () => {
+  let turns = [];
+  for (let index = 0; index < 8; index++) turns = addTurn(turns, `q${index}`, ask("what needs me", context));
+  assert.equal(turns.length, 6);
+  assert.equal(turns[0].question, "q2");
+  assert.equal(turns.at(-1).id, 8);
 });

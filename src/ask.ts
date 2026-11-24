@@ -329,3 +329,10 @@ export function followUps(answer: AskAnswer, context: AskContext): string[] {
   };
   return byIntent[answer.intent].filter((chip) => normalize(chip) !== "").slice(0, 3);
 }
+
+/** One question and Mellow's answer. The app keeps these so the thread follows you between pages. */
+export type Turn = { id: number; question: string; answer: AskAnswer };
+
+export function addTurn(previous: Turn[], question: string, answer: AskAnswer): Turn[] {
+  return [...previous, { id: (previous.at(-1)?.id ?? 0) + 1, question, answer }].slice(-6);
+}

@@ -7,7 +7,7 @@ import { ActivityPage } from "./ActivityPage";
 import { LearnPage } from "./LearnPage";
 import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextPanel";
 import { panelFor, queueView, sameView, type PanelView } from "./panel";
-import { ask, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series } from "./ask";
+import { addTurn, ask, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 import { monitorReceiving, sampleHistory } from "./monitoring";
@@ -141,7 +141,9 @@ export default function App() {
   const [panelView, setPanelView] = useState<PanelView>(queueView);
   const [panelCollapsed, setPanelCollapsed] = useState(initialCollapsed);
   const [compareRequest, setCompareRequest] = useState(0);
-  const [askRequest, setAskRequest] = useState<string | null>(null);
+  const [turns, setTurns] = useState<Turn[]>([]);
+  const [askOpen, setAskOpen] = useState(false);
+  const askButton = useRef<HTMLButtonElement>(null);
   const [activeId, setActiveId] = useState("");
   const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
@@ -295,8 +297,12 @@ export default function App() {
       setTab(next);
       setStatus("");
       setError("");
-      setAskRequest(question ?? null);
-      if (question) applyView(panelFor(ask(question, askContext)));
+      setAskOpen(false);
+      if (question) {
+        const answer = ask(question, askContext);
+        setTurns((previous) => addTurn(previous, question, answer));
+        applyView(panelFor(answer));
+      }
     };
     if (next === tab && !question) update(); else smooth(update);
   }
@@ -316,6 +322,30 @@ export default function App() {
   function backToQueue() {
     if (sameView(panelView, queueView)) { setFocusSeries(null); return; }
     smooth(() => applyView(queueView), "panel");
+  }
+
+  function focusComposer(scroll: boolean) {
+    requestAnimationFrame(() => {
+      const field = document.getElementById("ask-input") as HTMLTextAreaElement | null;
+      if (!field) return;
+      if (scroll) {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        field.closest(".conversation")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "end" });
+      }
+      field.focus({ preventScroll: true });
+    });
+  }
+
+  function openAsk() {
+    if (tab === "Today") { focusComposer(true); return; }
+    if (askOpen) { closeAsk(); return; }
+    setAskOpen(true);
+    focusComposer(false);
+  }
+
+  function closeAsk() {
+    setAskOpen(false);
+    requestAnimationFrame(() => askButton.current?.focus());
   }
 
   function togglePanel() {
@@ -363,11 +393,28 @@ export default function App() {
       const task = [...queue, ...manager].find((item) => item.id === action.id);
       if (task) openTask(task);
     } else if (action.kind === "tab") goTo(action.tab);
-    else if (action.kind === "compare") setCompareRequest((count) => count + 1);
-    else if (action.kind === "series") setFocusSeries(action.series);
-    else if (action.kind === "evidence") openEvidence();
+    else if (action.kind === "compare") {
+      if (tab !== "Today") goTo("Today");
+      requestAnimationFrame(() => setCompareRequest((count) => count + 1));
+    } else if (action.kind === "series") setFocusSeries(action.series);
+    else if (action.kind === "evidence") {
+      if (tab !== "Today") goTo("Today");
+      requestAnimationFrame(openEvidence);
+    }
     else toggleDelay();
   }
+
+  useEffect(() => {
+    const onKey = (event: globalThis.KeyboardEvent) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      event.preventDefault();
+      askButton.current?.click();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
 
   useLayoutEffect(() => {
     const node = nav.current;
@@ -391,6 +438,16 @@ export default function App() {
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => goTo(item)}>{item}</button>)}
         </nav>
         <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · Sample workspace</p>
+        <button ref={askButton} type="button" className="ask-trigger" onClick={openAsk} aria-keyshortcuts="/"
+          aria-expanded={tab === "Today" ? undefined : askOpen} aria-controls={tab === "Today" ? "ask-input" : "ask-drawer"}
+          data-open={tab !== "Today" && askOpen ? "" : undefined} title="Ask Mellow (/)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5H4.5z" /><path d="M8.5 10.5h7" />
+          </svg>
+          <span className="ask-trigger-label">Ask Mellow</span>
+          {turns.length > 0 && tab !== "Today" && !askOpen && <span className="ask-dot" aria-hidden="true" />}
+          <kbd aria-hidden="true">/</kbd>
+        </button>
       </div></header>
       <main className="page" key={tab}>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
@@ -458,7 +515,7 @@ export default function App() {
                 <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
               </div>
             </section>
-            <Conversation context={askContext} chips={briefing.chips} onAction={onAsk} onAnswer={showAnswer} onClear={backToQueue} initialQuestion={askRequest ?? undefined} />
+            <Conversation context={askContext} chips={briefing.chips} turns={turns} onTurns={setTurns} onAction={onAsk} onAnswer={showAnswer} onClear={backToQueue} />
           </div>
           <ContextPanel view={panelView} collapsed={panelCollapsed} needYou={queue.length} lastCheck={posture.lastSuccessfulRun?.checkedAt}
             onBack={backToQueue} onToggle={togglePanel}>
@@ -500,6 +557,20 @@ export default function App() {
           onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} />}
         {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)} />}
       </main>
+      {tab !== "Today" && askOpen && <aside className="ask-drawer" id="ask-drawer" role="dialog" aria-label="Talk with Mellow"
+        onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); closeAsk(); } }}>
+        <div className="ask-drawer-bar">
+          <span className="kicker">Mellow · from {tab}</span>
+          <button type="button" className="tool" aria-label="Close" onClick={closeAsk}>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" /></svg>
+          </button>
+        </div>
+        <div className="ask-drawer-body">
+          {turns.length === 0 && <p className="mellow-voice ask-drawer-lead">{briefing.message}</p>}
+          <Conversation context={askContext} chips={briefing.chips} turns={turns} onTurns={setTurns} onAction={onAsk}
+            onAnswer={(answer) => applyView(panelFor(answer))} onClear={() => applyView(queueView)} />
+        </div>
+      </aside>}
     </div>
   );
 }

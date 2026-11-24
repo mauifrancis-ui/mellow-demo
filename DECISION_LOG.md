@@ -229,3 +229,10 @@ inside the scroll area, and phones scroll under the pinned bar. View
 transitions ran for panel, collapse and tab changes, with the panel kind
 leaving the reading column still. Reduced motion ran no animations.
 Founder preview approval is pending.
+
+## Version 1.33 Ask Mellow from anywhere · 2026-11-24
+
+- Decision: add an "Ask Mellow" control to the sticky app bar, with `/` as a keyboard shortcut. On Today it scrolls to the conversation and focuses the reply field. On Activity and Learn it opens a floating drawer (a bottom sheet on phones) that overlays the page instead of pushing it.
+- The conversation thread now lives in the app, not the component, so the same turns follow you between Today and the drawer. A vermilion dot on the control means there's a thread waiting.
+- Actions in the drawer that need Today's tools (open a record, compare, add evidence) take you to Today with the thread intact.
+- Founder approval: pending preview.
