@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from "react";
 
 import {
-  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, storageKey, workQueue,
+  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, workQueue,
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
@@ -39,15 +39,25 @@ function DecisionNote({ note, onChange }: { note: string; onChange: (note: strin
   );
 }
 
-function RecordContext({ task, pending }: { task: Task; pending: boolean }) {
-  return (
-    <div className="record-insight">
-      <div className="insight-label">{task.sample ? "Sample observation" : "CSV observation"}</div>
-      <strong>{task.observation}</strong>
-      <p>{task.source} · Record {task.line}</p>
-      {pending && <p className="pending-review">Manager review pending</p>}
+function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
+  return <section className="record-insight comparison" aria-label="What the records say">
+    <div className="comparison-heading">
+      <h3>What the records say</h3>
+      <span className="source-state" data-state={review.state}>{review.state}</span>
     </div>
-  );
+    <div className="comparison-grid">
+      <div className="comparison-source">
+        <span>{task.sample ? "Inventory record" : "Imported record"}</span>
+        <strong>{task.observation}</strong>
+        <small>{task.source} · Record {task.line}</small>
+      </div>
+      <div className="comparison-source">
+        <span>{review.source ? "Receiving log" : "Second source"}</span>
+        <strong>{review.source ? review.source.excerpt : "Nothing linked yet"}</strong>
+        {review.source && <small>{review.source.reference}</small>}
+      </div>
+    </div>
+  </section>;
 }
 
 export default function App() {
@@ -60,14 +70,17 @@ export default function App() {
   const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
+  const [handoffStatus, setHandoffStatus] = useState("");
   const [query, setQuery] = useState("");
   const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
   const evidenceInput = useRef<HTMLInputElement>(null);
   const feedback = useRef<HTMLParagraphElement>(null);
   const latest = latestDecisions(workspace.history);
-  const manager = workspace.tasks.filter((task) => latest.get(task.id) === "Manager review requested");
+  const handoff = shiftHandoff(workspace);
+  const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
+  const reviewedCount = workspace.tasks.length - queue.length - manager.length;
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
@@ -152,7 +165,9 @@ export default function App() {
       return next;
     });
     if (saved && changed) {
-      setStatus(`${decision === "Approved" ? "Finding confirmed" : decision}: ${task.record}. Saved on this device.`);
+      const result = decision === "Approved" ? "Issue confirmed" : decision === "Manager review requested" ? "Added to manager handoff" : decision === "Dismissed" ? "Marked not an issue" : "Reopened";
+      setStatus(`${task.record} · ${result}. Saved on this device.`);
+      setHandoffStatus("");
       if (decision === "Reopened") {
         requestAnimationFrame(() => feedback.current?.focus());
       } else {
@@ -174,7 +189,7 @@ export default function App() {
     return tasks.map((task) => (
       <li key={task.id}>
         <button className="queue-row" aria-current={tab === "Today" && active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
-          <span><strong>{task.record}</strong><small>{task.observation}</small></span>
+          <span><strong>{task.record}</strong><small>{latest.get(task.id) === "Manager review requested" ? "Needs a manager" : prepareReview(task).state}</small></span>
           <span className="chevron" aria-hidden="true">›</span>
         </button>
       </li>
@@ -182,9 +197,19 @@ export default function App() {
   }
 
   const managerPanel = <section className="panel manager-panel" aria-labelledby="manager-title">
-    <h2 id="manager-title">Unresolved manager reviews <span>{manager.length}</span></h2>
-    {manager.length ? <ul>{taskRows(manager)}</ul> : <p className="empty">No manager reviews pending.</p>}
+    <h2 id="manager-title">Needs a manager <span>{manager.length}</span></h2>
+    {manager.length ? <ul>{taskRows(manager)}</ul> : <p className="empty">Nothing waiting for a manager.</p>}
   </section>;
+
+  async function copyHandoff() {
+    const content = ["Mellow shift handoff · Sample workspace", ...handoff.map(({ text }) => text)].join("\n\n");
+    try {
+      await navigator.clipboard.writeText(content);
+      setHandoffStatus("Handoff copied.");
+    } catch {
+      setHandoffStatus("Couldn’t copy. Select the handoff text below.");
+    }
+  }
 
   function changePalette(value: Palette) {
     setPalette(value);
@@ -209,9 +234,15 @@ export default function App() {
         </div>
       </div></header>
       <main className="page">
-        <header className="page-header">
-          <div><h1>{tab}</h1><p>{tab === "Today" ? (queue.length === 1 ? "One finding needs your judgment." : `${queue.length} findings to review.`) : tab === "Activity" ? "Review decisions saved on this device." : "Find official starting points for your research."}</p></div>
-          {tab === "Today" && <label className="upload">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>}
+        <header className={tab === "Today" ? "shift-header" : "page-header"}>
+          <div><h1>{tab === "Today" ? "Your shift, in focus." : tab}</h1><p>{tab === "Today" ? "See where your records disagree and leave the next shift a clear handoff." : tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p></div>
+          {tab === "Today" && <>
+            <dl className="shift-counts">
+              <div><dt>To check</dt><dd>{queue.length}</dd></div>
+              <div><dt>Needs a manager</dt><dd>{manager.length}</dd></div>
+              <div><dt>Checked</dt><dd>{reviewedCount}</dd></div>
+            </dl>
+          </>}
         </header>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
@@ -219,24 +250,20 @@ export default function App() {
           <section className="primary" aria-labelledby="task-title">
             <div className="review-heading">
               <div key={active?.id} className="record-identity">
-                <p className="eyebrow">{active ? "Record review" : "Work queue"}</p>
-                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.record ?? "Queue clear"}</h2>
+                <p className="eyebrow">{active ? (active.sample ? "Sample package" : "Imported record") : "Shift review"}</p>
+                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.record ?? "You’re caught up"}</h2>
               </div>
               <a className="queue-link" href="#work-queue">View queue</a>
             </div>
             <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
             {error && <p className="error review-feedback" role="alert">{error}</p>}
             {active && review ? <>
-              <RecordContext key={active.id} task={active} pending={latest.get(active.id) === "Manager review requested"} />
+              <SourceComparison key={active.id} task={active} review={review} />
               <div className="evidence">
                 <div className="evidence-header">
-                  <h3>{review.source ? "Compare the evidence" : "Supporting evidence needed"}</h3>
+                  <h3>What to do next</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
-                {review.source && <blockquote className="source-quote">
-                  <p>“{review.source.excerpt}”</p>
-                  <footer>{review.source.reference}</footer>
-                </blockquote>}
                 <p className="review-summary">{review.summary}</p>
                 <p id="evidence-help" className="evidence-status">{review.nextStep}</p>
                 {editing ? <div className="evidence-fields">
@@ -251,27 +278,42 @@ export default function App() {
               </div>
               <div className="decision-footer">
                 <div className="actions">
-                  {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Confirm finding</button>}
-                  <button className={!canApprove && !editing ? "solid" : ""} disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Ask a manager</button>
-                  <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss finding</button>
+                  {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Confirm issue</button>}
+                  <button className={!canApprove && !editing ? "solid" : ""} disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>
+                  <button className="quiet" onClick={() => decide(active, "Dismissed")}>Not an issue</button>
                 </div>
                 {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
               </div>
-            </> : <p className="completion">{manager.length ? "Pending manager reviews are still available in the queue." : "Import a CSV to add records, or reopen a decision from Activity."}</p>}
+            </> : <div className="completion">
+              <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>
+              <button className="manual-evidence" onClick={() => setTab("Activity")}>{manager.length ? "Open shift handoff" : "See what was checked"}</button>
+            </div>}
           </section>
           <aside className="queue-rail" aria-label="Record queues">
             <section className="panel" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
-              <h2 id="queue-title">Work queue <span>{queue.length}</span></h2>
+              <h2 id="queue-title">To check <span>{queue.length}</span></h2>
               {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">No records awaiting review.</p>}
             </section>
             {managerPanel}
+            <label className="upload import-queue">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>
           </aside>
         </div>}
-        {tab === "Activity" && managerPanel}
+        {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">
+          <div className="handoff-header">
+            <div><h2 id="handoff-title">Shift handoff</h2><p>Give the next person the record, the gap, and the source.</p></div>
+            {handoff.length > 0 && <button className="manual-evidence" onClick={() => void copyHandoff()}>Copy handoff</button>}
+          </div>
+          <p className="handoff-status" role="status">{handoffStatus}</p>
+          {handoff.length ? <ul>{handoff.map(({ task, summary, text }) => <li className="handoff-record" key={task.id}>
+            <strong>{task.record}</strong><p>{summary}</p>
+            <details><summary>View handoff text</summary><pre>{text}</pre></details>
+            <button className="manual-evidence" onClick={() => openTask(task)}>Open {task.record}</button>
+          </li>)}</ul> : <p className="empty">Nothing waiting for a manager.</p>}
+        </section>}
         {tab === "Activity" && <section className="panel"><h2>Decision history</h2>
           {workspace.history.length ? <ul>{workspace.history.map((entry) => (
             <li className="activity-row" key={entry.id}>
-              <div><strong>{entry.task.record} · {entry.decision === "Approved" ? "Finding confirmed" : entry.decision}</strong><small><time dateTime={entry.at}>{new Date(entry.at).toLocaleString()}</time> · {entry.task.source}</small>
+              <div><strong>{entry.task.record} · {entry.decision === "Approved" ? "Issue confirmed" : entry.decision === "Manager review requested" ? "Needs a manager" : entry.decision === "Dismissed" ? "Not an issue" : entry.decision}</strong><small><time dateTime={entry.at}>{new Date(entry.at).toLocaleString()}</time> · {entry.task.source}</small>
                 {(entry.evidence.reference || entry.comparedSource) && <details>
                   <summary>Evidence reviewed</summary>
                   {entry.comparedSource && entry.comparedSource.reference !== entry.evidence.reference &&
@@ -285,6 +327,14 @@ export default function App() {
                 <button onClick={() => { decide(entry.task, "Reopened"); }}>Reopen <span className="sr-only">{entry.task.record}</span></button>}
             </li>
           ))}</ul> : <p className="empty">No decisions recorded yet.</p>}
+        </section>}
+        {tab === "Learn" && <section className="panel field-guide" aria-labelledby="guide-title">
+          <h2 id="guide-title">From receiving to the shelf</h2>
+          <div className="guide-grid">
+            <article><h3>Lot or batch number</h3><p>The identifier that helps you trace a product to the group it came from. Compare what’s on the label with what’s in your records.</p></article>
+            <article><h3>Receiving log</h3><p>The record of what showed up and what staff saw when it arrived. It gives the next person a place to start when inventory looks wrong.</p></article>
+            <article><h3>Shift handoff</h3><p>Leave the package ID, what disagrees, and where to check next. Keep the original source with the note.</p></article>
+          </div>
         </section>}
         {tab === "Learn" && <section className="panel learn">
           <p>Effective dates and license applicability have yet to be verified. Use the issuing authority’s current materials to confirm what applies.</p>

@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.5.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.6.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -157,3 +157,27 @@ These are deterministic sample comparisons. Uploaded data receives only the
 observations the app can establish from that data and can never borrow sample
 evidence. The Metrc sandbox probe and model integration do not provide live
 evidence to this preview.
+
+## Version 1.6 dispensary shift
+
+Design for a spectrum of familiarity, from staff who check occasional records
+between customers to inventory leads and managers responsible for follow-up.
+Use the same vocabulary across Today, Activity, and Learn. Define industry
+terms at the point of use or in Learn. Preserve package IDs and source names
+for staff who already know their workflow.
+
+Today answers what needs attention with live workspace counts: To check,
+Needs a manager, and Checked. The source comparison makes the difference
+between inventory records and receiving visible without opening separate
+files. Staff can confirm an issue, leave it for a manager, or mark it as
+not an issue. When their queue clears, link to the work they left behind.
+
+Activity answers what the next shift needs. The handoff includes unresolved
+package IDs, the evidence already reviewed, and the next check. Copy is
+deliberate and the preview stores work on this device. Learn explains lot or
+batch numbers, receiving logs, and handoffs alongside official references.
+
+Evaluate the value with a stockroom or receiving task. Check whether a new
+staff member can explain why a record needs attention, and whether the next
+reviewer can pick up the case without repeating source discovery. Measure
+those results against the team's normal process before claiming savings.

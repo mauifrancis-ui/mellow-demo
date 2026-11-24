@@ -128,23 +128,52 @@ export function prepareReview(task: Task) {
   if (source && task.id === "PKG-221") {
     return {
       source,
+      state: "Sources agree",
       evidence: { ...source, note: "" },
-      summary: "The receiving log supports the missing identifier in the inventory export.",
-      nextStep: "Confirm the finding if the sources support it. The confirmation records your review here.",
+      summary: "Neither record lists a lot number. Confirming saves the two sources together for the next shift.",
+      nextStep: "Confirm the missing lot number, or mark it as not an issue.",
+      handoffNext: "Check the physical package label for a lot number.",
     };
   }
   if (source) {
     return {
       source,
+      state: "Sources disagree",
       evidence: undefined,
-      summary: "The export is blank, but the receiving log says an identifier was present.",
-      nextStep: "Ask a manager to reconcile the two sources, or add evidence that resolves the conflict.",
+      summary: "The export is blank, but receiving saw a lot number on the label. The original label is the next place to check.",
+      nextStep: "Leave this for a manager to check, or add a source that explains the difference.",
+      handoffNext: "Compare the original package label with the receiving log and the inventory record.",
     };
   }
   return {
     source: undefined,
+    state: "Source needed",
     evidence: undefined,
-    summary: "No supporting record is linked to this observation.",
-    nextStep: "Ask a manager to investigate, or add evidence if you have a source.",
+    summary: task.sample
+      ? "Only the inventory record is available. A blank export field can’t tell you what was on the label."
+      : "The import shows what was in the file. A second source can help you decide what happened.",
+    nextStep: "Leave it for a manager, or add a record that backs up what you found.",
+    handoffNext: "Find a supporting record for this item and compare it with the import.",
   };
+}
+
+
+export function shiftHandoff(workspace: Workspace) {
+  const states = latestDecisions(workspace.history);
+  return workspace.tasks.flatMap((task) => {
+    if (states.get(task.id) !== "Manager review requested") return [];
+    const entry = workspace.history.find((item) => item.task.id === task.id
+      && item.decision === "Manager review requested");
+    const review = prepareReview(task);
+    const parts = [
+      `${task.record} · Needs a manager`,
+      `${task.observation} (${task.source} · Record ${task.line})`,
+      review.summary,
+      `Next check: ${review.handoffNext}`,
+      entry?.comparedSource && `${entry.comparedSource.reference}: ${entry.comparedSource.excerpt}`,
+      entry?.evidence.reference && `${entry.evidence.reference}: ${entry.evidence.excerpt}`,
+      entry?.evidence.note && `Note: ${entry.evidence.note}`,
+    ];
+    return [{ task, summary: review.summary, text: parts.filter(Boolean).join("\n") }];
+  });
 }

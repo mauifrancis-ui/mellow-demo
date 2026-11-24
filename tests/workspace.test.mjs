@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyDraft, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, recordDecision, workQueue } from "../src/workspace.ts";
+import { emptyDraft, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, recordDecision, shiftHandoff, workQueue } from "../src/workspace.ts";
 
 test("approval requires both evidence fields and preserves the evidence snapshot", () => {
   const task = initial.tasks[0];
@@ -51,4 +51,15 @@ test("prepared reviews distinguish corroborated, conflicting, missing, and impor
   assert.deepEqual(escalated.history[0].comparedSource, prepareReview(conflicting).source);
   assert.equal(prepareReview(missing).source, undefined);
   assert.equal(prepareReview({ ...supported, sample: false }).source, undefined);
+});
+
+test("shift handoff includes the next check and source, and excludes resolved items", () => {
+  const [, task] = initial.tasks;
+  const flagged = recordDecision(initial, task, "Manager review requested", { ...emptyDraft, note: "Check with receiving." });
+  const [handoff] = shiftHandoff(flagged);
+  assert.match(handoff.text, /PKG-443/);
+  assert.match(handoff.text, /Next check: Compare the original package label/);
+  assert.match(handoff.text, /Sample receiving log/);
+  assert.match(handoff.text, /Check with receiving/);
+  assert.deepEqual(shiftHandoff(recordDecision(flagged, task, "Dismissed", emptyDraft)), []);
 });
