@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from "react";
+import { useRef, useState } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
@@ -100,7 +100,6 @@ export default function App() {
   const [error, setError] = useState("");
   const [handoffStatus, setHandoffStatus] = useState("");
   const [query, setQuery] = useState("");
-  const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
   const evidenceInput = useRef<HTMLInputElement>(null);
   const feedback = useRef<HTMLParagraphElement>(null);
@@ -108,7 +107,6 @@ export default function App() {
   const handoff = shiftHandoff(workspace);
   const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
-  const reviewedCount = workspace.tasks.length - queue.length - manager.length;
   const sampleOpen = sampleComparison.filter((row) => row.state !== "match"
     && queue.some((task) => task.sample && task.id === row.packageId));
   const priority = sampleOpen.find((row) => row.state === "different") ?? sampleOpen[0];
@@ -172,32 +170,23 @@ export default function App() {
     return saved;
   }
 
-  async function importCsv(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-    if (!file) return;
-    setImporting(true);
-    try {
-      if (file.size > 2_000_000) throw new Error("Choose a CSV of 2 MB or less.");
-      const rows = parseCsv(await file.text());
-      const batchId = crypto.randomUUID();
-      const tasks = rows.flatMap((row, index): Task[] => {
-        const observation = inspectRow(row);
-        if (!observation) return [];
-        return [{
-          id: `${batchId}:${index}`, source: file.name, line: index + 1, observation,
-          record: row.package_id || row.metrc_package_id || row.pkg_id || row.package || row.id || `Record ${index + 1}`,
-        }];
-      });
-      if (save((current) => ({ ...current, tasks: [...current.tasks, ...tasks] }))) {
-        if (tasks[0]) setActiveId(tasks[0].id);
-        setStatus(`Read ${rows.length} CSV records. Added ${tasks.length} observations to review.`);
-      }
-    } catch (failure) {
-      setError(failure instanceof Error ? failure.message : "Couldn’t read this file.");
-    } finally {
-      setImporting(false);
+  async function importCsv(file: File) {
+    if (file.size > 2_000_000) throw new Error("Choose a CSV of 2 MB or less.");
+    const rows = parseCsv(await file.text());
+    const batchId = crypto.randomUUID();
+    const tasks = rows.flatMap((row, index): Task[] => {
+      const observation = inspectRow(row);
+      if (!observation) return [];
+      return [{
+        id: `${batchId}:${index}`, source: file.name, line: index + 1, observation,
+        record: row.package_id || row.metrc_package_id || row.pkg_id || row.package || row.id || `Record ${index + 1}`,
+      }];
+    });
+    if (!save((current) => ({ ...current, tasks: [...current.tasks, ...tasks] }))) {
+      throw new Error("Couldn’t save these reviews on this device. Try again.");
     }
+    setStatus(`Read ${rows.length} CSV records. Added ${tasks.length} observations to review.`);
+    if (tasks[0]) openTask(tasks[0]);
   }
 
   function updateDraft(field: keyof Draft, value: string) {
@@ -311,13 +300,7 @@ export default function App() {
             <h1>{tab}</h1>
             {tab !== "Today" && <p>{tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>}
           </div>
-          {tab === "Today" && <>
-            <dl className="shift-counts">
-              <div><dt>To check</dt><dd>{queue.length}</dd></div>
-              <div><dt>Needs a manager</dt><dd>{manager.length}</dd></div>
-              <div><dt>Checked</dt><dd>{reviewedCount}</dd></div>
-            </dl>
-          </>}
+          {tab === "Today" && <ReceivingCheck onCompared={addComparison} onImport={importCsv} />}
         </header>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
@@ -384,11 +367,9 @@ export default function App() {
           <aside className="queue-rail" aria-label="Record queues">
             <section className="panel" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
               <h2 id="queue-title">To check <span>{queue.length}</span></h2>
-              {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">No records awaiting review.</p>}
+              {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">Nothing to check right now.</p>}
             </section>
-            {managerPanel}
-            <ReceivingCheck onCompared={addComparison} />
-            <label className="upload import-queue">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>
+            {manager.length > 0 && managerPanel}
           </aside>
         </div>}
         {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">

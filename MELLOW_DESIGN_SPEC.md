@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.23.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.24.0 · 2026-11-24
 
 **High standards, low stress.** Help dispensary staff see what needs attention,
 inspect the evidence, and leave the next shift a decision or a clear next
@@ -55,10 +55,16 @@ own provenance.
   handoff for all records. A comparison disagreement requires supporting
   evidence and a resolution note before a finding can be recorded.
 
-Put Compare inventory and receiving files in the queue. Save only local
-exception tasks and their evidence snapshots, not representations of routine
-matches. Leave both original files unchanged. The ten-second skim remains
+Place an outlined Compare files button in the Today header. Open a focused
+dialog with both inputs and source values side by side, stacking the inputs
+on narrow screens. Compare first and show differences before Add to queue
+writes exception tasks locally. Offer Check one file instead inside the
+dialog. Leave both original files unchanged. The ten-second skim remains
 a research target.
+
+Keep the rail for work records. Show the To check count there once and show
+manager follow-up only while it has records. Keep intake and comparison
+controls outside the rail.
 
 ## Surface and control rules
 

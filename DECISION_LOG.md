@@ -84,3 +84,10 @@ identical retry preserves prior decisions and changed evidence can be
 reviewed independently. Source files remain read-only. Verified the
 single card and visible sample values in rendered markup and ran the
 14 automated tests, including retry identity and conflict evidence.
+
+## Version 1.24 compare files dialog
+
+Separated file setup from task navigation. Compare files opens a dialog with
+the two sources and a read-only result table. A separate Add to queue action
+stages the exceptions. The one-file check is available in the same dialog.
+The queue keeps outstanding cases and shows manager follow-up when present.
