@@ -284,3 +284,13 @@ answered.
 
 **Status messages** clear when you change tabs, so a message from Today no
 longer shows on Activity or Learn.
+
+## Rule: button dropdowns overlay
+
+A menu opened from a button, such as More options, floats over the content
+below it and never pushes content down. It opens 6px below its button, with an
+ink border, a 4px radius and the one permitted shadow, for floating layers
+only. It closes on an outside click, on Escape (which returns focus to the
+button), and after an action is chosen. Inline disclosures that reveal
+reading material, such as What I checked or Evidence reviewed, still expand
+in place.

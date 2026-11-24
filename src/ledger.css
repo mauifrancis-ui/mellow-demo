@@ -321,3 +321,19 @@
   .decision-row :is(.evidence-toggle, .evidence-none) { grid-column: 2 / -1; grid-row: 3; }
   .evidence-detail { margin-left: 0; }
 }
+
+/* Button dropdowns overlay the content below; they never push it */
+.review-options.dropdown { position: relative; }
+.shell[data-palette="ledger"] .dropdown[open] > .review-options-body {
+  position: absolute; top: calc(100% + 6px); left: 0; z-index: 30; display: grid; gap: 2px;
+  width: max-content; min-width: 240px; max-width: min(320px, calc(100vw - 32px)); margin: 0; padding: 6px;
+  border: 1px solid var(--ink); border-radius: 4px; background: var(--paper); box-shadow: 0 10px 24px rgb(28 27 25 / 12%);
+}
+.shell[data-palette="ledger"] .dropdown .review-options-body > button {
+  justify-content: flex-start; width: 100%; min-height: 44px; padding: 0 12px; border: 0; border-radius: 3px; background: transparent; font-weight: 500;
+}
+.shell[data-palette="ledger"] .dropdown .review-options-body .note { padding: 0 4px; }
+@media (hover: hover) {
+  .shell[data-palette="ledger"] .dropdown .review-options-body > button:hover { background: var(--tint); }
+}
+.shell[data-palette="ledger"] .dropdown .review-options-body .note summary { padding-inline: 8px; font-weight: 500; }

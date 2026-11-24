@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { ReceivingMonitor } from "./ReceivingMonitor";
 import { Briefing, Conversation } from "./AskMellow";
@@ -18,6 +18,32 @@ import {
 
 const tabs = ["Today", "Activity", "Learn"] as const;
 type Tab = typeof tabs[number];
+
+// Button dropdowns float over the page instead of pushing content down.
+function Dropdown({ label, children }: { label: string; children: ReactNode }) {
+  const ref = useRef<HTMLDetailsElement>(null);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: PointerEvent) => {
+      if (!ref.current?.contains(event.target as Node)) ref.current?.removeAttribute("open");
+    };
+    document.addEventListener("pointerdown", close);
+    return () => document.removeEventListener("pointerdown", close);
+  }, [open]);
+  return <details ref={ref} className="review-options dropdown" onToggle={(event) => setOpen(event.currentTarget.open)}
+    onKeyDown={(event) => {
+      if (event.key !== "Escape" || !ref.current?.open) return;
+      ref.current.removeAttribute("open");
+      ref.current.querySelector("summary")?.focus();
+    }}>
+    <summary>{label}</summary>
+    <div className="review-options-body" role="group" aria-label={label}
+      onClick={(event) => { if ((event.target as HTMLElement).closest("button")) ref.current?.removeAttribute("open"); }}>
+      {children}
+    </div>
+  </details>;
+}
 
 function DecisionNote({ note, onChange }: { note: string; onChange: (note: string) => void }) {
   const [open, setOpen] = useState(Boolean(note));
@@ -363,14 +389,11 @@ export default function App() {
                       {primaryAction === "record" && <button className="solid" aria-describedby={editing && missingEvidence ? "evidence-missing" : "evidence-help"} disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
                       {primaryAction === "evidence" && <button className="solid" onClick={openEvidence}>{evidenceAction}</button>}
                       {!pendingManager && <button className={primaryAction === "manager" ? "solid" : "secondary"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
-                      <details className="review-options" key={active.id}>
-                        <summary>More options</summary>
-                        <div className="review-options-body">
-                          {!editing && primaryAction !== "evidence" && <button onClick={openEvidence}>{evidenceAction}</button>}
-                          <button onClick={() => decide(active, "Dismissed")}>Not an issue</button>
-                          {!needsRationale && <DecisionNote note={draft.note} onChange={(value) => updateDraft("note", value)} />}
-                        </div>
-                      </details>
+                      <Dropdown key={active.id} label="More options">
+                        {!editing && primaryAction !== "evidence" && <button onClick={openEvidence}>{evidenceAction}</button>}
+                        <button onClick={() => decide(active, "Dismissed")}>Not an issue</button>
+                        {!needsRationale && <DecisionNote note={draft.note} onChange={(value) => updateDraft("note", value)} />}
+                      </Dropdown>
                     </div>
                     {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
                   </div>

@@ -188,3 +188,12 @@ leaving a record for a manager, marking one not an issue, the Activity
 ledger with evidence expanded, Learn lookup filtering, and a Learn chip
 answering on Today. There were no console errors and reduced motion ran no
 animations. Founder preview approval is pending.
+
+## Dropdowns overlay content · 2026-11-24
+
+Founder rule: button dropdowns overlap content instead of pushing it.
+More options is now a floating menu that closes on an outside click, on
+Escape and after an action. Verified in the browser: the content below
+moved 0px when it opened, Escape closed it and returned focus, an outside
+click closed it, and choosing Not an issue applied the decision. Lint,
+build and 26 tests passed.
