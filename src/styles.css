@@ -3,9 +3,14 @@
   font-family: "Google Sans Variable", system-ui, sans-serif;
   --pill: 999px;
   --gutter: clamp(16px, 4vw, 48px);
+  /* Motion: 120ms press and hover, 180ms arrival, 200ms change and disclosure. */
   --ease: cubic-bezier(.2, .7, .25, 1);
-  --press: 120ms;
-  --reveal: 200ms;
+  --motion-press: 120ms;
+  --motion-arrive: 180ms;
+  --motion-change: 200ms;
+  --motion-travel: 4px;
+  --press: var(--motion-press);
+  --reveal: var(--motion-change);
   --ink: #1c2836;
   --muted: #48586a;
   --surface: #fffdfa;
@@ -102,12 +107,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   nav button:hover, .queue-row:hover, .upload:hover, .actions button:enabled:not(.solid):hover, .activity-row button:hover { background: #e9efed; }
   .actions .solid:enabled:hover { background: #1a484a; }
 }
-@media (prefers-reduced-motion: no-preference) {
-  :where(button, .upload, .queue-row) { transition: background-color var(--press) var(--ease), color var(--press) var(--ease), box-shadow var(--press) var(--ease), transform var(--press) var(--ease); }
-  :where(nav button, .actions button, .activity-row button):enabled:active { transform: translateY(1px); }
-  .note[open] textarea { animation: settle var(--reveal) var(--ease) both; }
-  @keyframes settle { from { transform: translateY(4px); } to { transform: translateY(0); } }
-}
 
 /* Review workspace */
 .masthead { background: var(--deep); color: #fffdfa; border-color: #334358; }
@@ -143,14 +142,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 .manager-panel h2 span { color: #65420d; }
 @media (min-width: 820px) {
   .queue-link { display: none; }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .record-identity { animation: record-arrival var(--reveal) var(--ease) both; }
-  .queue-link, .next-record { transition: background-color var(--press) var(--ease); }
-  @keyframes record-arrival {
-    from { opacity: .78; transform: translateY(4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
 }
 
 /* Preview palette roles */
@@ -300,16 +291,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 .error.review-feedback { margin-top: 4px; }
 .evidence-fields :is(input, textarea) { border-radius: 16px; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .page { animation: page-arrival 180ms var(--ease) both; }
-  .evidence, .review-options[open] .review-options-body { animation: panel-arrival 200ms var(--ease) both; }
-  .feedback:not(:empty) { animation: page-arrival 160ms var(--ease) both; }
-  .queue-row .chevron { transition: transform var(--press) var(--ease); }
-  .queue-row[aria-current] .chevron { transform: translateX(2px); }
-  .manual-evidence:active { transform: translateY(1px); }
-  @keyframes page-arrival { from { opacity: .78; } to { opacity: 1; } }
-  @keyframes panel-arrival { from { transform: translateY(6px); opacity: .72; } to { transform: translateY(0); opacity: 1; } }
-}
 
 .comparison { padding-top: 0; border-top: 0; }
 .comparison-grid[data-single="true"] { grid-template-columns: 1fr; }
@@ -322,8 +303,8 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   list-style: none; width: fit-content; color: var(--deep); font-weight: 650;
 }
 .review-options summary::-webkit-details-marker { display: none; }
-.review-options summary::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: rotate(45deg); margin-top: -3px; }
-.review-options[open] > summary::after, .review-options .note[open] > summary::after { transform: rotate(225deg); margin-top: 3px; }
+.review-options summary::after { content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0; transform: translateY(-2px) rotate(45deg); }
+.review-options[open] > summary::after, .review-options .note[open] > summary::after { transform: translateY(2px) rotate(225deg); }
 .review-options-body {
   display: grid; justify-items: start; gap: 4px; padding: 4px;
   border: 1px solid var(--line); border-radius: 16px; margin-top: 4px;
@@ -390,9 +371,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 .compare-table tbody tr { border-top: 1px solid var(--line); }
 .shell .queue-row[aria-current] { background: color-mix(in srgb, var(--selected) 36%, var(--surface)); }
 
-@media (prefers-reduced-motion: no-preference) {
-  .compare-dialog[open] { animation: panel-arrival var(--reveal) var(--ease) both; }
-}
 
 .receiving-monitor {
   grid-column: 1 / -1;
@@ -408,31 +386,6 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   letter-spacing: -.04em; margin-bottom: 8px;
 }
 .monitor-open { margin-top: 12px; }
-.monitor-map {
-  display: grid; grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
-  grid-template-rows: repeat(2, minmax(44px, auto)); gap: 8px 0; align-items: center;
-  background-color: var(--observation);
-  background-image: radial-gradient(color-mix(in srgb, var(--focus) 16%, transparent) 1px, transparent 1px);
-  background-size: 12px 12px;
-  border-radius: 20px; padding: clamp(8px, 1.7vw, 20px); min-width: 0;
-}
-.monitor-source, .monitor-map-result {
-  display: grid; align-content: center; min-width: 0; gap: 4px;
-  padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
-}
-.monitor-source:first-child { grid-area: 1 / 1; }
-.monitor-source[data-receiving] { grid-area: 2 / 1; }
-.monitor-source span, .monitor-map-result span { font-size: 14px; color: var(--muted); }
-.monitor-source strong, .monitor-map-result strong { font-size: 14px; line-height: 1.25; }
-.monitor-map-result { grid-area: 1 / 3 / 3; align-self: stretch; background: var(--deep); color: var(--surface); border-color: var(--deep); }
-.monitor-map-result span { color: inherit; }
-.monitor-link { height: 0; border-top: 2px solid var(--observation-edge); }
-.monitor-link-inventory { grid-area: 1 / 2; }
-.monitor-link-receiving { grid-area: 2 / 2; }
-.receiving-monitor[data-delayed="true"] .monitor-link-receiving { border-top: 2px dashed #986b27; }
-.receiving-monitor[data-delayed="true"] :is(.monitor-source[data-receiving], .monitor-map-result) {
-  background: #fff0ce; border-color: #ba8d45; color: #65420d;
-}
 .monitor-details { grid-column: 1 / -1; border-top: 1px solid var(--line); }
 .monitor-details summary {
   display: flex; align-items: center; flex-wrap: wrap; min-height: var(--touch);
@@ -441,17 +394,105 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 .monitor-details summary::-webkit-details-marker { display: none; }
 .monitor-details summary::after {
   content: ""; width: 6px; height: 6px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
-  transform: rotate(45deg); margin-top: -3px;
+  transform: translateY(-2px) rotate(45deg);
 }
-.monitor-details[open] summary::after { transform: rotate(225deg); margin-top: 3px; }
+.monitor-details[open] summary::after { transform: translateY(2px) rotate(225deg); }
 .monitor-details summary time { color: var(--muted); font-size: 14px; font-weight: 400; }
 .monitor-detail-body { padding-block: 4px 8px; }
 .monitor-details p { margin-bottom: 8px; }
 @media (width < 680px) {
   .receiving-monitor { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* Sample monitoring chart */
+.monitor-chart {
+  --matched: #5e9c4c; --different: #e2a63d; --missing: #8c5bc4; --delayed: #986b27;
+  margin: 0; min-width: 0; display: grid; gap: 8px;
+}
+.chart-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.chart-title { color: var(--deep); font-size: 14px; font-weight: 650; }
+.chart-scope { color: var(--muted); font-size: 13px; }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; list-style: none; color: var(--muted); font-size: 13px; }
+.chart-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.chart-swatch { width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
+.monitor-chart [data-series="matched"] { --c: var(--matched); }
+.monitor-chart [data-series="different"] { --c: var(--different); }
+.monitor-chart [data-series="missing"] { --c: var(--missing); }
+.chart-swatch[data-series="delayed"] { background: transparent; border: 1.5px dashed var(--delayed); }
+.chart-frame { position: relative; min-width: 0; border-radius: 12px; }
+.chart-frame:focus-visible { outline-offset: 6px; }
+.chart-frame svg { display: block; overflow: visible; }
+.chart-frame text { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.chart-tick line { stroke: var(--line); stroke-width: 1; }
+.chart-baseline { stroke: color-mix(in srgb, var(--muted) 50%, transparent); stroke-width: 1; }
+.chart-hit { fill: transparent; }
+.chart-column [data-series] { fill: var(--c); }
+.chart-frame .chart-cap { fill: var(--deep); font-size: 13px; font-weight: 650; }
+.chart-slot[data-current] .chart-time { fill: var(--deep); font-weight: 650; }
+.chart-delayed rect { fill: color-mix(in srgb, var(--delayed) 8%, transparent); stroke: var(--delayed); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.chart-frame .chart-delayed text { fill: #65420d; font-weight: 650; }
+.chart-tip {
+  position: absolute; z-index: 2;
+  display: grid; gap: 2px; min-width: 132px; padding: 8px 12px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+  box-shadow: 0 8px 24px rgb(20 32 22 / 10%); font-size: 13px; color: var(--muted);
+  pointer-events: none; white-space: nowrap;
+}
+.chart-tip[data-flip] { translate: -100% 0; }
+.chart-tip strong { color: var(--deep); font-size: 15px; }
+.chart-tip-time { margin-bottom: 4px; }
+.chart-tip-row { display: flex; align-items: center; gap: 6px; }
+.chart-tip-row b { color: var(--deep); font-variant-numeric: tabular-nums; }
+.chart-key { width: 12px; height: 2px; border-radius: 1px; background: var(--c); }
+.monitor-table { width: 100%; margin-block: 4px 12px; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.monitor-table caption { text-align: left; color: var(--muted); padding-bottom: 4px; }
+.monitor-table :is(th, td) { padding: 6px 8px; text-align: right; border-top: 1px solid var(--line); }
+.monitor-table :is(th:first-child) { text-align: left; padding-left: 0; }
+.monitor-table thead th { color: var(--muted); font-weight: 600; border-top: 0; }
+.monitor-table td[colspan] { text-align: left; color: #65420d; }
+
+/* Sliding navigation pill */
+nav[data-pill] { position: relative; }
+nav[data-pill] button { position: relative; z-index: 1; }
+.nav-pill { position: absolute; top: 0; left: 0; border-radius: var(--pill); background: var(--selected); pointer-events: none; }
+.shell[data-palette] .masthead nav[data-pill] button[aria-current],
+.shell[data-palette] .masthead nav[data-pill] button[aria-current]:hover { background: transparent; }
+
+/* Motion system. Every movement answers an action or a state change.
+   Reduced motion keeps the same end states with no timed movement. */
 @media (prefers-reduced-motion: no-preference) {
-  .monitor-map, .monitor-details[open] .monitor-detail-body {
-    animation: panel-arrival var(--reveal) var(--ease) both;
+  /* Press and hover: 120ms */
+  :where(button, .upload, .queue-row, .queue-link, .next-record, summary) {
+    transition: background-color var(--motion-press) var(--ease), color var(--motion-press) var(--ease),
+      border-color var(--motion-press) var(--ease), transform var(--motion-press) var(--ease);
   }
+  :where(button:not(.queue-row), .upload, .review-options summary):active { transform: translateY(1px); }
+  .queue-row .chevron { transition: transform var(--motion-press) var(--ease); }
+  .queue-row[aria-current] .chevron { transform: translateX(2px); }
+  .chart-column { transition: opacity var(--motion-press) var(--ease); }
+  svg[data-active] .chart-slot:not([data-current]) :is(.chart-column, .chart-delayed) { opacity: .4; }
+  .chart-tip { animation: arrive var(--motion-press) var(--ease) both; }
+
+  /* Arrival: 180ms */
+  .page { animation: arrive var(--motion-arrive) var(--ease) both; }
+  .feedback:not(:empty) { animation: arrive var(--motion-arrive) var(--ease) both; }
+  .compare-dialog[open]::backdrop { animation: fade var(--motion-arrive) var(--ease) both; }
+
+  /* Change and disclosure: 200ms */
+  .nav-pill { transition: transform var(--motion-change) var(--ease), width var(--motion-change) var(--ease); }
+  .queue-row { transition: background-color var(--motion-change) var(--ease), box-shadow var(--motion-change) var(--ease); }
+  .record-identity, .monitor-message, .compare-dialog[open] { animation: reveal var(--motion-change) var(--ease) both; }
+  .evidence, .review-options[open] .review-options-body, .monitor-details[open] .monitor-detail-body,
+  .note[open] textarea { animation: reveal var(--motion-change) var(--ease) both; }
+  :is(.review-options, .monitor-details, .note) > summary::after { transition: transform var(--motion-change) var(--ease); }
+  .count { display: inline-block; animation: tick var(--motion-change) var(--ease) both; }
+  .chart-slot[data-fresh] .chart-column { animation: grow var(--motion-change) var(--ease) both; }
+  .chart-delayed { animation: fade var(--motion-change) var(--ease) both; }
+
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes arrive { from { opacity: .78; } to { opacity: 1; } }
+  @keyframes reveal { from { opacity: .72; transform: translateY(var(--motion-travel)); } to { opacity: 1; transform: none; } }
+  @keyframes tick { from { opacity: .4; transform: translateY(calc(var(--motion-travel) * -1)); } to { opacity: 1; transform: none; } }
+  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 }

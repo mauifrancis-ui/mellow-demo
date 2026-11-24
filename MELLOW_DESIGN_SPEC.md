@@ -157,3 +157,30 @@ source with a broken line and an explicit label. Keep the prior successful
 time in view during the delay. Use a brief entry transition on a state
 change and on detail disclosure, with equivalent static states in reduced
 motion. Stack the map under the brief at narrow widths.
+
+## Version 1.27 monitoring chart and motion system
+
+Replace the source map with a stacked column chart of packages compared per
+sample check. Stack matched, difference, and gap from the baseline with 2px
+surface gaps, 24px maximum columns, and a 4px rounded cap. Label the latest
+total on its cap and keep times on the axis. Show a delayed source as a
+dashed slot with an explicit Delayed label and keep earlier checks in view.
+Use matched #5E9C4C, difference #E2A63D, and gap #8C5BC4 in every palette.
+The set passes lightness, chroma, color-vision separation, and normal-vision
+checks against the Forest surface. The amber is below 3:1 against the
+surface, so the chart always keeps its legend, tooltip, and table view. The
+chart is one tab stop. Arrow, Home, and End keys move between checks and
+announce each check. Hover and focus show a tooltip beside the column and
+dim the other columns. "What I checked" holds the same data as a table.
+Earlier checks are fictional sample data and are labeled as such.
+
+Motion tokens live in `:root`: `--motion-press` 120ms, `--motion-arrive`
+180ms, `--motion-change` 200ms, `--motion-travel` 4px, and one easing curve.
+Press and hover use press timing, including a 1px press on buttons and
+summaries. Pages, feedback, and the dialog backdrop use arrival timing.
+Record changes, disclosure bodies, the monitor message, the sliding
+navigation pill, queue selection, disclosure chevrons, the To check count,
+and a newly completed check use change timing. A new check grows from the
+baseline. Checks already present on arrival render still. Every animation
+sits inside `prefers-reduced-motion: no-preference`, so reduced motion keeps
+the same end states with no timed movement.

@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { ReceivingMonitor } from "./ReceivingMonitor";
-import { monitorReceiving } from "./monitoring";
+import { monitorReceiving, sampleHistory } from "./monitoring";
 import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
 import {
@@ -93,10 +93,15 @@ function SourceComparison({ task, review }: { task: Task; review: ReturnType<typ
 export default function App() {
   const [palette, setPalette] = useState(initialPalette);
   const [tab, setTab] = useState<Tab>("Today");
+  const nav = useRef<HTMLElement>(null);
+  const [pill, setPill] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [workspace, setWorkspace] = useState(() => {
     try { return readWorkspace(); } catch { return initial; }
   });
-  const [posture, setPosture] = useState(() => monitorReceiving(undefined, sampleComparison, "current", new Date().toISOString()));
+  const [posture, setPosture] = useState(() => {
+    const now = new Date().toISOString();
+    return monitorReceiving(undefined, sampleComparison, "current", now, sampleHistory(now));
+  });
   const [activeId, setActiveId] = useState("");
   const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
@@ -281,11 +286,25 @@ export default function App() {
     try { localStorage.setItem(paletteKey, value); } catch { /* Keep the current choice in memory. */ }
   }
 
+  useLayoutEffect(() => {
+    const node = nav.current;
+    if (!node) return;
+    const place = () => {
+      const current = node.querySelector<HTMLElement>("button[aria-current]");
+      setPill(current ? { x: current.offsetLeft, y: current.offsetTop, width: current.offsetWidth, height: current.offsetHeight } : null);
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [tab]);
+
   return (
     <div className="shell" data-palette={palette}>
       <header className="masthead"><div className="masthead-inner">
         <div className="wordmark">mellow<span aria-hidden="true">.</span></div>
-        <nav aria-label="Main navigation">
+        <nav aria-label="Main navigation" ref={nav} data-pill={pill ? "" : undefined}>
+          {pill && <span className="nav-pill" aria-hidden="true" style={{ width: pill.width, height: pill.height, transform: `translate(${pill.x}px, ${pill.y}px)` }} />}
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item}</button>)}
         </nav>
         <div className="preview-settings">
@@ -376,7 +395,7 @@ export default function App() {
           </section>
           <aside className="queue-rail" aria-label="Record queues">
             <section className="panel" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
-              <h2 id="queue-title">To check <span>{queue.length}</span></h2>
+              <h2 id="queue-title">To check <span className="count" key={queue.length}>{queue.length}</span></h2>
               {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">Nothing to check right now.</p>}
             </section>
             {manager.length > 0 && managerPanel}

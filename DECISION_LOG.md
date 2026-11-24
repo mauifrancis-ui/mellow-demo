@@ -114,3 +114,21 @@ Renamed the npm package from `auditready-demo` to `mellow-demo`. The
 Vercel project and production URL keep the `auditready-demo` name, since
 renaming them would change the live address. Build, lint and 16 tests
 passed after the change.
+
+## Version 1.27 monitoring chart and motion system · 2026-11-24
+
+Founder feedback said the source map did not say anything. Replaced it with
+a stacked column chart of packages compared per sample check, which shows
+volume, outcome mix, and a delayed source at a glance. Monitoring posture now
+keeps the last eight runs with their difference and gap counts. The live
+sample comparison is the latest run, and seven fictional earlier runs give
+the chart a history. Those runs are labeled as sample data in the chart and
+in the table. Consolidated the motion rules from the spec into tokens and one
+reduced-motion section, replacing scattered hard-coded timings. Added the
+sliding navigation pill, smooth disclosure chevrons, queue selection
+transitions, a count tick, the monitor message change, and chart growth for
+new checks. Verification: lint, type check, build, and 17 tests passed. A
+browser render at 1440px and 375px covered the default, hover, keyboard,
+delayed, and restored states, with no console errors. Computed styles
+confirmed the 120, 180, and 200ms timings. Reduced motion ran no
+animations. Founder preview approval is pending before merge to `main`.
