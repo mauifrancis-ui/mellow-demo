@@ -40,13 +40,7 @@ function DecisionNote({ note, onChange }: { note: string; onChange: (note: strin
   );
 }
 
-const reviewSteps = [
-  { id: "inventory-source", label: "Inventory", drawing: "package" },
-  { id: "second-source", label: "Second source", drawing: "receipt" },
-  { id: "review-decision", label: "Decision", drawing: "handoff" },
-] as const;
-
-function ReviewDrawing({ kind }: { kind: typeof reviewSteps[number]["drawing"] }) {
+function ReviewDrawing({ kind }: { kind: "package" | "receipt" | "handoff" }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 64 48" className="review-drawing" fill="none"
       stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -69,42 +63,21 @@ function ReviewDrawing({ kind }: { kind: typeof reviewSteps[number]["drawing"] }
   );
 }
 
-function ReviewSteps() {
-  const [selected, setSelected] = useState<string>();
-  return (
-    <nav className="review-steps" aria-label="Review sections">
-      {reviewSteps.map(({ id, label, drawing }, index) => (
-        <a key={id} href={`#${id}`} aria-current={selected === id ? "location" : undefined} onClick={(event) => {
-          const target = document.getElementById(id);
-          if (!target) return;
-          event.preventDefault();
-          setSelected(id);
-          target.focus({ preventScroll: true });
-          target.scrollIntoView({ block: "nearest", behavior: "instant" });
-        }}>
-          <ReviewDrawing kind={drawing} />
-          <span className="step-label"><span className="step-number">{index + 1}</span>{label}</span>
-        </a>
-      ))}
-    </nav>
-  );
-}
-
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
   return <section className="record-insight comparison" aria-label="What the records say">
     <div className="comparison-heading">
-      <h3>Source comparison</h3>
+      <h3>What’s in the records</h3>
       <span className="source-state" data-state={review.state}>{review.state}</span>
     </div>
     <div className="comparison-grid">
       <div className="comparison-source" id="inventory-source" tabIndex={-1} role="group" aria-label="Inventory source">
-        <span>{task.sample ? "Inventory record" : "Imported record"}</span>
+        <span className="source-label"><ReviewDrawing kind="package" />{task.sample ? "Inventory export" : "Imported file"}</span>
         <strong>{task.observation}</strong>
         <small>{task.source} · Record {task.line}</small>
       </div>
       <div className="comparison-source" id="second-source" tabIndex={-1} role="group" aria-label="Second source">
-        <span>{review.source ? "Receiving log" : "Second source"}</span>
-        <strong>{review.source ? review.source.excerpt : "Nothing linked yet"}</strong>
+        <span className="source-label"><ReviewDrawing kind="receipt" />{task.sample ? "Receiving log" : "Supporting record"}</span>
+        <strong>{review.source ? review.source.excerpt : "No supporting record is attached."}</strong>
         {review.source && <small>{review.source.reference}</small>}
       </div>
     </div>
@@ -136,11 +109,13 @@ export default function App() {
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const review = active ? prepareReview(active) : undefined;
-  const hasManualEvidence = Boolean(draft.reference || draft.excerpt);
-  const editing = active?.id === editRecordId || hasManualEvidence;
-  const preparedEvidence = !editing ? review?.evidence : undefined;
+  const hasManualEvidence = Boolean(draft.reference || draft.excerpt)
+    && (draft.reference !== review?.evidence?.reference || draft.excerpt !== review?.evidence?.excerpt);
+  const editing = active?.id === editRecordId;
+  const preparedEvidence = !editing && !hasManualEvidence ? review?.evidence : undefined;
   const needsRationale = editing && Boolean(review?.source && !review.evidence);
-  const canApprove = hasEvidence(preparedEvidence ?? draft) && (!needsRationale || Boolean(draft.note.trim()));
+  const canApprove = Boolean(preparedEvidence) || (editing && hasEvidence(draft) && (!needsRationale || Boolean(draft.note.trim())));
+  const pendingManager = Boolean(active && latest.get(active.id) === "Manager review requested");
   const hasDraft = Object.values(draft).some((value) => value.trim());
 
   function save(update: (current: Workspace) => Workspace) {
@@ -229,6 +204,12 @@ export default function App() {
     }
   }
 
+  function openEvidence() {
+    if (!active) return;
+    setEditRecordId(active.id);
+    requestAnimationFrame(() => evidenceInput.current?.focus());
+  }
+
   function openTask(task: Task) {
     setActiveId(task.id);
     setEditRecordId("");
@@ -284,7 +265,7 @@ export default function App() {
           </label>
         </div>
       </div></header>
-      <main className="page">
+      <main className="page" key={tab}>
         <header className={tab === "Today" ? "shift-header" : "page-header"}>
           <div><h1>{tab === "Today" ? "Your shift, in focus." : tab}</h1><p>{tab === "Today" ? "See where your records disagree and leave the next shift a clear handoff." : tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p></div>
           {tab === "Today" && <>
@@ -306,40 +287,45 @@ export default function App() {
               </div>
               <a className="queue-link" href="#work-queue">View queue</a>
             </div>
-            <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
             {error && <p className="error review-feedback" role="alert">{error}</p>}
             {active && review ? <>
-              <ReviewSteps key={active.id} />
+              <div className="review-instruction" key={active.id}>
+                <ReviewDrawing kind="handoff" />
+                <div>
+                  <h3>{pendingManager ? "Waiting for a manager" : review.evidence ? "Check whether both records are missing the lot number" : review.source ? "Have a manager check the package label" : "Find a record that backs this up"}</h3>
+                  <p id="evidence-help">{pendingManager ? "This is already in the handoff. If you can resolve it, review the evidence below." : review.nextStep}</p>
+                </div>
+              </div>
               <SourceComparison key={active.id} task={active} review={review} />
-              <div className="evidence">
+              {editing && <section className="evidence" aria-label="Add supporting evidence">
                 <div className="evidence-header">
-                  <h3>Next check</h3>
+                  <h3>Evidence you’re adding</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
-                <p className="review-summary">{review.summary}</p>
-                <p id="evidence-help" className="evidence-status">{review.nextStep}</p>
-                {editing ? <div className="evidence-fields">
+                <div className="evidence-fields">
                   <label>Evidence source<input ref={evidenceInput} value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
                   <label>Supporting excerpt<textarea rows={2} value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
                   {needsRationale && <label>How does this evidence resolve the conflict?<textarea rows={2} value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} /></label>}
-                </div> : <button className="manual-evidence" onClick={() => {
-                  setEditRecordId(active.id);
-                  requestAnimationFrame(() => evidenceInput.current?.focus());
-                }}>{review.source ? "Add another source" : "Add evidence"}</button>}
-                {!needsRationale && <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />}
-              </div>
-              <div className="decision-footer" id="review-decision" tabIndex={-1} role="group" aria-label="Decision controls">
+                </div>
+              </section>}
+              <div className="decision-footer" id="review-decision" role="group" aria-label="Decision controls">
                 <div className="actions">
-                  {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Confirm issue</button>}
-                  <button className={!canApprove && !editing ? "solid" : ""} disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>
+                  {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
+                  {!editing && hasManualEvidence && <button className="solid" onClick={openEvidence}>Review saved evidence</button>}
+                  {!pendingManager && <button className={!canApprove && !editing && !hasManualEvidence ? "solid" : ""} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
                   <button className="quiet" onClick={() => decide(active, "Dismissed")}>Not an issue</button>
                 </div>
                 {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
+              </div>
+              <div className="review-extras">
+                {!editing && !hasManualEvidence && <button className="manual-evidence" onClick={openEvidence}>{review.source ? "Add a supporting record" : "Add evidence"}</button>}
+                {!needsRationale && <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />}
               </div>
             </> : <div className="completion">
               <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>
               <button className="manual-evidence" onClick={() => setTab("Activity")}>{manager.length ? "Open shift handoff" : "See what was checked"}</button>
             </div>}
+            <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
           </section>
           <aside className="queue-rail" aria-label="Record queues">
             <section className="panel" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">

@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.8.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.9.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -223,3 +223,28 @@ no implication that a task is complete or that a decision is mandatory.
 Use a 200ms, 3px settle for the drawings when a record opens, with 35ms
 between entries. Press and selection feedback use existing timing tokens.
 All illustrations and state cues remain visible in reduced-motion mode.
+
+## Version 1.9 guided decisions
+
+The app header shares the page canvas. Use a 28–42px title range for the
+active issue and more rounded corners on the review frame and editing
+controls. Keep the source area on a neutral surface with a thin separator.
+
+Start with a case-specific instruction that identifies what to verify and
+what the main action will do. Show the original line drawings next to the
+named sources and instruction. For the sample, use Inventory export and
+Receiving log as source labels. Present the records before the action row.
+When records support the finding, Record issue saves it in Mellow. When they
+disagree or a source is missing, favor Leave for manager. A reviewer can
+mark a finding that does not apply as Not an issue.
+
+Keep saved manual evidence collapsed until the reviewer opens it. Evidence
+that exactly matches the prepared source remains visible in the comparison,
+without a duplicate editor. Preserve existing drafts, including partial
+drafts. Require review of saved manual evidence before it can support a
+decision. Show the save result as small inline feedback below the actions.
+
+Use 180ms page arrival, a 200ms slide for the evidence and instruction
+panels, and 120ms button feedback. Give a changed record and save
+confirmation their own restrained transitions. Avoid simulated loading
+delays. Reduced motion removes all movement and timed entry effects.

@@ -131,7 +131,7 @@ export function prepareReview(task: Task) {
       state: "Sources agree",
       evidence: { ...source, note: "" },
       summary: "Neither record lists a lot number. Confirming saves the two sources together for the next shift.",
-      nextStep: "Confirm the missing lot number, or mark it as not an issue.",
+      nextStep: "If neither record lists a lot number, choose Record issue. It saves the finding here without changing inventory.",
       handoffNext: "Check the physical package label for a lot number.",
     };
   }
@@ -141,7 +141,7 @@ export function prepareReview(task: Task) {
       state: "Sources disagree",
       evidence: undefined,
       summary: "The export is blank, but receiving saw a lot number on the label. The original label is the next place to check.",
-      nextStep: "Leave this for a manager to check, or add a source that explains the difference.",
+      nextStep: "Receiving saw a number that the export doesn’t show. Leave it for a manager unless you can document which record is right.",
       handoffNext: "Compare the original package label with the receiving log and the inventory record.",
     };
   }
@@ -152,7 +152,7 @@ export function prepareReview(task: Task) {
     summary: task.sample
       ? "Only the inventory record is available. A blank export field can’t tell you what was on the label."
       : "The import shows what was in the file. A second source can help you decide what happened.",
-    nextStep: "Leave it for a manager, or add a record that backs up what you found.",
+    nextStep: "A blank field is only a clue. Add the receiving log or another supporting record, or leave it for a manager.",
     handoffNext: "Find a supporting record for this item and compare it with the import.",
   };
 }
