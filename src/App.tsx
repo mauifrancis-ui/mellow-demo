@@ -42,7 +42,7 @@ function DecisionNote({ note, onChange }: { note: string; onChange: (note: strin
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
   return <section className="record-insight comparison" aria-label="What the records say">
     <div className="comparison-heading">
-      <h3>What the records say</h3>
+      <h3>Source comparison</h3>
       <span className="source-state" data-state={review.state}>{review.state}</span>
     </div>
     <div className="comparison-grid">
@@ -250,8 +250,8 @@ export default function App() {
           <section className="primary" aria-labelledby="task-title">
             <div className="review-heading">
               <div key={active?.id} className="record-identity">
-                <p className="eyebrow">{active ? (active.sample ? "Sample package" : "Imported record") : "Shift review"}</p>
-                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.record ?? "You’re caught up"}</h2>
+                {active && <p className="eyebrow">{active.record}{active.sample ? " · Sample package" : " · Imported record"}</p>}
+                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.sample ? "Missing lot number" : active?.record ?? "You’re caught up"}</h2>
               </div>
               <a className="queue-link" href="#work-queue">View queue</a>
             </div>
@@ -261,7 +261,7 @@ export default function App() {
               <SourceComparison key={active.id} task={active} review={review} />
               <div className="evidence">
                 <div className="evidence-header">
-                  <h3>What to do next</h3>
+                  <h3>Next check</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
                 <p className="review-summary">{review.summary}</p>

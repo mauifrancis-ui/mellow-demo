@@ -72,3 +72,22 @@ retrieve only permitted package evidence. Add authenticated tenant and facility
 authorization, state-specific endpoint validation, pagination and rate limits,
 and provenance before exposing records to the app. Keep output fields scoped
 to the review. The probe provides no package synchronization or Metrc writes.
+
+## Retrieval sources reviewed on 2026-11-24
+
+| Source | Candidate use and access |
+| --- | --- |
+| Metrc Connect | Facility-scoped track-and-trace data. Confirm jurisdiction, integrator onboarding, vendor key, facility user permissions, and readable package endpoints. [Metrc Connect](https://www.metrc.com/track-and-trace-technology/metrc-connect/) |
+| Dutchie POS | Authorized store inventory and products. Request a key using a pilot shop and an approved integration. Scope to the inventory permissions needed. [API quick start](https://api.pos.dutchie.com/pages/quick-start.html) · [Partner access](https://support.dutchie.com/hc/en-us/articles/27660267271187-Dutchie-POS-API-key-request-process-for-third-party-integrations) |
+| Flowhub | Potential inventory source where the store already uses Flowhub. Confirm partner or data agreement requirements and confirm that the approved endpoint returns the fields required for the comparison. [Flowhub Open Ecommerce](https://help.flowhub.com/en/articles/16005241-use-open-ecommerce) |
+| State regulators | Use current rules and official license records for their jurisdiction and effective period. Confirm each jurisdiction's supported machine access and dataset terms. [California DCC licensing data](https://www.cannabis.ca.gov/resources/data-dashboard/license-report/) · [Data.CA.gov API and dataset licensing](https://data.ca.gov/docs/developer-documentation) |
+| Leafly | Documented retail integrations sync menu data. A public strain-database retrieval license was not verified. Leafly's terms restrict automated extraction. Seek explicit permission for retrieval, storage, and display before considering it for Learn. [Integration example](https://help.leafly.com/s/article/BLAZE-Pull-Menu-Integration-Guide) · [Terms of Use](https://www.leafly.com/info/terms-of-use) |
+
+Start with one pilot shop, one package ID, one authorized inventory source,
+and its matching receiving record or lab certificate where relevant. Store
+the provider record ID, link, facility, observed time, and retrieval time.
+Use facility and record identifiers to match sources. Return an explicit
+mismatch when the linkage cannot be verified. Keep any education catalog
+out of the evidence used for package decisions. Validate provider terms
+cover use with the model before passing excerpts to it. No live connector
+was enabled in this revision.

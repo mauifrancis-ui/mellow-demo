@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.6.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.7.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -181,3 +181,26 @@ Evaluate the value with a stockroom or receiving task. Check whether a new
 staff member can explain why a record needs attention, and whether the next
 reviewer can pick up the case without repeating source discovery. Measure
 those results against the team's normal process before claiming savings.
+
+## Version 1.7 editorial workspace
+
+Use a continuous work surface. Start Today with the shift headline and three
+ruled counts. Make the discrepancy the active record heading and keep its
+package ID directly above it. Use one shared surface for the source
+comparison, with aligned labels and a divider between sources. Keep the
+next check and human decision directly below. Use a ruled side rail for
+the two queues, with 12px vertical row padding. At narrow widths the sources
+stack inside the same surface and the rail moves below the review.
+
+Reserve pills for standalone controls. Use color along an edge or within a
+shared area to identify context. Keep source and decision states readable
+as words. Avoid nesting raised or rounded surfaces inside the review.
+Use typography, alignment, and spacing to establish the hierarchy across all
+three preview palettes. Keep motion confined to the incoming record's
+identity and source comparison and honor reduced motion.
+
+For live retrieval, show evidence in the same source comparison. Label the
+provider, source record, and effective or retrieved time where available.
+Keep operational evidence, regulatory sources, and educational information
+distinct in both the interface and the retrieval layer. Acquisition and
+permission requirements are in [Mellow Core](MELLOW_CORE.md).

@@ -55,3 +55,16 @@ recovery. The Kare, Ive, Wroblewski, and Clark lenses informed recognizable
 controls, tactile motion, reduced motion, and access on narrow screens. The
 Morris lens required record-scoped provenance, clear evidence gaps, and
 explicit human control of future agent proposals.
+
+## Version 1.7 editorial and retrieval pass
+
+- Rams, Maeda, and Vignelli favored one clear work surface, typography for
+  hierarchy, and rules for comparison. The repeated rounded panels made
+  unrelated items appear equally important.
+- The Eameses, Kare, and Ive favored recognizable pill controls with color
+  used sparingly where the reviewer needs orientation.
+- Norman, Zhuo, and Morris prioritized the path from source to discrepancy
+  to next check. The discrepancy becomes the heading and each source stays
+  visible beside its counterpart.
+- Wroblewski and Clark favored stacking sources within the same comparison at
+  narrow widths and keeping the decision close to the record.
