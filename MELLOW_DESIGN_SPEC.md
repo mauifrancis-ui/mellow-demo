@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.25.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.26.0 · 2026-11-24
 
 **High standards, low stress.** Help dispensary staff see what needs attention,
 inspect the evidence, and leave the next shift a decision or a clear next
@@ -146,3 +146,14 @@ server, retrieval sources, and GPT knowledge is tracked in
   in ten seconds without coaching. Compare their handling of a de-identified
   discrepancy with their current process before claiming savings.
 - Release the production build only after founder review and approval.
+
+## Version 1.26 monitoring presentation
+
+Place the sample monitoring brief above the active task within the shared
+review surface. Lead with the message and keep the last successful time
+visible beside What I checked. The source map names Inventory and Receiving
+and shows their relationship to the comparison. Mark a delayed receiving
+source with a broken line and an explicit label. Keep the prior successful
+time in view during the delay. Use a brief entry transition on a state
+change and on detail disclosure, with equivalent static states in reduced
+motion. Stack the map under the brief at narrow widths.

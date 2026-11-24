@@ -308,13 +308,13 @@ export default function App() {
         </header>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
-        {tab === "Today" && <ReceivingMonitor posture={posture} record={monitorTask?.record}
+        {tab === "Today" && <div className="card-surface review-layout">
+          <ReceivingMonitor posture={posture} record={monitorTask?.record}
           onReview={monitorTask && active?.id !== monitorTask.id ? () => openTask(monitorTask) : undefined}
           onToggleDelay={() => {
             const time = new Date().toISOString();
             setPosture((current) => monitorReceiving(current, sampleComparison, current.receiving === "current" ? "delayed" : "current", time));
-          }} />}
-        {tab === "Today" && <div className="card-surface review-layout">
+          }} />
           <section className="primary" aria-labelledby="task-title">
             <div className="review-heading">
               <div key={active?.id} className="record-identity">
