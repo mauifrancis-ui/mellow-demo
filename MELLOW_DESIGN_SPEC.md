@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.4.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.5.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -136,3 +136,24 @@ three treatments. The choice persists in that browser.
 
 Use the brighter colors for accents and grouping. Pending review and errors
 retain explicit labels across themes.
+
+## Version 1.5 prepared review
+
+Today is where a reviewer decides what to do with an observation Mellow has
+prepared. Start with what the export shows, the linked source if present, what
+the comparison means, and the next available action. Confirm a finding when
+the evidence supports it, dismiss it when it does not apply, or route an
+unresolved case to a manager.
+
+The demo has three explicitly fictional source situations: corroborating
+evidence, conflicting evidence, and no linked evidence. Show the two available
+sample excerpts inline. Provide a ready-to-confirm path for the corroborated
+finding and a manager path for the unresolved ones. Manual entry lives behind
+Add evidence. A conflict needs both an alternate source and the reviewer's
+reason for resolving it before confirmation. Saving records the decision and
+evidence in Activity without making an external data change.
+
+These are deterministic sample comparisons. Uploaded data receives only the
+observations the app can establish from that data and can never borrow sample
+evidence. The Metrc sandbox probe and model integration do not provide live
+evidence to this preview.

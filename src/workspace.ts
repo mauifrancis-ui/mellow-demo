@@ -2,7 +2,7 @@ type Row = Record<string, string>;
 export type Task = { id: string; record: string; source: string; line: number; observation: string; sample?: boolean };
 export type Draft = { reference: string; excerpt: string; note: string };
 export type Decision = "Approved" | "Manager review requested" | "Dismissed" | "Reopened";
-export type Entry = { id: string; task: Task; decision: Decision; at: string; evidence: Draft; returnToManager?: boolean };
+export type Entry = { id: string; task: Task; decision: Decision; at: string; evidence: Draft; returnToManager?: boolean; comparedSource?: Pick<Draft, "reference" | "excerpt"> };
 export type Workspace = { tasks: Task[]; drafts: Record<string, Draft>; history: Entry[] };
 
 export const emptyDraft: Draft = { reference: "", excerpt: "", note: "" };
@@ -92,8 +92,13 @@ export function recordDecision(current: Workspace, task: Task, decision: Decisio
   const state = latestDecisions(current.history).get(task.id);
   if (decision === "Reopened" ? !closed : closed || state === decision) return current;
   if (decision === "Approved" && !hasEvidence(evidence)) throw new Error("Supporting evidence is required.");
+  const review = prepareReview(task);
+  if (decision === "Approved" && review.source && !review.evidence && !evidence.note.trim()) {
+    throw new Error("Explain how the added evidence resolves the conflict.");
+  }
   const entry: Entry = {
     id: crypto.randomUUID(), task, decision, evidence, at: new Date().toISOString(),
+    comparedSource: review.source,
     returnToManager: decision === "Reopened" && previous?.returnToManager ||
       decision !== "Reopened" && state === "Manager review requested",
   };
@@ -109,4 +114,37 @@ export function nextRecord(tasks: Task[], queue: Task[], currentId: string) {
   const index = tasks.findIndex(({ id }) => id === currentId);
   const remaining = new Set(queue.filter(({ id }) => id !== currentId).map(({ id }) => id));
   return [...tasks.slice(index + 1), ...tasks.slice(0, index + 1)].find(({ id }) => remaining.has(id));
+}
+
+const demoSources = {
+  "PKG-221": [{ reference: "Sample receiving log · PKG-221", excerpt: "Receiving check: no batch or lot identifier was recorded for this package." }],
+  "PKG-443": [{ reference: "Sample receiving log · PKG-443", excerpt: "Receiving check: a lot identifier was present on the package label." }],
+} as const;
+
+export function prepareReview(task: Task) {
+  const source = task.sample && Object.hasOwn(demoSources, task.id)
+    ? demoSources[task.id as keyof typeof demoSources][0]
+    : undefined;
+  if (source && task.id === "PKG-221") {
+    return {
+      source,
+      evidence: { ...source, note: "" },
+      summary: "The receiving log supports the missing identifier in the inventory export.",
+      nextStep: "Confirm the finding if the sources support it. The confirmation records your review here.",
+    };
+  }
+  if (source) {
+    return {
+      source,
+      evidence: undefined,
+      summary: "The export is blank, but the receiving log says an identifier was present.",
+      nextStep: "Ask a manager to reconcile the two sources, or add evidence that resolves the conflict.",
+    };
+  }
+  return {
+    source: undefined,
+    evidence: undefined,
+    summary: "No supporting record is linked to this observation.",
+    nextStep: "Ask a manager to investigate, or add evidence if you have a source.",
+  };
 }

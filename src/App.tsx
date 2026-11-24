@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from "react";
 
 import {
-  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, readWorkspace, recordDecision, storageKey, workQueue,
+  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, storageKey, workQueue,
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
@@ -57,11 +57,13 @@ export default function App() {
     try { return readWorkspace(); } catch { return initial; }
   });
   const [activeId, setActiveId] = useState("");
+  const [editRecordId, setEditRecordId] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
+  const evidenceInput = useRef<HTMLInputElement>(null);
   const feedback = useRef<HTMLParagraphElement>(null);
   const latest = latestDecisions(workspace.history);
   const manager = workspace.tasks.filter((task) => latest.get(task.id) === "Manager review requested");
@@ -69,12 +71,13 @@ export default function App() {
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
-  const canApprove = hasEvidence(draft);
+  const review = active ? prepareReview(active) : undefined;
+  const hasManualEvidence = Boolean(draft.reference || draft.excerpt);
+  const editing = active?.id === editRecordId || hasManualEvidence;
+  const preparedEvidence = !editing ? review?.evidence : undefined;
+  const needsRationale = editing && Boolean(review?.source && !review.evidence);
+  const canApprove = hasEvidence(preparedEvidence ?? draft) && (!needsRationale || Boolean(draft.note.trim()));
   const hasDraft = Object.values(draft).some((value) => value.trim());
-  const evidenceNeeded = !draft.reference.trim() && !draft.excerpt.trim()
-    ? "Approval needs an evidence source and an excerpt."
-    : !draft.reference.trim() ? "Approval needs an evidence source."
-      : "Approval needs a supporting excerpt.";
 
   function save(update: (current: Workspace) => Workspace) {
     try {
@@ -84,7 +87,7 @@ export default function App() {
       setError("");
       return true;
     } catch (failure) {
-      setError(failure instanceof Error && failure.message === "Supporting evidence is required."
+      setError(failure instanceof Error && ["Supporting evidence is required.", "Explain how the added evidence resolves the conflict."].includes(failure.message)
         ? failure.message : "Couldn’t save to this browser. Check storage and try again.");
       return false;
     }
@@ -139,18 +142,22 @@ export default function App() {
     let changed = false;
     let nextId = "";
     const saved = save((current) => {
-      const evidence = workspace.drafts[task.id] ?? current.drafts[task.id] ?? emptyDraft;
+      const savedDraft = workspace.drafts[task.id] ?? current.drafts[task.id] ?? emptyDraft;
+      const evidence = decision === "Approved" && preparedEvidence
+        ? { ...preparedEvidence, note: savedDraft.note }
+        : savedDraft;
       const next = recordDecision(current, task, decision, evidence);
       changed = next !== current;
       if (changed && decision !== "Reopened") nextId = nextRecord(next.tasks, workQueue(next), task.id)?.id ?? "";
       return next;
     });
     if (saved && changed) {
-      setStatus(`${decision}: ${task.record}. Saved on this device.`);
+      setStatus(`${decision === "Approved" ? "Finding confirmed" : decision}: ${task.record}. Saved on this device.`);
       if (decision === "Reopened") {
         requestAnimationFrame(() => feedback.current?.focus());
       } else {
         setActiveId(nextId);
+        setEditRecordId("");
         focusRecord();
       }
     }
@@ -158,6 +165,7 @@ export default function App() {
 
   function openTask(task: Task) {
     setActiveId(task.id);
+    setEditRecordId("");
     setTab("Today");
     focusRecord();
   }
@@ -202,7 +210,7 @@ export default function App() {
       </div></header>
       <main className="page">
         <header className="page-header">
-          <div><h1>{tab}</h1><p>{tab === "Today" ? (queue.length === 1 ? "One record to review." : `${queue.length} records to review.`) : tab === "Activity" ? "Review decisions saved on this device." : "Find official starting points for your research."}</p></div>
+          <div><h1>{tab}</h1><p>{tab === "Today" ? (queue.length === 1 ? "One finding needs your judgment." : `${queue.length} findings to review.`) : tab === "Activity" ? "Review decisions saved on this device." : "Find official starting points for your research."}</p></div>
           {tab === "Today" && <label className="upload">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>}
         </header>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
@@ -218,25 +226,34 @@ export default function App() {
             </div>
             <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
             {error && <p className="error review-feedback" role="alert">{error}</p>}
-            {active ? <>
+            {active && review ? <>
               <RecordContext key={active.id} task={active} pending={latest.get(active.id) === "Manager review requested"} />
               <div className="evidence">
                 <div className="evidence-header">
-                  <h3>Supporting evidence</h3>
+                  <h3>{review.source ? "Compare the evidence" : "Supporting evidence needed"}</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
-                <p id="evidence-help" className="evidence-status" data-ready={canApprove}>{canApprove ? "Evidence added. Confirm it supports your decision." : evidenceNeeded}</p>
-                <div className="evidence-fields">
-                  <label>Evidence source<input value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
+                {review.source && <blockquote className="source-quote">
+                  <p>“{review.source.excerpt}”</p>
+                  <footer>{review.source.reference}</footer>
+                </blockquote>}
+                <p className="review-summary">{review.summary}</p>
+                <p id="evidence-help" className="evidence-status">{review.nextStep}</p>
+                {editing ? <div className="evidence-fields">
+                  <label>Evidence source<input ref={evidenceInput} value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
                   <label>Supporting excerpt<textarea rows={2} value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
-                </div>
-                <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />
+                  {needsRationale && <label>How does this evidence resolve the conflict?<textarea rows={2} value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} /></label>}
+                </div> : <button className="manual-evidence" onClick={() => {
+                  setEditRecordId(active.id);
+                  requestAnimationFrame(() => evidenceInput.current?.focus());
+                }}>{review.source ? "Add another source" : "Add evidence"}</button>}
+                {!needsRationale && <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />}
               </div>
               <div className="decision-footer">
                 <div className="actions">
-                  <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Approve record</button>
-                  <button disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Flag for manager</button>
-                  <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss</button>
+                  {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Confirm finding</button>}
+                  <button className={!canApprove && !editing ? "solid" : ""} disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Ask a manager</button>
+                  <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss finding</button>
                 </div>
                 {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
               </div>
@@ -254,8 +271,14 @@ export default function App() {
         {tab === "Activity" && <section className="panel"><h2>Decision history</h2>
           {workspace.history.length ? <ul>{workspace.history.map((entry) => (
             <li className="activity-row" key={entry.id}>
-              <div><strong>{entry.task.record} · {entry.decision}</strong><small><time dateTime={entry.at}>{new Date(entry.at).toLocaleString()}</time> · {entry.task.source}</small>
-                {entry.evidence.reference && <details><summary>Supporting evidence</summary><p>{entry.evidence.reference}</p><p>{entry.evidence.excerpt}</p><p>{entry.evidence.note}</p></details>}
+              <div><strong>{entry.task.record} · {entry.decision === "Approved" ? "Finding confirmed" : entry.decision}</strong><small><time dateTime={entry.at}>{new Date(entry.at).toLocaleString()}</time> · {entry.task.source}</small>
+                {(entry.evidence.reference || entry.comparedSource) && <details>
+                  <summary>Evidence reviewed</summary>
+                  {entry.comparedSource && entry.comparedSource.reference !== entry.evidence.reference &&
+                    <><p>{entry.comparedSource.reference}</p><p>{entry.comparedSource.excerpt}</p></>}
+                  {entry.evidence.reference && <><p>{entry.evidence.reference}</p><p>{entry.evidence.excerpt}</p></>}
+                  {entry.evidence.note && <p>{entry.evidence.note}</p>}
+                </details>}
               </div>
               {latest.get(entry.task.id) === entry.decision && workspace.history.find((item) => item.task.id === entry.task.id)?.id === entry.id &&
                 (entry.decision === "Approved" || entry.decision === "Dismissed") &&

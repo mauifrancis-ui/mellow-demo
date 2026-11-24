@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyDraft, initial, inspectRow, latestDecisions, nextRecord, parseCsv, recordDecision, workQueue } from "../src/workspace.ts";
+import { emptyDraft, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, recordDecision, workQueue } from "../src/workspace.ts";
 
 test("approval requires both evidence fields and preserves the evidence snapshot", () => {
   const task = initial.tasks[0];
@@ -38,4 +38,17 @@ test("review advances in queue order and never picks a pending manager case", ()
   assert.deepEqual(workQueue(finished), []);
   assert.equal(nextRecord(finished.tasks, workQueue(finished), first.id), undefined);
   assert.equal(latestDecisions(finished.history).get(second.id), "Manager review requested");
+});
+
+test("prepared reviews distinguish corroborated, conflicting, missing, and imported evidence", () => {
+  const [supported, conflicting, missing] = initial.tasks;
+  const prepared = prepareReview(supported);
+  const confirmed = recordDecision(initial, supported, "Approved", prepared.evidence);
+  assert.deepEqual(confirmed.history[0].evidence, prepared.evidence);
+  assert.equal(prepareReview(conflicting).evidence, undefined);
+  assert.throws(() => recordDecision(initial, conflicting, "Approved", prepared.evidence), /resolves the conflict/);
+  const escalated = recordDecision(initial, conflicting, "Manager review requested", emptyDraft);
+  assert.deepEqual(escalated.history[0].comparedSource, prepareReview(conflicting).source);
+  assert.equal(prepareReview(missing).source, undefined);
+  assert.equal(prepareReview({ ...supported, sample: false }).source, undefined);
 });

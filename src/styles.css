@@ -195,3 +195,15 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   color: #fffdf7; background: var(--mast); border: 1px solid #ffffff9c; border-radius: var(--pill);
   min-height: 44px; padding: 8px 12px; font: inherit;
 }
+
+.source-quote {
+  margin: 0; padding: 12px 16px; background: var(--subtle-surface);
+  border-inline-start: 3px solid var(--observation-edge); border-radius: 4px 12px 12px 4px;
+}
+.source-quote footer { margin-top: 4px; color: var(--muted); font-size: 14px; }
+.review-summary { font-weight: 650; }
+.manual-evidence {
+  width: fit-content; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line);
+  border-radius: var(--pill); color: var(--accent); font-weight: 650;
+}
+.manual-evidence:hover { background: var(--selected); }
