@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.15.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.16.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -329,3 +329,9 @@ Render Package, Inventory, and Receiving in consistent left-aligned columns
 with shared row alignment. Pair each exception with the reason for the
 next step. Distinguish a blank field from a missing row. A finding never
 infers which source is correct or makes changes to either source.
+
+## Version 1.16 receiving check secondary actions
+
+Place See differences and gaps and Compare your own exports side by side
+as outlined secondary buttons. Wrap them on narrow screens. Both controls
+report their expanded state and display their content below the action row.

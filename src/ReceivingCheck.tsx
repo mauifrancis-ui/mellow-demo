@@ -13,6 +13,7 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
   showDifferences: boolean;
   onShowDifferences: (open: boolean) => void;
 }) {
+  const [showExports, setShowExports] = useState(false);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const rows = result ?? sampleComparison;
@@ -55,8 +56,15 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
     <ul className="comparison-key" aria-label="Receiving check results">
       {totals.map(({ id, label, count }) => <li key={id} data-result={id}><strong>{count}</strong> {label}</li>)}
     </ul>
-    <details open={showDifferences} onToggle={(event) => onShowDifferences(event.currentTarget.open)}>
-      <summary id="receiving-differences">See differences and gaps</summary>
+    <div className="receiving-actions">
+      <button type="button" className="manual-evidence" aria-expanded={showDifferences} aria-controls="receiving-differences" onClick={() => onShowDifferences(!showDifferences)}>
+        See differences and gaps
+      </button>
+      <button type="button" className="manual-evidence" aria-expanded={showExports} aria-controls="receiving-exports" onClick={() => setShowExports(!showExports)}>
+        Compare your own exports
+      </button>
+    </div>
+    <div id="receiving-differences" hidden={!showDifferences}>
       {exceptions.length ? <table className="lot-differences">
         <caption className="sr-only">Inventory and receiving lot numbers for packages that need a check</caption>
         <thead><tr><th scope="col">Package</th><th scope="col">Inventory</th><th scope="col">Receiving</th></tr></thead>
@@ -69,9 +77,8 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
           <tr className="lot-next-check"><td colSpan={3}><strong>{lotInsight(row).title}.</strong> {lotInsight(row).detail}</td></tr>
         </tbody>)}
       </table> : <p>All lot numbers match across the two files.</p>}
-    </details>
-    <details>
-      <summary>Compare your own exports</summary>
+    </div>
+    <div id="receiving-exports" hidden={!showExports}>
       <p>Choose two de-identified CSVs with <code>package_id</code> and <code>lot_number</code> columns. The comparison stays on this page and makes no changes to either source.</p>
       <form onSubmit={(event) => void checkFiles(event)} className="lot-uploads">
         <label>Inventory export<input name="inventory" type="file" accept=".csv,text/csv" required /></label>
@@ -80,6 +87,6 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
       </form>
       {error && <p role="alert" className="error">{error}</p>}
       {result && <button className="manual-evidence" onClick={() => { onResult(undefined); setError(""); }}>Return to sample</button>}
-    </details>
+    </div>
   </section>;
 }

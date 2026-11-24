@@ -388,7 +388,7 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 
 .receiving-check { display: grid; gap: 8px; padding-block: 4px 16px; }
 .receiving-check header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; }
-.receiving-check :is(header p, details p) { color: var(--muted); }
+.receiving-check :is(header p, #receiving-exports > p:not(.error)) { color: var(--muted); }
 .comparison-meter { display: flex; gap: 4px; min-height: 16px; border-radius: var(--pill); overflow: hidden; }
 .comparison-meter span { flex-basis: 0; }
 .comparison-meter [data-result="match"] { background: var(--accent); }
@@ -399,7 +399,9 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 .comparison-key li::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-inline-end: 4px; border-radius: 2px; background: var(--accent); }
 .comparison-key [data-result="different"]::before { background: #d99a38; }
 .comparison-key [data-result="missing"]::before { background: var(--selected); border: 1px dashed var(--muted); }
-.receiving-check summary { min-height: 44px; padding-block: 12px; width: fit-content; color: var(--accent); font-weight: 700; }
+.receiving-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 4px; }
+.receiving-actions button { border-color: var(--muted); }
+.receiving-actions button[aria-expanded="true"] { background: var(--selected); }
 .lot-differences li { border-top: 1px solid var(--line); }
 .lot-uploads { display: flex; flex-wrap: wrap; gap: 12px; align-items: start; padding-block: 8px; }
 .lot-uploads input { max-width: 100%; }
