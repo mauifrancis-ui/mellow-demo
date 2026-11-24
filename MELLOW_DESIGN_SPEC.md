@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.19.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.20.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -380,3 +380,18 @@ The Mellow labels are hypotheses. Validate them with receiving staff and
 inventory leads by asking what was compared, what the result means, and
 what to do next without coaching.
 [Dutchie receiving workflow](https://support.dutchie.com/hc/en-us/articles/12882250822035-Metrc-Receive-inventory-from-a-pending-transfer-in-Dutchie-POS) · [Flowhub comparison workflow](https://help.flowhub.com/en/articles/6487308-the-metrc-tab)
+
+## Version 1.20 comparison card and voice
+
+Give the comparison one rounded surface with a short heading, source scope,
+and two result filters. The counts themselves open the matching source
+rows. Show a clear selected state and keep the table flat inside the card.
+If all lot numbers match, say so in one sentence. Keep file selection
+secondary to the results.
+
+Use self-hosted Google Sans Variable for body, labels, and controls. Keep
+the serif for editorial hierarchy. Use the actual source name and a friendly
+sentence such as “We compared eight packages across inventory and receiving
+records.” Write with warmth and calm confidence. Explain gaps plainly, give
+one useful next action, and avoid slang or reassurance that implies the
+issue is resolved. The preview wording still needs confirmation with staff.
