@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.7.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.8.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -204,3 +204,22 @@ provider, source record, and effective or retrieved time where available.
 Keep operational evidence, regulatory sources, and educational information
 distinct in both the interface and the retrieval layer. Acquisition and
 permission requirements are in [Mellow Core](MELLOW_CORE.md).
+
+## Version 1.8 illustrated review
+
+Forest field guide is the new default palette for first-time visitors.
+Use #1E3B24 for ink, navigation, and primary actions, #5E9C4C for rules
+and emphasis, #A9CC7A for step markers and selection, and #EFF5E4 for the
+canvas and source surface. Place dark ink on the lighter greens instead
+of using medium green as a text background. Preserve saved palette choices.
+
+Add an illustrated index to the active review. An original line drawing
+of a package, a receiving document, or a decision sheet accompanies each
+labeled shortcut. The index remains one flat strip. Each link takes focus
+to its source or decision controls. People may skip the index and use the
+normal reading and tab order. Numbers indicate reading order. They carry
+no implication that a task is complete or that a decision is mandatory.
+
+Use a 200ms, 3px settle for the drawings when a record opens, with 35ms
+between entries. Press and selection feedback use existing timing tokens.
+All illustrations and state cues remain visible in reduced-motion mode.

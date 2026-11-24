@@ -6,6 +6,7 @@ import {
 } from "./workspace";
 
 const palettes = [
+  { id: "field", label: "Forest field guide" },
   { id: "solar", label: "Solar olive" },
   { id: "indigo", label: "Indigo ember" },
   { id: "ochre", label: "Ochre clay" },
@@ -15,9 +16,9 @@ const paletteKey = "mellow.preview.palette";
 
 function initialPalette(): Palette {
   try {
-    return palettes.find(({ id }) => id === localStorage.getItem(paletteKey))?.id ?? "indigo";
+    return palettes.find(({ id }) => id === localStorage.getItem(paletteKey))?.id ?? "field";
   } catch {
-    return "indigo";
+    return "field";
   }
 }
 
@@ -39,6 +40,56 @@ function DecisionNote({ note, onChange }: { note: string; onChange: (note: strin
   );
 }
 
+const reviewSteps = [
+  { id: "inventory-source", label: "Inventory", drawing: "package" },
+  { id: "second-source", label: "Second source", drawing: "receipt" },
+  { id: "review-decision", label: "Decision", drawing: "handoff" },
+] as const;
+
+function ReviewDrawing({ kind }: { kind: typeof reviewSteps[number]["drawing"] }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 64 48" className="review-drawing" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      {kind === "package" && <>
+        <path className="drawing-fill" d="m9 16 21-9 21 9-21 9Z" />
+        <path d="M9 16v20l21 9 21-9V16M30 25v20M20 12l21 9v7" />
+        <path d="m14 27 10 4v7l-10-4zM17 31l4 2" />
+      </>}
+      {kind === "receipt" && <>
+        <path d="M16 6h27v35l-4-3-5 3-5-3-5 3-4-3-4 3z" />
+        <path className="drawing-fill" d="M21 12h16v6H21z" />
+        <path d="M22 23h15m-15 5h9m-9 5h13m15-19 4-3m-3 9h5" />
+      </>}
+      {kind === "handoff" && <>
+        <path className="drawing-fill" d="M16 12h32v30H16z" />
+        <path d="M24 12V8h16v4M22 20h20m-20 6h12m-12 6h8" />
+        <path d="m34 33 4 4 8-9M8 18l-4-4m49 5 6-3" />
+      </>}
+    </svg>
+  );
+}
+
+function ReviewSteps() {
+  const [selected, setSelected] = useState<string>();
+  return (
+    <nav className="review-steps" aria-label="Review sections">
+      {reviewSteps.map(({ id, label, drawing }, index) => (
+        <a key={id} href={`#${id}`} aria-current={selected === id ? "location" : undefined} onClick={(event) => {
+          const target = document.getElementById(id);
+          if (!target) return;
+          event.preventDefault();
+          setSelected(id);
+          target.focus({ preventScroll: true });
+          target.scrollIntoView({ block: "nearest", behavior: "instant" });
+        }}>
+          <ReviewDrawing kind={drawing} />
+          <span className="step-label"><span className="step-number">{index + 1}</span>{label}</span>
+        </a>
+      ))}
+    </nav>
+  );
+}
+
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
   return <section className="record-insight comparison" aria-label="What the records say">
     <div className="comparison-heading">
@@ -46,12 +97,12 @@ function SourceComparison({ task, review }: { task: Task; review: ReturnType<typ
       <span className="source-state" data-state={review.state}>{review.state}</span>
     </div>
     <div className="comparison-grid">
-      <div className="comparison-source">
+      <div className="comparison-source" id="inventory-source" tabIndex={-1} role="group" aria-label="Inventory source">
         <span>{task.sample ? "Inventory record" : "Imported record"}</span>
         <strong>{task.observation}</strong>
         <small>{task.source} · Record {task.line}</small>
       </div>
-      <div className="comparison-source">
+      <div className="comparison-source" id="second-source" tabIndex={-1} role="group" aria-label="Second source">
         <span>{review.source ? "Receiving log" : "Second source"}</span>
         <strong>{review.source ? review.source.excerpt : "Nothing linked yet"}</strong>
         {review.source && <small>{review.source.reference}</small>}
@@ -258,6 +309,7 @@ export default function App() {
             <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
             {error && <p className="error review-feedback" role="alert">{error}</p>}
             {active && review ? <>
+              <ReviewSteps key={active.id} />
               <SourceComparison key={active.id} task={active} review={review} />
               <div className="evidence">
                 <div className="evidence-header">
@@ -276,7 +328,7 @@ export default function App() {
                 }}>{review.source ? "Add another source" : "Add evidence"}</button>}
                 {!needsRationale && <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />}
               </div>
-              <div className="decision-footer">
+              <div className="decision-footer" id="review-decision" tabIndex={-1} role="group" aria-label="Decision controls">
                 <div className="actions">
                   {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Confirm issue</button>}
                   <button className={!canApprove && !editing ? "solid" : ""} disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>

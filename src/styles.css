@@ -293,3 +293,41 @@ small { display: block; margin-top: 4px; font-size: 14px; }
   .comparison-grid { grid-template-columns: 1fr; }
   .comparison-source + .comparison-source { border-inline-start: 0; border-block-start: 1px solid var(--line); }
 }
+
+.shell[data-palette="field"] {
+  --canvas: #eff5e4; --surface: #fbfdf7; --ink: #1e3b24; --muted: #445c42; --deep: #1e3b24;
+  --accent: #1e3b24; --focus: #365d36; --selected: #a9cc7a; --line: #c4d3b5;
+  --mast: #1e3b24; --mast-hover: #345938; --signature: #a9cc7a;
+  --observation: #eff5e4; --observation-edge: #5e9c4c; --subtle-surface: #f2f7e9;
+}
+.shell[data-palette="field"] .masthead { --focus: #a9cc7a; }
+.shell[data-palette="field"] .actions .solid:enabled:hover { background: #315837; }
+.review-steps {
+  --diagram-fill: var(--selected);
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 var(--review-inset) 16px; gap: 0;
+  border-block: 1px solid var(--line);
+}
+.review-steps a {
+  display: grid; justify-items: start; align-content: center; gap: 4px;
+  min-height: 72px; min-width: 0; padding: 8px;
+  border-inline-end: 1px solid var(--line); color: var(--deep);
+}
+.review-steps a:last-child { border-inline-end: 0; }
+.review-steps a:hover, .review-steps a[aria-current] { background: var(--observation); }
+.review-steps a[aria-current] { box-shadow: inset 0 -3px var(--observation-edge); }
+.review-drawing { width: clamp(32px, 6vw, 64px); height: auto; }
+.drawing-fill { fill: var(--diagram-fill); }
+.step-label { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; font-size: 14px; font-weight: 650; }
+.step-number { display: grid; place-items: center; min-width: 20px; height: 20px; border-radius: 50%; background: var(--selected); color: var(--deep); }
+.comparison-source:focus, .decision-footer:focus { outline: 2px solid var(--focus); outline-offset: -2px; }
+@media (prefers-reduced-motion: no-preference) {
+  .review-steps a { transition: background-color var(--press) var(--ease), box-shadow var(--press) var(--ease); }
+  .review-steps .review-drawing { animation: drawing-arrival var(--reveal) var(--ease) both; }
+  .review-steps a:nth-child(2) .review-drawing { animation-delay: 35ms; }
+  .review-steps a:nth-child(3) .review-drawing { animation-delay: 70ms; }
+  @keyframes drawing-arrival {
+    from { transform: translateY(3px); opacity: .7; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+}
