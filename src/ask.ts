@@ -37,6 +37,7 @@ export type AskAnswer = {
   items?: { label: string; detail: string; id?: string; title?: string; kind?: Issue["kind"] }[];
   actions: { label: string; action: AskAction }[];
   series?: Series;
+  focusId?: string;
 };
 
 export const suggestions = [
@@ -169,6 +170,7 @@ export function ask(input: string, context: AskContext): AskAnswer {
       body: [row ? describe(row) : "", state, handedOff ? "It’s already in the manager handoff." : queued ? "It’s in To check." : ""].filter(Boolean).join(" "),
       actions: queued || handedOff ? [{ label: `Open ${id}`, action: { kind: "open", id } }] : [],
       series: row && row.state !== "match" ? row.state : undefined,
+      focusId: id,
     };
   }
 

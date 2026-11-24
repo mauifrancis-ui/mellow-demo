@@ -294,3 +294,29 @@ only. It closes on an outside click, on Escape (which returns focus to the
 button), and after an action is chosen. Inline disclosures that reveal
 reading material, such as What I checked or Evidence reviewed, still expand
 in place.
+
+## Version 1.31 contextual, collapsible panel
+
+The right side of Today follows the conversation. `panelFor()` in
+`src/panel.ts` maps each answer to a view:
+
+- A package question shows that package's trail: status, both source
+  records, when it was flagged, and its decisions.
+- A question about gaps, differences or matches shows the chart focused on
+  that result, plus the packages behind it.
+- A question about the day or the receiving source shows the day's checks.
+- A handoff question shows the shift handoff, ready to copy.
+- A walk-through or a "what's next" question shows the queue.
+- A question that points nowhere leaves the panel as it is.
+
+The panel changes only when the person sends a question, taps a chip or
+follows a Learn question. It never changes on a timer. Its header always
+reads "Showing · …" and offers Back to queue. Clearing the conversation
+returns it to the queue.
+
+The panel can be collapsed. On desktop it becomes a 112px strip that keeps
+the "need you" count and the time of the last check, and the conversation
+column widens to 860px. The choice is remembered. Below 900px the panel is a
+bottom sheet over the page. It starts minimized as a "3 need you" bar and
+opens to 78% of the viewport height. Views change with a 200ms fade, and
+reduced motion removes all timed movement.

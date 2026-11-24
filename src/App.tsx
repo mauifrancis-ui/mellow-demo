@@ -4,7 +4,9 @@ import { ReceivingMonitor } from "./ReceivingMonitor";
 import { Briefing, Conversation } from "./AskMellow";
 import { ActivityPage } from "./ActivityPage";
 import { LearnPage } from "./LearnPage";
-import { brief, issueOf, orderQueue, type AskAction, type Series } from "./ask";
+import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextPanel";
+import { panelFor, queueView, type PanelView } from "./panel";
+import { ask, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 import { monitorReceiving, sampleHistory } from "./monitoring";
@@ -17,6 +19,17 @@ import {
 
 
 const tabs = ["Today", "Activity", "Learn"] as const;
+const panelKey = "mellow.panel";
+
+function initialCollapsed() {
+  try {
+    const saved = localStorage.getItem(panelKey);
+    if (saved) return saved === "collapsed";
+    return window.matchMedia("(width < 900px)").matches;
+  } catch {
+    return false;
+  }
+}
 type Tab = typeof tabs[number];
 
 // Button dropdowns float over the page instead of pushing content down.
@@ -113,6 +126,8 @@ export default function App() {
     return monitorReceiving(undefined, sampleComparison, "current", now, sampleHistory(now));
   });
   const [focusSeries, setFocusSeries] = useState<Series | null>(null);
+  const [panelView, setPanelView] = useState<PanelView>(queueView);
+  const [panelCollapsed, setPanelCollapsed] = useState(initialCollapsed);
   const [compareRequest, setCompareRequest] = useState(0);
   const [askRequest, setAskRequest] = useState<string | null>(null);
   const [activeId, setActiveId] = useState("");
@@ -268,6 +283,26 @@ export default function App() {
     setStatus("");
     setError("");
     setAskRequest(question ?? null);
+    if (question) showAnswer(ask(question, askContext));
+  }
+
+  function showAnswer(answer: AskAnswer) {
+    const next = panelFor(answer);
+    if (!next) return;
+    setPanelView(next);
+    setFocusSeries(next.kind === "series" ? next.series : null);
+  }
+
+  function backToQueue() {
+    setPanelView(queueView);
+    setFocusSeries(null);
+  }
+
+  function togglePanel() {
+    setPanelCollapsed((current) => {
+      try { localStorage.setItem(panelKey, current ? "open" : "collapsed"); } catch { /* Keep the choice for this visit. */ }
+      return !current;
+    });
   }
 
   function openTask(task: Task) {
@@ -404,9 +439,11 @@ export default function App() {
                 <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
               </div>
             </section>
-            <Conversation context={askContext} chips={briefing.chips} onAction={onAsk} initialQuestion={askRequest ?? undefined} />
+            <Conversation context={askContext} chips={briefing.chips} onAction={onAsk} onAnswer={showAnswer} onClear={backToQueue} initialQuestion={askRequest ?? undefined} />
           </div>
-          <aside className="ledger-side" aria-label="Today at a glance">
+          <ContextPanel view={panelView} collapsed={panelCollapsed} needYou={queue.length} lastCheck={posture.lastSuccessfulRun?.checkedAt}
+            onBack={backToQueue} onToggle={togglePanel}>
+            {panelView.kind === "queue" && <>
             <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />
             <section className="ledger-queue" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
               <div className="queue-head">
@@ -425,7 +462,19 @@ export default function App() {
                 <button className="text-link" onClick={() => goTo("Activity")}>Activity</button>
               </p>}
             </section>
-          </aside>
+            </>}
+            {panelView.kind === "package" && <PackageTrail id={panelView.id} task={[...queue, ...manager, ...workspace.tasks].find((item) => item.id === panelView.id)}
+              row={sampleComparison.find(({ packageId }) => packageId === panelView.id)} queued={queue.some((item) => item.id === panelView.id)}
+              decision={latest.get(panelView.id)} entries={workspace.history.filter((entry) => entry.task.id === panelView.id)}
+              lastCheck={posture.lastSuccessfulRun?.checkedAt} isActive={active?.id === panelView.id} onOpen={openTask} />}
+            {panelView.kind === "series" && <>
+              <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />
+              <SeriesList series={panelView.series} rows={sampleComparison} open={[...queue, ...manager]} latest={latest}
+                matched={posture.runs.reduce((sum, run) => sum + run.matched, 0)} activeId={active?.id} onOpen={openTask} />
+            </>}
+            {panelView.kind === "summary" && <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />}
+            {panelView.kind === "handoff" && <HandoffPanel handoff={handoff} status={handoffStatus} onCopy={() => void copyHandoff()} onOpen={openTask} />}
+          </ContextPanel>
         </div>}
         {tab === "Activity" && <ActivityPage history={workspace.history} latest={latest} handoff={handoff} open={queue.length}
           flaggedToday={posture.runs.reduce((sum, run) => sum + run.exceptions, 0)} handoffStatus={handoffStatus}

@@ -33,10 +33,12 @@ function formatSize(bytes: number) {
 
 type Turn = { id: number; question: string; answer: AskAnswer };
 
-export function Conversation({ context, chips, onAction, initialQuestion }: {
+export function Conversation({ context, chips, onAction, onAnswer, onClear, initialQuestion }: {
   context: AskContext;
   chips: string[];
   onAction: (action: AskAction, answer: AskAnswer) => void;
+  onAnswer?: (answer: AskAnswer) => void;
+  onClear?: () => void;
   initialQuestion?: string;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
@@ -64,6 +66,7 @@ export function Conversation({ context, chips, onAction, initialQuestion }: {
     setValue("");
     setAttachment(null);
     if (answer.series) onAction({ kind: "series", series: answer.series }, answer);
+    onAnswer?.(answer);
   }
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -114,7 +117,7 @@ export function Conversation({ context, chips, onAction, initialQuestion }: {
           {turns.length > 1 && <button type="button" className="text-link" aria-expanded={showEarlier} onClick={() => setShowEarlier((open) => !open)}>
             {showEarlier ? "Hide earlier" : `Earlier · ${turns.length - 1} question${turns.length === 2 ? "" : "s"}`}
           </button>}
-          <button type="button" className="text-link" onClick={() => { setTurns([]); input.current?.focus(); }}>Clear</button>
+          <button type="button" className="text-link" onClick={() => { setTurns([]); onClear?.(); input.current?.focus(); }}>Clear</button>
         </span>
       </div>
       <ol className="log" aria-live="polite">

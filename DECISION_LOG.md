@@ -197,3 +197,18 @@ Escape and after an action. Verified in the browser: the content below
 moved 0px when it opened, Escape closed it and returned focus, an outside
 click closed it, and choosing Not an issue applied the decision. Lint,
 build and 26 tests passed.
+
+## Version 1.31 contextual, collapsible panel · 2026-11-24
+
+The founder asked whether the right column needs to show all the time. The
+decision: it follows the conversation and it can be collapsed, while the
+"need you" count stays visible even when collapsed. The panel changes only
+on an explicit action, is always labeled, and has Back to queue one tap
+away. That keeps it predictable for people who want a steady queue.
+Verification: lint, type check, build, and 29 tests passed, 3 of them new
+panel-mapping tests. A browser run covered the package, gaps (with chart
+focus), summary and handoff views, a fallback leaving the view unchanged,
+Back to queue, collapse to the strip at 112px with the main column at
+860px, collapse remembered after a reload, a Learn chip setting the view,
+and the phone sheet starting minimized. There were no console errors and
+reduced motion ran no animations. Founder preview approval is pending.
