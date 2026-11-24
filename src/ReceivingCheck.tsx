@@ -15,7 +15,7 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
   const different = exceptions.filter(({ state }) => state === "different").length;
   const missing = exceptions.length - different;
   const reasons = [
-    different > 0 && different === 1 ? "1 lot number differs" : `${different} lot numbers differ`,
+    different > 0 && (different === 1 ? "1 lot number differs" : `${different} lot numbers differ`),
     missing > 0 && `${missing} with missing information`,
   ].filter(Boolean).join(" · ");
   const priority = exceptions.find(({ state }) => state === "different") ?? exceptions[0];
