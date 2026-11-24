@@ -1,11 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { compareLots, lotInsight, lotRecords, sampleComparison, summarizeLots, type LotCheck } from "./comparison";
 
-export function ReceivingCheck({ result, onResult, showDifferences, onShowDifferences }: {
+export function ReceivingCheck({ result, onResult }: {
   result?: LotCheck[];
   onResult: (rows?: LotCheck[]) => void;
-  showDifferences: boolean;
-  onShowDifferences: (open: boolean) => void;
 }) {
   const [filter, setFilter] = useState<"different" | "missing">();
   const [showRows, setShowRows] = useState(false);
@@ -47,16 +45,14 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
       onResult(compareLots(lotRecords(left), lotRecords(right)));
       setFilter(undefined);
       setShowRows(false);
-      onShowDifferences(false);
     } catch (failure) {
-      onResult(undefined);
       setError(failure instanceof Error ? failure.message : "Couldn’t read the files.");
     } finally {
       setBusy(false);
     }
   }
 
-  return <section className="receiving-check" aria-labelledby="receiving-title">
+  return <section className="card-surface receiving-check" aria-labelledby="receiving-title">
     <header>
       <h2 id="receiving-title">Lot numbers, side by side</h2>
       <p>{result ? "Your files" : "Sample records"}</p>
@@ -69,18 +65,17 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
     </div>
     {exceptions.length > 0 && <div className="receiving-filters" role="group" aria-label="Compare records by result">
       {categories.filter(({ count }) => count > 0).map(({ id, label, count }) => {
-        const selected = showDifferences && filter === id;
+        const selected = filter === id;
         return <button type="button" key={id} data-result={id} aria-pressed={selected} aria-controls="receiving-differences" onClick={() => {
-          setFilter(id);
+          setFilter(selected ? undefined : id);
           setShowRows(false);
-          onShowDifferences(!selected);
         }}>
           <span className="receiving-filter-count">{count}</span>
           <span>{label}</span>
         </button>;
       })}
     </div>}
-    <div id="receiving-differences" hidden={!showDifferences || !exceptions.length}>
+    <div id="receiving-differences" hidden={!filter || !visibleRows.length}>
       {filter === "different" && <p className="comparison-insight">The two sources disagree. Use the package label to verify the lot number before changing a record.</p>}
       {filter === "missing" && <ul className="comparison-insight">{missingChecks.map((check) => check && <li key={check}>{check}</li>)}</ul>}
       <details className="receiving-dive" open={showRows} onToggle={(event) => setShowRows(event.currentTarget.open)}>
@@ -113,7 +108,7 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
         <button className="manual-evidence" disabled={busy}>Compare files</button>
       </form>
       {error && <p role="alert" className="error">{error}</p>}
-      {result && <button className="manual-evidence" onClick={() => { onResult(undefined); setFilter(undefined); setShowRows(false); onShowDifferences(false); setError(""); }}>Return to sample</button>}
+      {result && <button className="manual-evidence" onClick={() => { onResult(undefined); setFilter(undefined); setShowRows(false); setError(""); }}>Return to sample</button>}
     </div>
   </section>;
 }

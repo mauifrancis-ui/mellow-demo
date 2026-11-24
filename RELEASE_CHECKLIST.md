@@ -34,4 +34,4 @@
 - [x] Run `npm run build`, `npm run lint`, and `npm test`.
 - [x] Verify missing-evidence rejection, reopening with manager review, and CSV parsing in automated tests.
 - [ ] Open an interactive preview and test mobile reflow, keyboard navigation, screen-reader operation, and draft persistence.
-- [ ] Confirm project permissions for a separate Vercel Preview deployment. The existing production domain responds at `auditready-demo-blond.vercel.app`.
+- [x] Confirm project permissions for a separate Vercel Preview deployment. The existing production domain responds at `auditready-demo-blond.vercel.app`.

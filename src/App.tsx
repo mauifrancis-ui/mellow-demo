@@ -98,7 +98,6 @@ export default function App() {
   const [handoffStatus, setHandoffStatus] = useState("");
   const [query, setQuery] = useState("");
   const [comparison, setComparison] = useState<LotCheck[]>();
-  const [showDifferences, setShowDifferences] = useState(false);
   const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
   const evidenceInput = useRef<HTMLInputElement>(null);
@@ -301,7 +300,7 @@ export default function App() {
         </header>
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
-        {tab === "Today" && <div className="review-layout">
+        {tab === "Today" && <div className="card-surface review-layout">
           <section className="primary" aria-labelledby="task-title">
             <div className="review-heading">
               <div key={active?.id} className="record-identity">
@@ -370,7 +369,7 @@ export default function App() {
             <label className="upload import-queue">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>
           </aside>
         </div>}
-        {tab === "Today" && <ReceivingCheck result={comparison} onResult={setComparison} showDifferences={showDifferences} onShowDifferences={setShowDifferences} />}
+        {tab === "Today" && <ReceivingCheck result={comparison} onResult={setComparison} />}
         {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">
           <div className="handoff-header">
             <div><h2 id="handoff-title">Shift handoff</h2><p>Give the next person the record, the gap, and the source.</p></div>

@@ -52,3 +52,24 @@ and failure behavior before the simulated board pass. The revision puts the
 queue beside the record at desktop widths, places continuation in the decision
 area, and advances after a successful save. The source observation and evidence
 gap establish the in-context surfaces for later cited findings and agent actions.
+
+## Version 1.22 design audit
+
+The previous spec mixed current requirements with superseded iterations of
+card shape, palette, navigation, and comparison summaries. Replaced the
+append-only guidance with a current specification and linked the prior
+version in Git. The review and comparison now share one outer card style.
+Their queues and source tables use flat rows and dividers. The app now
+derives the comparison disclosure directly from the selected result group
+and keeps existing comparison data if a replacement import fails.
+
+Source inspection covers Today, Activity, Learn, and the stylesheet. Build,
+lint, and workflow regression results are tracked with the preview revision.
+Browser geometry, keyboard and assistive technology, and ten-second
+comprehension still require direct verification. Live source and AI
+integration, authenticated decisions, and production approval remain open.
+
+The static Today markup audit confirmed two shared card surfaces, review-first
+reading order, a visible skim, a collapsed detail section, and no record
+selection controls. Build, lint, and 12 regression tests passed. The managed
+preview relay timed out on port 4173 during interactive verification.
