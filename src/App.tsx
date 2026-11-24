@@ -34,13 +34,13 @@ function DecisionNote({ note, onChange }: { note: string; onChange: (note: strin
   const [open, setOpen] = useState(Boolean(note));
   return (
     <details className="note" open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
-      <summary>Decision note <span>(optional)</span></summary>
+      <summary>{note ? "Edit note" : "Add note"}</summary>
       <textarea aria-label="Decision note" value={note} onChange={(event) => onChange(event.target.value)} maxLength={1000} />
     </details>
   );
 }
 
-function ReviewDrawing({ kind }: { kind: "package" | "receipt" | "handoff" }) {
+function ReviewDrawing({ kind }: { kind: "package" | "receipt" }) {
   return (
     <svg aria-hidden="true" viewBox="0 0 64 48" className="review-drawing" fill="none"
       stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
@@ -54,32 +54,23 @@ function ReviewDrawing({ kind }: { kind: "package" | "receipt" | "handoff" }) {
         <path className="drawing-fill" d="M21 12h16v6H21z" />
         <path d="M22 23h15m-15 5h9m-9 5h13m15-19 4-3m-3 9h5" />
       </>}
-      {kind === "handoff" && <>
-        <path className="drawing-fill" d="M16 12h32v30H16z" />
-        <path d="M24 12V8h16v4M22 20h20m-20 6h12m-12 6h8" />
-        <path d="m34 33 4 4 8-9M8 18l-4-4m49 5 6-3" />
-      </>}
     </svg>
   );
 }
 
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
-  return <section className="record-insight comparison" aria-label="What the records say">
-    <div className="comparison-heading">
-      <h3>What’s in the records</h3>
-      <span className="source-state" data-state={review.state}>{review.state}</span>
-    </div>
-    <div className="comparison-grid">
-      <div className="comparison-source" id="inventory-source" tabIndex={-1} role="group" aria-label="Inventory source">
+  return <section className="comparison" aria-label="Evidence">
+    <div className="comparison-grid" data-single={!review.source}>
+      <div className="comparison-source">
         <span className="source-label"><ReviewDrawing kind="package" />{task.sample ? "Inventory export" : "Imported file"}</span>
         <strong>{task.observation}</strong>
         <small>{task.source} · Record {task.line}</small>
       </div>
-      <div className="comparison-source" id="second-source" tabIndex={-1} role="group" aria-label="Second source">
-        <span className="source-label"><ReviewDrawing kind="receipt" />{task.sample ? "Receiving log" : "Supporting record"}</span>
-        <strong>{review.source ? review.source.excerpt : "No supporting record is attached."}</strong>
-        {review.source && <small>{review.source.reference}</small>}
-      </div>
+      {review.source && <div className="comparison-source">
+        <span className="source-label"><ReviewDrawing kind="receipt" />Receiving log</span>
+        <strong>{review.source.excerpt}</strong>
+        <small>{review.source.reference}</small>
+      </div>}
     </div>
   </section>;
 }
@@ -116,6 +107,14 @@ export default function App() {
   const needsRationale = editing && Boolean(review?.source && !review.evidence);
   const canApprove = Boolean(preparedEvidence) || (editing && hasEvidence(draft) && (!needsRationale || Boolean(draft.note.trim())));
   const pendingManager = Boolean(active && latest.get(active.id) === "Manager review requested");
+  const primaryAction = editing || canApprove ? "record"
+    : hasManualEvidence || !review?.source || pendingManager ? "evidence" : "manager";
+  const instruction = pendingManager ? "Already in the manager handoff."
+    : hasManualEvidence ? "Check the evidence you added before recording this issue."
+      : review?.evidence ? "If neither record lists a lot number, record the issue."
+        : review?.source ? "The records disagree. Leave this for a manager to check the label."
+          : "Only the import is available. Add a supporting record or leave this for a manager.";
+  const evidenceAction = hasManualEvidence ? "Review saved evidence" : "Add evidence";
   const hasDraft = Object.values(draft).some((value) => value.trim());
 
   function save(update: (current: Workspace) => Workspace) {
@@ -289,13 +288,7 @@ export default function App() {
             </div>
             {error && <p className="error review-feedback" role="alert">{error}</p>}
             {active && review ? <>
-              <div className="review-instruction" key={active.id}>
-                <ReviewDrawing kind="handoff" />
-                <div>
-                  <h3>{pendingManager ? "Waiting for a manager" : review.evidence ? "Check whether both records are missing the lot number" : review.source ? "Have a manager check the package label" : "Find a record that backs this up"}</h3>
-                  <p id="evidence-help">{pendingManager ? "This is already in the handoff. If you can resolve it, review the evidence below." : review.nextStep}</p>
-                </div>
-              </div>
+              <p className="review-instruction" id="evidence-help">{instruction}</p>
               <SourceComparison key={active.id} task={active} review={review} />
               {editing && <section className="evidence" aria-label="Add supporting evidence">
                 <div className="evidence-header">
@@ -310,16 +303,19 @@ export default function App() {
               </section>}
               <div className="decision-footer" id="review-decision" role="group" aria-label="Decision controls">
                 <div className="actions">
-                  {(editing || canApprove) && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
-                  {!editing && hasManualEvidence && <button className="solid" onClick={openEvidence}>Review saved evidence</button>}
-                  {!pendingManager && <button className={!canApprove && !editing && !hasManualEvidence ? "solid" : ""} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
-                  <button className="quiet" onClick={() => decide(active, "Dismissed")}>Not an issue</button>
+                  {primaryAction === "record" && <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
+                  {primaryAction === "evidence" && <button className="solid" onClick={openEvidence}>{evidenceAction}</button>}
+                  {!pendingManager && <button className={primaryAction === "manager" ? "solid" : "secondary"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
+                  <details className="review-options" key={active.id}>
+                    <summary>More options</summary>
+                    <div className="review-options-body">
+                      {!editing && primaryAction !== "evidence" && <button onClick={openEvidence}>{evidenceAction}</button>}
+                      <button onClick={() => decide(active, "Dismissed")}>Not an issue</button>
+                      {!needsRationale && <DecisionNote note={draft.note} onChange={(value) => updateDraft("note", value)} />}
+                    </div>
+                  </details>
                 </div>
                 {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
-              </div>
-              <div className="review-extras">
-                {!editing && !hasManualEvidence && <button className="manual-evidence" onClick={openEvidence}>{review.source ? "Add a supporting record" : "Add evidence"}</button>}
-                {!needsRationale && <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />}
               </div>
             </> : <div className="completion">
               <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>

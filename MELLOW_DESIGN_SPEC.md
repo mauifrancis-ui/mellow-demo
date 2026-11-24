@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.9.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.10.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -248,3 +248,19 @@ Use 180ms page arrival, a 200ms slide for the evidence and instruction
 panels, and 120ms button feedback. Give a changed record and save
 confirmation their own restrained transitions. Avoid simulated loading
 delays. Reduced motion removes all movement and timed entry effects.
+
+## Version 1.10 action order and evidence density
+
+Show one instruction and the available evidence. A file with no supporting
+record gets one evidence row. Show a comparison only when both records exist.
+Keep provenance in the row and use the instruction to explain the gap or
+disagreement. Avoid an additional status badge that repeats the instruction.
+
+The first action reflects the current case. Record issue for supporting
+evidence, Add evidence when only an import exists, and Leave for manager
+when sources conflict. Saved evidence opens for inspection before it can
+support a decision. Keep any available manager action visible as a secondary
+choice. Put dismissal, notes, and alternative evidence under More options
+when they are secondary to the immediate task. Next record remains a
+navigation action. Keep controls at least 44px high with the same padding
+at rest, hover, and focus. Hover changes the fill without moving the label.
