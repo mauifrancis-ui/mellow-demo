@@ -47,16 +47,16 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
 
   return <section className="receiving-check" aria-labelledby="receiving-title">
     <header>
-      <h2 id="receiving-title">Receiving check</h2>
-      <p>{result ? "Your two CSV files" : "Sample data"}</p>
+      <h2 id="receiving-title">Lot number comparison</h2>
+      <p>{result ? "Inventory and receiving exports" : "Sample inventory and receiving records"}</p>
     </header>
     <div className="receiving-outcome" aria-live="polite" aria-atomic="true">
-      <strong>{exceptions.length ? `${exceptions.length} of ${rows.length} packages flagged` : `All ${rows.length} lot numbers match`}</strong>
+      <strong>{exceptions.length ? `${exceptions.length} of ${rows.length} ${exceptions.length === 1 ? "packages has" : "packages have"} differences or gaps` : `All ${rows.length} lot numbers match`}</strong>
       {reasons && <p>{reasons}</p>}
     </div>
     <div className="receiving-actions">
       {exceptions.length > 0 && <button type="button" className="manual-evidence" aria-expanded={showDifferences} aria-controls="receiving-differences" onClick={() => onShowDifferences(!showDifferences)}>
-        {showDifferences ? "Hide flagged packages" : "See flagged packages"}
+        {showDifferences ? "Hide differences" : "See differences and gaps"}
       </button>}
       <button type="button" className="manual-evidence" aria-expanded={showExports} aria-controls="receiving-exports" onClick={() => setShowExports(!showExports)}>
         Compare your own exports
@@ -67,12 +67,12 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
       {exceptions.length ? <div className="lot-table">
         <table className="lot-differences">
           <caption className="sr-only">Lot numbers with differences or gaps</caption>
-          <thead><tr><th scope="col">Package</th><th scope="col">Inventory</th><th scope="col">Receiving</th></tr></thead>
+          <thead><tr><th scope="col">Package</th><th scope="col">Inventory record</th><th scope="col">Receiving record</th></tr></thead>
           <tbody>
             {exceptions.map((row) => <tr key={row.packageId}>
               <th scope="row">{row.packageId}</th>
-              <td>{row.inventory === null ? "No record" : row.inventory || "Blank"}</td>
-              <td>{row.receiving === null ? "No record" : row.receiving || "Blank"}</td>
+              <td>{row.inventory === null ? "No matching record" : row.inventory || "No lot number"}</td>
+              <td>{row.receiving === null ? "No matching record" : row.receiving || "No lot number"}</td>
             </tr>)}
           </tbody>
         </table>

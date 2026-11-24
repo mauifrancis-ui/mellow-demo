@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.18.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.19.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -365,3 +365,18 @@ Keep this summary on the page surface beneath the review. The text and source
 table answer the current question. Use a proportional chart only when
 the proportion itself supports a decision, or a time series when historical
 comparison is available and is the question the operator needs to answer.
+
+## Version 1.19 comparison terminology
+
+Use Lot number comparison and name the two sources. Describe differences
+and gaps directly. In the table, No lot number means an existing record has
+a blank lot field. No matching record means there was no row with that
+package ID in the other source. Reserve To check and Needs a manager for
+work that still has a decision or handoff state.
+
+Desk research in the Dutchie and Flowhub help centers shows distinct
+language for receiving inventory and comparing records for discrepancies.
+The Mellow labels are hypotheses. Validate them with receiving staff and
+inventory leads by asking what was compared, what the result means, and
+what to do next without coaching.
+[Dutchie receiving workflow](https://support.dutchie.com/hc/en-us/articles/12882250822035-Metrc-Receive-inventory-from-a-pending-transfer-in-Dutchie-POS) · [Flowhub comparison workflow](https://help.flowhub.com/en/articles/6487308-the-metrc-tab)
