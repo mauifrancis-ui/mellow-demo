@@ -1,0 +1,28 @@
+# Decision Log
+
+## 2026-11-24 · Architecture and Release 01
+
+| ID | Decision | Basis and follow-up |
+| --- | --- | --- |
+| 001 | Establish Mellow as a shared intelligence layer with a versioned repository core. | Founder direction. Transfer the original GPT materials explicitly and obtain founder approval before treating the core as complete. |
+| 002 | Keep decision writes in the application and AI assistance read-only. | Engineering and compliance review identified the need for separate permissions, evidence validation, decision history, and manual operation when AI is unavailable. |
+| 003 | Keep one guided task and a compact queue. Preserve visible unresolved manager reviews. | Design and accessibility review led to multiline row centering, named actions, keyboard focus, narrow-screen wrapping, and persistent review visibility. Validate on the recovered application. |
+| 004 | Require reviewed source scope and provenance for regulatory claims. | Compliance review led to explicit handling of missing, stale, and conflicting evidence. Validate with jurisdiction-specific evaluation examples before activation. |
+| 005 | Prepare the architecture on the local Mellow branch. | The available GitHub branches contain a README only. The supplied myOS project is outside scope. Port this architecture into the full Mellow app when its source is available. |
+| 006 | Require founder approval of the working preview before production. | Founder direction. Release approval and Vercel access remain pending. |
+
+Future entries should include date, owner, rationale, affected areas, validation evidence, and any superseding decision.
+
+## Frontend recovered
+
+The pasted React component contains Today, Activity, Learn, and browser-side CSV
+intake. It supersedes the frontend source blocker in decision 005. The local
+Vite scaffold builds with TypeScript and Tailwind. Original server infrastructure,
+project tests, deployment configuration, and GPT materials remain unverified.
+
+## Release 01 demo review
+
+- **Design pass.** Replaced score and bulk controls with the guided record and compact queues. The Vignelli and Ive lenses informed the measured row padding and centered alignment. The Rams, Eames, Kare, and Maeda lenses informed action hierarchy and recognizable labels.
+- **Engineering pass.** The Norman and Zhuo lenses informed evidence snapshots, recoverable decisions, and retaining manager status on reopen. Added regression tests for the evidence gate, manager recovery, and CSV parsing.
+- **Accessibility pass.** The Wroblewski, Clark, and Morris lenses informed wrapping, named actions, visible focus, and clear control of decisions. Browser reflow, keyboard, and screen-reader verification remain open because the managed preview relay timed out.
+- **Compliance pass.** Removed synthetic fixes, unverified thresholds, and readiness figures. Scoped approvals and manager flags to local demonstration. Reviewed AI architecture stays disabled pending explicit knowledge transfer.

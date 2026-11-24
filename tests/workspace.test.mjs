@@ -1,0 +1,29 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { emptyDraft, initial, inspectRow, latestDecisions, parseCsv, recordDecision } from "../src/workspace.ts";
+
+test("approval requires both evidence fields and preserves the evidence snapshot", () => {
+  const task = initial.tasks[0];
+  assert.throws(() => recordDecision(initial, task, "Approved", { ...emptyDraft, reference: "Example" }), /Supporting evidence/);
+  const evidence = { reference: "Sample inventory record", excerpt: "Sample supporting excerpt", note: "Checked" };
+  const approved = recordDecision(initial, task, "Approved", evidence);
+  assert.deepEqual(approved.history[0].evidence, evidence);
+  assert.equal(recordDecision(approved, task, "Approved", evidence), approved);
+});
+
+test("reopening a resolved manager review keeps history and returns it to manager review", () => {
+  const task = initial.tasks[0];
+  const pending = recordDecision(initial, task, "Manager review requested", emptyDraft);
+  const dismissed = recordDecision(pending, task, "Dismissed", emptyDraft);
+  const reopened = recordDecision(dismissed, task, "Reopened", emptyDraft);
+  assert.equal(latestDecisions(reopened.history).get(task.id), "Manager review requested");
+  assert.deepEqual(reopened.history.map((entry) => entry.decision), ["Reopened", "Dismissed", "Manager review requested"]);
+});
+
+test("CSV observations report explicit data gaps and never infer a regulatory finding", () => {
+  const rows = parseCsv('package_id,batch_id,delta_9_thc\r\n"P,1",,0.5%\r\n"P\n2",recorded,0.9%');
+  assert.deepEqual(rows.map((row) => row.package_id), ["P,1", "P\n2"]);
+  assert.equal(inspectRow(rows[0]), "The batch or lot field is empty.");
+  assert.equal(inspectRow(rows[1]), "");
+  assert.throws(() => parseCsv("package_id,batch_id\nPKG-1"), /column count/);
+});
