@@ -68,3 +68,12 @@ explicit human control of future agent proposals.
   visible beside its counterpart.
 - Wroblewski and Clark favored stacking sources within the same comparison at
   narrow widths and keeping the decision close to the record.
+
+## Version 1.17 simulated board pass
+
+Rams and Maeda questioned the need for a second entrance to the task already
+on Today. Norman and Zhuo favored opening the actionable record in place.
+Vignelli and Kare favored one structured row per package with the source
+values aligned under their labels. Morris kept the recommendation separate
+from the values and kept decisions in the review. The receiving comparison
+is available below it for source verification.

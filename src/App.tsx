@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
-import { lotInsight, sampleComparison, type LotCheck } from "./comparison";
+import { sampleComparison, type LotCheck } from "./comparison";
 
 import {
   emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, workQueue,
@@ -110,19 +110,9 @@ export default function App() {
   const reviewedCount = workspace.tasks.length - queue.length - manager.length;
   const sampleOpen = sampleComparison.filter((row) => row.state !== "match"
     && queue.some((task) => task.sample && task.id === row.packageId));
-  const openComparisons = comparison?.filter((row) => row.state !== "match") ?? sampleOpen;
-  const priority = openComparisons.find((row) => row.state === "different") ?? openComparisons[0];
-  const priorityTask = !comparison && (priority
-    ? queue.find((task) => task.sample && task.id === priority.packageId)
-    : queue[0]);
-  const briefing = priority ? lotInsight(priority) : comparison
-    ? { title: "All compared lot numbers match", detail: "No label check is needed for these two files." }
-    : priorityTask
-      ? { title: `Review ${priorityTask.record}`, detail: priorityTask.observation }
-      : manager.length
-        ? { title: "Manager follow-up is ready", detail: "Open the handoff for the package, sources, and next check." }
-        : { title: "You’re caught up", detail: "Your decisions and sources are saved in Activity." };
-  const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0];
+  const priority = sampleOpen.find((row) => row.state === "different") ?? sampleOpen[0];
+  const priorityTask = queue.find((task) => task.sample && task.id === priority?.packageId);
+  const active = [...queue, ...manager].find((task) => task.id === activeId) ?? priorityTask ?? queue[0];
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const review = active ? prepareReview(active) : undefined;
@@ -234,12 +224,6 @@ export default function App() {
     }
   }
 
-  function openComparison(row: LotCheck) {
-    setShowDifferences(true);
-    const index = openComparisons.indexOf(row);
-    requestAnimationFrame(() => document.getElementById(`lot-check-${index}`)?.focus());
-  }
-
   function openEvidence() {
     if (!active) return;
     setEditRecordId(active.id);
@@ -304,14 +288,8 @@ export default function App() {
       <main className="page" key={tab}>
         <header className={tab === "Today" ? "shift-header" : "page-header"}>
           <div className="shift-briefing">
-            {tab === "Today" && <p className="briefing-source">{comparison ? "Your CSV comparison" : priority ? "Sample shift insight" : "Shift insight"}</p>}
-            <h1>{tab === "Today" ? briefing.title : tab}</h1>
-            <p>{tab === "Today" ? briefing.detail : tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>
-            {tab === "Today" && <div className="actions briefing-actions">
-              {comparison && priority ? <button className="solid" onClick={() => openComparison(priority)}>See source records</button>
-                : priorityTask ? <button className="solid" onClick={() => openTask(priorityTask)}>Review {priorityTask.record}</button>
-                  : !comparison && manager.length > 0 && <button className="solid" onClick={() => setTab("Activity")}>Open shift handoff</button>}
-            </div>}
+            <h1>{tab}</h1>
+            {tab !== "Today" && <p>{tab === "Activity" ? "See what was decided and what still needs a manager." : "A field guide for the dispensary floor."}</p>}
           </div>
           {tab === "Today" && <>
             <dl className="shift-counts">
@@ -321,7 +299,6 @@ export default function App() {
             </dl>
           </>}
         </header>
-        {tab === "Today" && <ReceivingCheck result={comparison} onResult={setComparison} showDifferences={showDifferences} onShowDifferences={setShowDifferences} />}
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="review-layout">
@@ -329,7 +306,7 @@ export default function App() {
             <div className="review-heading">
               <div key={active?.id} className="record-identity">
                 {active && <p className="eyebrow">{active.record}{active.sample ? " · Sample package" : " · Imported record"}</p>}
-                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.sample ? "Missing lot number" : active?.record ?? "You’re caught up"}</h2>
+                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.sample ? (review?.source && !review.evidence ? "Check the package label" : "Missing lot number") : active ? "Check the imported record" : "You’re caught up"}</h2>
               </div>
               <a className="queue-link" href="#work-queue">View queue</a>
             </div>
@@ -393,6 +370,7 @@ export default function App() {
             <label className="upload import-queue">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>
           </aside>
         </div>}
+        {tab === "Today" && <ReceivingCheck result={comparison} onResult={setComparison} showDifferences={showDifferences} onShowDifferences={setShowDifferences} />}
         {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">
           <div className="handoff-header">
             <div><h2 id="handoff-title">Shift handoff</h2><p>Give the next person the record, the gap, and the source.</p></div>

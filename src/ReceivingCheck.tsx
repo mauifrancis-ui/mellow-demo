@@ -19,6 +19,8 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
   const rows = result ?? sampleComparison;
   const totals = categories.map((category) => ({ ...category, count: rows.filter((row) => row.state === category.id).length }));
   const exceptions = rows.filter(({ state }) => state !== "match");
+  const priority = exceptions.find(({ state }) => state === "different") ?? exceptions[0];
+  const insight = result && priority ? lotInsight(priority) : undefined;
 
   async function checkFiles(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,6 +37,7 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
       if (inventory.size > 500_000 || receiving.size > 500_000) throw new Error("Choose CSV files of 500 KB or less.");
       const [left, right] = await Promise.all([inventory.text(), receiving.text()]);
       onResult(compareLots(lotRecords(left), lotRecords(right)));
+      onShowDifferences(true);
     } catch (failure) {
       onResult(undefined);
       setError(failure instanceof Error ? failure.message : "Couldn’t read the files.");
@@ -65,18 +68,20 @@ export function ReceivingCheck({ result, onResult, showDifferences, onShowDiffer
       </button>
     </div>
     <div id="receiving-differences" hidden={!showDifferences}>
-      {exceptions.length ? <table className="lot-differences">
-        <caption className="sr-only">Inventory and receiving lot numbers for packages that need a check</caption>
-        <thead><tr><th scope="col">Package</th><th scope="col">Inventory</th><th scope="col">Receiving</th></tr></thead>
-        {exceptions.map((row, index) => <tbody key={row.packageId}>
-          <tr>
-            <th scope="row" id={`lot-check-${index}`} tabIndex={-1}>{row.packageId}</th>
-            <td>{row.inventory === null ? "No record" : row.inventory || "Blank"}</td>
-            <td>{row.receiving === null ? "No record" : row.receiving || "Blank"}</td>
-          </tr>
-          <tr className="lot-next-check"><td colSpan={3}><strong>{lotInsight(row).title}.</strong> {lotInsight(row).detail}</td></tr>
-        </tbody>)}
-      </table> : <p>All lot numbers match across the two files.</p>}
+      {insight && <p className="comparison-insight"><strong>{insight.title}.</strong> {insight.detail}</p>}
+      {exceptions.length ? <div className="lot-table">
+        <table className="lot-differences">
+          <caption className="sr-only">Lot numbers with differences or gaps</caption>
+          <thead><tr><th scope="col">Package</th><th scope="col">Inventory</th><th scope="col">Receiving</th></tr></thead>
+          <tbody>
+            {exceptions.map((row) => <tr key={row.packageId}>
+              <th scope="row">{row.packageId}</th>
+              <td>{row.inventory === null ? "No record" : row.inventory || "Blank"}</td>
+              <td>{row.receiving === null ? "No record" : row.receiving || "Blank"}</td>
+            </tr>)}
+          </tbody>
+        </table>
+      </div> : <p>All lot numbers match across the two files.</p>}
     </div>
     <div id="receiving-exports" hidden={!showExports}>
       <p>Choose two de-identified CSVs with <code>package_id</code> and <code>lot_number</code> columns. The comparison stays on this page and makes no changes to either source.</p>

@@ -408,11 +408,13 @@ small { display: block; margin-top: 4px; font-size: 14px; }
 
 .shift-briefing { min-width: 0; }
 .shift-header .shift-briefing h1 { max-width: 21ch; font-size: clamp(32px, 5vw, 54px); }
-.shift-header .briefing-source { color: var(--accent); font-size: 14px; font-weight: 700; margin: 0 0 8px; }
-.briefing-actions:not(:empty) { margin-block-start: 12px; }
+.lot-table {
+  overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface);
+}
 .lot-differences { width: 100%; table-layout: fixed; border-collapse: collapse; color: var(--ink); text-align: left; }
-.lot-differences :is(th, td) { padding: 12px 8px; text-align: left; vertical-align: middle; overflow-wrap: anywhere; }
-.lot-differences tr > :first-child { padding-inline-start: 0; }
-.lot-differences thead { color: var(--muted); font-size: 14px; }
-.lot-differences tbody { border-top: 1px solid var(--line); }
-.lot-differences .lot-next-check td { padding-block-start: 0; color: var(--muted); font-size: 14px; }
+.lot-differences :is(th, td) { padding: 12px clamp(8px, 2vw, 16px); text-align: left; vertical-align: middle; overflow-wrap: anywhere; }
+.lot-differences thead { background: var(--subtle-surface); color: var(--deep); font-size: 14px; }
+.lot-differences thead th { height: 48px; }
+.lot-differences tbody tr { border-top: 1px solid var(--line); }
+.lot-differences tbody th { font-weight: 650; }
+.comparison-insight { margin-block: 4px 12px; color: var(--muted); }

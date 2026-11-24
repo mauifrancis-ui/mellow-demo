@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.16.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.17.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -335,3 +335,19 @@ infers which source is correct or makes changes to either source.
 Place See differences and gaps and Compare your own exports side by side
 as outlined secondary buttons. Wrap them on narrow screens. Both controls
 report their expanded state and display their content below the action row.
+
+## Version 1.17 one review path and source table
+
+Today opens the highest-priority unresolved sample review in place, with the
+queue beside it at wide widths. After an explicit selection, keep the chosen
+record active. The review shows the next check beside its evidence and
+decision controls. Keep the receiving summary below the review. For real CSV
+comparisons, open the results on completion and show one computed next check
+above the table. This comparison remains read-only.
+
+Use a native semantic table styled with Material surface and divider roles.
+Give it a distinct 48px header, 12px vertical cell padding, shared left
+alignment, and a single divider between rows. Show package and source values
+once per row, with Blank distinguished from No record. Avoid repeated prose,
+row selection, and action buttons inside this evidence table.
+[Material data table guidance](https://m2.material.io/components/data-tables)
