@@ -24,3 +24,19 @@ These simulated lenses are inspired by published work and practice. The board is
 4. After release, review support issues and outcome measures, prioritize fixes, and record what the next iteration will verify.
 
 For each pass record the version, lens, observed evidence, finding, owner, disposition, and retest result. The current pass was a specification review. Product behavior and visual implementation are pending.
+
+## Version 1.1 visual and interaction review
+
+These are simulated advisory perspectives applied to the release spec and source.
+
+| Lenses | Recommendation adopted |
+| --- | --- |
+| Dieter Rams and John Maeda | Spend visual emphasis on the record and next action. Put approval requirements beside the decision. |
+| Charles and Ray Eames and Jony Ive | Pair warm paper with evergreen and rounded actions. Give the interface a subtle press response and let new content settle quickly. |
+| Massimo Vignelli and Susan Kare | Give editorial headings and operational text distinct roles. Use labels, contrast, and a selection marker so state survives without color. |
+| Don Norman and Julie Zhuo | Name the missing evidence before the user acts. Keep confirmations inline and make optional notes discoverable. |
+| Luke Wroblewski and Josh Clark | Let navigation and actions wrap and the evidence grid reflow. Keep 44px targets and support reduced motion. |
+| Meredith Ringel Morris | Make provenance visible beside the observation. Keep human judgment explicit after evidence fields are complete. |
+
+Desktop and narrow-screen browser checks, keyboard flow, and screen-reader
+verification remain part of preview review.

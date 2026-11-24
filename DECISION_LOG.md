@@ -26,3 +26,11 @@ project tests, deployment configuration, and GPT materials remain unverified.
 - **Engineering pass.** The Norman and Zhuo lenses informed evidence snapshots, recoverable decisions, and retaining manager status on reopen. Added regression tests for the evidence gate, manager recovery, and CSV parsing.
 - **Accessibility pass.** The Wroblewski, Clark, and Morris lenses informed wrapping, named actions, visible focus, and clear control of decisions. Browser reflow, keyboard, and screen-reader verification remain open because the managed preview relay timed out.
 - **Compliance pass.** Removed synthetic fixes, unverified thresholds, and readiness figures. Scoped approvals and manager flags to local demonstration. Reviewed AI architecture stays disabled pending explicit knowledge transfer.
+
+## Visual system version 1.1
+
+Adopted a warm paper and evergreen palette, pill actions, an intrinsic layout,
+and short motion tied to pressing, opening a note, or switching records.
+Moved evidence context and approval eligibility into the visible workflow after
+the simulated board review. Publish revisions on the Preview branch for founder
+feedback.

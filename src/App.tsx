@@ -13,6 +13,16 @@ const references = [
   { title: "Texas State Law Library Hemp Products Guide", jurisdiction: "Texas", url: "https://guides.sll.texas.gov/cannabis/hemp-products" },
 ];
 
+function DecisionNote({ note, onChange }: { note: string; onChange: (note: string) => void }) {
+  const [open, setOpen] = useState(Boolean(note));
+  return (
+    <details className="note" open={open} onToggle={(event) => setOpen(event.currentTarget.open)}>
+      <summary>Decision note <span>(optional)</span></summary>
+      <textarea aria-label="Decision note" value={note} onChange={(event) => onChange(event.target.value)} maxLength={1000} />
+    </details>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState<Tab>("Today");
   const [workspace, setWorkspace] = useState(() => {
@@ -24,12 +34,18 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [importing, setImporting] = useState(false);
   const editor = useRef<HTMLHeadingElement>(null);
+  const feedback = useRef<HTMLParagraphElement>(null);
   const latest = latestDecisions(workspace.history);
   const manager = workspace.tasks.filter((task) => latest.get(task.id) === "Manager review requested");
   const queue = workspace.tasks.filter((task) => !latest.has(task.id) || latest.get(task.id) === "Reopened");
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0] ?? manager[0];
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const canApprove = hasEvidence(draft);
+  const hasDraft = Object.values(draft).some((value) => value.trim());
+  const evidenceNeeded = !draft.reference.trim() && !draft.excerpt.trim()
+    ? "Add a source reference and supporting excerpt to enable approval."
+    : !draft.reference.trim() ? "Add a source reference to enable approval."
+      : "Add a supporting excerpt to enable approval.";
 
   function save(update: (current: Workspace) => Workspace) {
     try {
@@ -90,7 +106,10 @@ export default function App() {
       changed = next !== current;
       return next;
     });
-    if (saved && changed) setStatus(`${decision}: ${task.record}. Saved on this device.`);
+    if (saved && changed) {
+      setStatus(`${decision}: ${task.record}. Saved on this device.`);
+      requestAnimationFrame(() => feedback.current?.focus());
+    }
   }
 
   function openTask(task: Task) {
@@ -102,7 +121,7 @@ export default function App() {
   function taskRows(tasks: Task[]) {
     return tasks.map((task) => (
       <li key={task.id}>
-        <button className="queue-row" onClick={() => openTask(task)}>
+        <button className="queue-row" aria-current={tab === "Today" && active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
           <span><strong>{task.record}</strong><small>{task.observation}</small></span>
           <span className="chevron" aria-hidden="true">›</span>
         </button>
@@ -112,37 +131,49 @@ export default function App() {
 
   return (
     <div className="shell">
-      <aside className="sidebar">
+      <header className="masthead"><div className="masthead-inner">
         <div className="wordmark">mellow<span aria-hidden="true">.</span></div>
         <nav aria-label="Main navigation">
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item}</button>)}
         </nav>
-        <p className="local-label">Local demo · Sample data only.</p>
-      </aside>
+        <p className="local-label">Sample workspace</p>
+      </div></header>
       <main className="page">
         <header className="page-header">
-          <div><h1>{tab}</h1><p>{tab === "Today" ? "Review one record at a time." : tab === "Activity" ? "Review decisions saved on this device." : "Find official starting points for your research."}</p></div>
+          <div><h1>{tab}</h1><p>{tab === "Today" ? (queue.length === 1 ? "One record to review." : `${queue.length} records to review.`) : tab === "Activity" ? "Review decisions saved on this device." : "Find official starting points for your research."}</p></div>
           {tab === "Today" && <label className="upload">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>}
         </header>
-        <div role="status">{status}</div>
+        <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>
         {error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && (
           <>
             {active ? <section className="primary" aria-labelledby="task-title">
-              <p className="eyebrow">{latest.get(active.id) === "Manager review requested" ? "Manager review pending" : "Record review"}</p>
-              <h2 id="task-title" tabIndex={-1} ref={editor}>{active.record}</h2>
-              <p>{active.observation}</p>
-              <p className="source">{active.source} · Record {active.line}{active.sample ? " · Sample" : ""}</p>
+              <div className="record-context" key={active.id}>
+                <p className="eyebrow">{latest.get(active.id) === "Manager review requested" ? "Manager review pending" : "Record review"}</p>
+                <h2 id="task-title" tabIndex={-1} ref={editor}>{active.record}</h2>
+                <p className="observation">{active.observation}</p>
+                <dl className="provenance">
+                  <div><dt>Source</dt><dd>{active.source}</dd></div>
+                  <div><dt>CSV position</dt><dd>Record {active.line}{active.sample ? " · Sample" : ""}</dd></div>
+                </dl>
+              </div>
               <div className="evidence">
-                <h3>Supporting evidence</h3>
-                <p id="evidence-help">Use a source you inspected. Record its reference and the excerpt that supports your decision.</p>
-                <label>Source reference<input value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
-                <label>Supporting excerpt<textarea value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
-                <label>Decision note <span>(optional)</span><textarea value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} /></label>
-                <div className="actions">
-                  <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record demo approval</button>
-                  <button disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Flag for manager review</button>
-                  <button onClick={() => decide(active, "Dismissed")}>Dismiss observation</button>
+                <div className="evidence-header">
+                  <h3>Supporting evidence</h3>
+                  {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
+                </div>
+                <div className="evidence-fields">
+                  <label>Source reference<input value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
+                  <label>Supporting excerpt<textarea value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
+                </div>
+                <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />
+                <div className="decision-footer">
+                  <p id="evidence-help" className="evidence-status" data-ready={canApprove}>{canApprove ? "Evidence added. Confirm it supports your decision." : evidenceNeeded}</p>
+                  <div className="actions">
+                    <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record demo approval</button>
+                    <button disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Flag for manager review</button>
+                    <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss observation</button>
+                  </div>
                 </div>
               </div>
             </section> : <section className="panel empty"><h2>No open observations</h2><p>Import a demo CSV or reopen a decision from Activity.</p></section>}
@@ -164,7 +195,7 @@ export default function App() {
         </section>}
         {tab === "Learn" && <section className="panel learn">
           <p>Effective dates and license applicability have yet to be verified. Use the issuing authority’s current materials to confirm what applies.</p>
-          <label>Search references<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <label>Search references<input type="search" className="search" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
           <ul>{references.filter((item) => `${item.title} ${item.jurisdiction}`.toLowerCase().includes(query.trim().toLowerCase())).map((item) => (
             <li key={item.url}><a className="queue-row" href={item.url}><span><strong>{item.title}</strong><small>{item.jurisdiction} · Reference</small></span><span className="chevron" aria-hidden="true">›</span></a></li>
           ))}</ul>
