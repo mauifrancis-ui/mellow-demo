@@ -99,3 +99,14 @@ export function recordDecision(current: Workspace, task: Task, decision: Decisio
   };
   return { ...current, drafts: { ...current.drafts, [task.id]: evidence }, history: [entry, ...current.history] };
 }
+
+export function workQueue(workspace: Workspace) {
+  const latest = latestDecisions(workspace.history);
+  return workspace.tasks.filter(({ id }) => !latest.has(id) || latest.get(id) === "Reopened");
+}
+
+export function nextRecord(tasks: Task[], queue: Task[], currentId: string) {
+  const index = tasks.findIndex(({ id }) => id === currentId);
+  const remaining = new Set(queue.filter(({ id }) => id !== currentId).map(({ id }) => id));
+  return [...tasks.slice(index + 1), ...tasks.slice(0, index + 1)].find(({ id }) => remaining.has(id));
+}

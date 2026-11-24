@@ -1,7 +1,7 @@
 import { useRef, useState, type ChangeEvent } from "react";
 
 import {
-  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, parseCsv, readWorkspace, recordDecision, storageKey,
+  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, nextRecord, parseCsv, readWorkspace, recordDecision, storageKey, workQueue,
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
@@ -23,6 +23,17 @@ function DecisionNote({ note, onChange }: { note: string; onChange: (note: strin
   );
 }
 
+function RecordContext({ task, pending }: { task: Task; pending: boolean }) {
+  return (
+    <div className="record-insight">
+      <div className="insight-label">{task.sample ? "Sample observation" : "CSV observation"}</div>
+      <strong>{task.observation}</strong>
+      <p>{task.source} · Record {task.line}</p>
+      {pending && <p className="pending-review">Manager review pending</p>}
+    </div>
+  );
+}
+
 export default function App() {
   const [tab, setTab] = useState<Tab>("Today");
   const [workspace, setWorkspace] = useState(() => {
@@ -37,8 +48,9 @@ export default function App() {
   const feedback = useRef<HTMLParagraphElement>(null);
   const latest = latestDecisions(workspace.history);
   const manager = workspace.tasks.filter((task) => latest.get(task.id) === "Manager review requested");
-  const queue = workspace.tasks.filter((task) => !latest.has(task.id) || latest.get(task.id) === "Reopened");
-  const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0] ?? manager[0];
+  const queue = workQueue(workspace);
+  const active = [...queue, ...manager].find((task) => task.id === activeId) ?? queue[0];
+  const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const canApprove = hasEvidence(draft);
   const hasDraft = Object.values(draft).some((value) => value.trim());
@@ -98,24 +110,39 @@ export default function App() {
     if (!save(update)) setWorkspace((current) => ({ ...current, drafts: { ...current.drafts, [id]: { ...draft, [field]: value } } }));
   }
 
+  function focusRecord() {
+    requestAnimationFrame(() => {
+      const heading = editor.current;
+      heading?.focus({ preventScroll: true });
+      heading?.scrollIntoView({ block: "nearest", behavior: "instant" });
+    });
+  }
+
   function decide(task: Task, decision: Decision) {
     let changed = false;
+    let nextId = "";
     const saved = save((current) => {
       const evidence = workspace.drafts[task.id] ?? current.drafts[task.id] ?? emptyDraft;
       const next = recordDecision(current, task, decision, evidence);
       changed = next !== current;
+      if (changed && decision !== "Reopened") nextId = nextRecord(next.tasks, workQueue(next), task.id)?.id ?? "";
       return next;
     });
     if (saved && changed) {
       setStatus(`${decision}: ${task.record}. Saved on this device.`);
-      requestAnimationFrame(() => feedback.current?.focus());
+      if (decision === "Reopened") {
+        requestAnimationFrame(() => feedback.current?.focus());
+      } else {
+        setActiveId(nextId);
+        focusRecord();
+      }
     }
   }
 
   function openTask(task: Task) {
     setActiveId(task.id);
     setTab("Today");
-    requestAnimationFrame(() => editor.current?.focus());
+    focusRecord();
   }
 
   function taskRows(tasks: Task[]) {
@@ -128,6 +155,11 @@ export default function App() {
       </li>
     ));
   }
+
+  const managerPanel = <section className="panel manager-panel" aria-labelledby="manager-title">
+    <h2 id="manager-title">Unresolved manager reviews <span>{manager.length}</span></h2>
+    {manager.length ? <ul>{taskRows(manager)}</ul> : <p className="empty">No manager reviews pending.</p>}
+  </section>;
 
   return (
     <div className="shell">
@@ -143,43 +175,52 @@ export default function App() {
           <div><h1>{tab}</h1><p>{tab === "Today" ? (queue.length === 1 ? "One record to review." : `${queue.length} records to review.`) : tab === "Activity" ? "Review decisions saved on this device." : "Find official starting points for your research."}</p></div>
           {tab === "Today" && <label className="upload">Import demo CSV<input type="file" accept=".csv,text/csv" onChange={importCsv} disabled={importing} /></label>}
         </header>
-        <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>
-        {error && <p className="error" role="alert">{error}</p>}
-        {tab === "Today" && (
-          <>
-            {active ? <section className="primary" aria-labelledby="task-title">
-              <div className="record-context" key={active.id}>
-                <p className="eyebrow">{latest.get(active.id) === "Manager review requested" ? "Manager review pending" : "Record review"}</p>
-                <h2 id="task-title" tabIndex={-1} ref={editor}>{active.record}</h2>
-                <p className="observation">{active.observation}</p>
-                <dl className="provenance">
-                  <div><dt className="sr-only">Source and record position</dt><dd>{active.source} · Record {active.line}</dd></div>
-                </dl>
+        {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
+        {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
+        {tab === "Today" && <div className="review-layout">
+          <section className="primary" aria-labelledby="task-title">
+            <div className="review-heading">
+              <div key={active?.id} className="record-identity">
+                <p className="eyebrow">{active ? "Record review" : "Work queue"}</p>
+                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.record ?? "Queue clear"}</h2>
               </div>
+              <a className="queue-link" href="#work-queue">View queue</a>
+            </div>
+            <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
+            {error && <p className="error review-feedback" role="alert">{error}</p>}
+            {active ? <>
+              <RecordContext key={active.id} task={active} pending={latest.get(active.id) === "Manager review requested"} />
               <div className="evidence">
                 <div className="evidence-header">
                   <h3>Supporting evidence</h3>
                   {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                 </div>
+                <p id="evidence-help" className="evidence-status" data-ready={canApprove}>{canApprove ? "Evidence added. Confirm it supports your decision." : evidenceNeeded}</p>
                 <div className="evidence-fields">
                   <label>Evidence source<input value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} /></label>
                   <label>Supporting excerpt<textarea rows={2} value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} /></label>
                 </div>
-                <div className="decision-footer">
-                  <p id="evidence-help" className="evidence-status" data-ready={canApprove}>{canApprove ? "Evidence added. Confirm it supports your decision." : evidenceNeeded}</p>
-                  <div className="actions">
-                    <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record demo approval</button>
-                    <button disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Flag for manager review</button>
-                    <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss</button>
-                  </div>
-                  <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />
-                </div>
+                <DecisionNote key={active.id} note={draft.note} onChange={(value) => updateDraft("note", value)} />
               </div>
-            </section> : <section className="panel empty"><h2>No open observations</h2><p>Import a demo CSV or reopen a decision from Activity.</p></section>}
-            <section className="panel"><h2>Work queue <span>{queue.length}</span></h2>{queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">No records awaiting review.</p>}</section>
-          </>
-        )}
-        {tab !== "Learn" && <section className="panel"><h2>Unresolved manager reviews <span>{manager.length}</span></h2>{manager.length ? <ul>{taskRows(manager)}</ul> : <p className="empty">No manager reviews pending.</p>}</section>}
+              <div className="decision-footer">
+                <div className="actions">
+                  <button className="solid" aria-describedby="evidence-help" disabled={!canApprove} onClick={() => decide(active, "Approved")}>Approve record</button>
+                  <button disabled={latest.get(active.id) === "Manager review requested"} onClick={() => decide(active, "Manager review requested")}>Flag for manager</button>
+                  <button className="quiet" onClick={() => decide(active, "Dismissed")}>Dismiss</button>
+                </div>
+                {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
+              </div>
+            </> : <p className="completion">{manager.length ? "Pending manager reviews are still available in the queue." : "Import a CSV to add records, or reopen a decision from Activity."}</p>}
+          </section>
+          <aside className="queue-rail" aria-label="Record queues">
+            <section className="panel" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
+              <h2 id="queue-title">Work queue <span>{queue.length}</span></h2>
+              {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">No records awaiting review.</p>}
+            </section>
+            {managerPanel}
+          </aside>
+        </div>}
+        {tab === "Activity" && managerPanel}
         {tab === "Activity" && <section className="panel"><h2>Decision history</h2>
           {workspace.history.length ? <ul>{workspace.history.map((entry) => (
             <li className="activity-row" key={entry.id}>

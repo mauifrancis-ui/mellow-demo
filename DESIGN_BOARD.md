@@ -40,3 +40,18 @@ These are simulated advisory perspectives applied to the release spec and source
 
 Desktop and narrow-screen browser checks, keyboard flow, and screen-reader
 verification remain part of preview review.
+
+## Version 1.3 team review and board pass
+
+Product design and engineering reviewed the reported workflow first. They
+identified the queue placement and top-of-page focus jump as separate causes
+of the scroll loop. The team recommended a persistent review frame, a nearby
+queue, and continuation after successful saves.
+
+The subsequent simulated board pass applied the Rams, Maeda, and Vignelli
+lenses to common-region grouping and a restrained ink, mineral blue, and
+amber palette. The Eames, Norman, and Zhuo lenses reviewed continuation and
+recovery. The Kare, Ive, Wroblewski, and Clark lenses informed recognizable
+controls, tactile motion, reduced motion, and access on narrow screens. The
+Morris lens required record-scoped provenance, clear evidence gaps, and
+explicit human control of future agent proposals.

@@ -43,3 +43,12 @@ state cues after feedback about scrolling, field alignment, and the green
 palette. Scoped the first assisted review to one verified evidence source and
 record type. Live activation still depends on approved GPT materials and
 server-side identity and evidence storage.
+
+## Version 1.3 workflow review
+
+Product design and engineering traced the reported scroll loop to the queue
+placement and decision focus. The team reviewed continuation, manager state,
+and failure behavior before the simulated board pass. The revision puts the
+queue beside the record at desktop widths, places continuation in the decision
+area, and advances after a successful save. The source observation and evidence
+gap establish the in-context surfaces for later cited findings and agent actions.

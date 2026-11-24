@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.2.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.3.0 · 2026-11-24
 
 Status: approved requirements captured. Release 01 local demo implemented. Hosted preview and browser verification pending.
 
@@ -86,3 +86,38 @@ Let the reviewer inspect or change the evidence and confirm the decision.
 Manual entry is available for missing sources and overrides. Keep the existing
 approval gate and clear separation between model advice and a recorded decision.
 See the activation prerequisites in [MELLOW_CORE.md](MELLOW_CORE.md).
+
+## Version 1.3 review workspace
+
+Keep the active record, source observation, evidence, and decision in one
+review frame. On wide screens, place the work queue and unresolved manager
+reviews in a right rail. On narrow screens, provide a queue shortcut in the
+record header and keep **Next record** beside the decision controls.
+
+After a successful decision, advance in work-queue order and announce the
+saved result in the review frame. Move focus to the new record heading and
+scroll it into view only as needed. Keep manager reviews in their own queue
+when ordinary work is complete. Next record skips without saving a decision.
+A failed save keeps the current record and draft in place.
+
+Use proximity and common region to group the fact with its source and group
+the two evidence fields within one editor. Ink navy anchors navigation,
+mineral blue identifies contextual observation and the active record, and
+amber denotes a pending manager review. Keep surface contrast, pill actions,
+and the 12px vertical queue-row spacing. Animate the header and observation
+when the record changes (200ms, 4px settle). Keep controls steady and respect
+reduced motion.
+
+### Contextual intelligence components
+
+| Component | Placement and behavior |
+| --- | --- |
+| Source observation | In the record frame, next to the record identity. Shows the observed fact and source. The preview renders local CSV or sample data here. |
+| Evidence gap | Beside evidence entry and linked to approval. Names the exact missing input. Retains manual review when assistance is unavailable. |
+| Cited finding | Planned for the record frame. Show a source excerpt, stable evidence reference, and retrieval status. Keep the recommendation visibly separate from the finding. |
+| Proposed action | Planned for the decision area. Show the suggested action, scope, evidence, and expected effect. The reviewer inspects and confirms; a model response cannot record a decision. |
+| Agent activity | Planned within the relevant record and Activity. Show a real state only when a job exists. Include pending, completed, unavailable, or conflicting evidence and an appropriate next step. Keep transient progress quiet and retain meaningful outcomes. |
+
+Response states belong to the record that requested them. A late response for an
+earlier record must never replace the active record or its draft. See
+[Mellow Core](MELLOW_CORE.md) for server and knowledge requirements.

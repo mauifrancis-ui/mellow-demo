@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { emptyDraft, initial, inspectRow, latestDecisions, parseCsv, recordDecision } from "../src/workspace.ts";
+import { emptyDraft, initial, inspectRow, latestDecisions, nextRecord, parseCsv, recordDecision, workQueue } from "../src/workspace.ts";
 
 test("approval requires both evidence fields and preserves the evidence snapshot", () => {
   const task = initial.tasks[0];
@@ -26,4 +26,16 @@ test("CSV observations report explicit data gaps and never infer a regulatory fi
   assert.equal(inspectRow(rows[0]), "The batch or lot field is empty.");
   assert.equal(inspectRow(rows[1]), "");
   assert.throws(() => parseCsv("package_id,batch_id\nPKG-1"), /column count/);
+});
+
+test("review advances in queue order and never picks a pending manager case", () => {
+  const [first, second, third] = initial.tasks;
+  const flagged = recordDecision(initial, second, "Manager review requested", emptyDraft);
+  assert.equal(nextRecord(flagged.tasks, workQueue(flagged), second.id), third);
+  const dismissed = recordDecision(flagged, third, "Dismissed", emptyDraft);
+  assert.equal(nextRecord(dismissed.tasks, workQueue(dismissed), third.id), first);
+  const finished = recordDecision(dismissed, first, "Manager review requested", emptyDraft);
+  assert.deepEqual(workQueue(finished), []);
+  assert.equal(nextRecord(finished.tasks, workQueue(finished), first.id), undefined);
+  assert.equal(latestDecisions(finished.history).get(second.id), "Manager review requested");
 });
