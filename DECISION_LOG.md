@@ -99,3 +99,18 @@ check, and a simulated delayed-source state. Delay preserves the earlier
 successful-run snapshot, and restoration runs the sample comparison again.
 The preview uses existing tasks and retains human verification. No live
 monitor, scheduled server job, or regulatory prompt was enabled.
+
+## Repository organization · 2026-11-24
+
+All Release 01 work lives on `mellow-release-01`, which is 28 commits
+ahead of `main` with linear history. `main` holds only the April README,
+and Vercel production deploys from `main`. Keep `main` unchanged until
+the founder approves the preview from this branch, then fast-forward
+`main` to release. `Mellow-mobile-prototype` matches `main` and holds no
+work. Delete it with founder approval and branch fresh from `main` when
+mobile work starts. Replaced the mixed April and Release 01 README with
+one current README covering setup, layout and the branch and deploy flow.
+Renamed the npm package from `auditready-demo` to `mellow-demo`. The
+Vercel project and production URL keep the `auditready-demo` name, since
+renaming them would change the live address. Build, lint and 16 tests
+passed after the change.
