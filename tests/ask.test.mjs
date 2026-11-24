@@ -58,3 +58,38 @@ test("the source answer follows the live posture", () => {
   assert.equal(ask("feed down?", { ...context, receiving: "delayed" }).actions[0].action.kind, "restore");
   assert.equal(ask("feed down?", context).actions[0].action.kind, "delay");
 });
+
+test("the briefing leads with what needs a person, from live data", async () => {
+  const { brief, orderQueue } = await import("../src/ask.ts");
+  const afternoon = new Date(2026, 10, 24, 15, 20);
+  const result = brief(context, afternoon);
+  assert.equal(result.greeting, "Good afternoon.");
+  assert.equal(result.headline, "Three packages need you before close.");
+  assert.equal(result.focusId, "PKG-443", "a disagreement outranks gaps");
+  assert.match(result.message, /^Start with PKG-443\. Inventory has no lot number\. Receiving has SAMPLE-6\./);
+  assert.match(result.message, /Two more are missing a lot or a record\./);
+  const matched = posture.runs.reduce((sum, run) => sum + run.matched, 0);
+  assert.match(result.message, new RegExp(`The other ${matched} from today’s 8 checks matched`));
+  for (const chip of result.chips) assert.notEqual(ask(chip, context).intent, "fallback", chip);
+  assert.deepEqual(orderQueue(queue, sampleComparison).map(({ issue }) => issue.label),
+    ["Records disagree", "No lot in either record", "No receiving record"]);
+});
+
+test("the briefing handles an empty queue, a manager handoff and a delay", async () => {
+  const { brief } = await import("../src/ask.ts");
+  const done = brief({ ...context, queue: [], manager: [{ id: "PKG-221", record: "PKG-221" }], receiving: "delayed" }, new Date(2026, 10, 24, 9));
+  assert.equal(done.greeting, "Good morning.");
+  assert.equal(done.headline, "You’re caught up.");
+  assert.equal(done.focusId, undefined);
+  assert.match(done.message, /^Receiving records are delayed/);
+  assert.match(done.message, /One is waiting on a manager\./);
+  assert.ok(done.chips.includes("What did I leave for my manager?"));
+});
+
+test("label and walk-through chips answer from the queue", () => {
+  assert.equal(intent("What do I check on the label?"), "label");
+  const list = ask("Walk me through all three", context);
+  assert.equal(list.intent, "list");
+  assert.deepEqual(list.items.map((item) => item.label), ["PKG-443", "PKG-221", "PKG-552"]);
+  assert.equal(intent("show all the gaps"), "gaps");
+});

@@ -11,10 +11,18 @@ export type AskAction =
   | { kind: "compare" }
   | { kind: "series"; series: Series }
   | { kind: "delay" }
-  | { kind: "restore" };
+  | { kind: "restore" }
+  | { kind: "evidence" };
+
+export type QueueItem = {
+  id: string;
+  record: string;
+  observation?: string;
+  lotComparison?: { inventory: string | null; receiving: string | null; different: boolean };
+};
 
 export type AskContext = {
-  queue: { id: string; record: string }[];
+  queue: QueueItem[];
   manager: { id: string; record: string }[];
   comparison: LotCheck[];
   runs: Run[];
@@ -22,7 +30,7 @@ export type AskContext = {
 };
 
 export type AskAnswer = {
-  intent: "package" | "unknown-package" | "next" | "gaps" | "differences" | "matched" | "compare"
+  intent: "package" | "unknown-package" | "next" | "list" | "label" | "gaps" | "differences" | "matched" | "compare"
     | "handoff" | "source" | "summary" | "learn" | "fallback";
   title: string;
   body: string;
@@ -63,6 +71,70 @@ function packageId(text: string) {
   return match ? `PKG-${match[1]}` : undefined;
 }
 
+export type Issue = { kind: "different" | "missing" | "other"; label: string; detail: string };
+
+export function issueOf(task: QueueItem, comparison: LotCheck[]): Issue {
+  const row = task.lotComparison
+    ? { inventory: task.lotComparison.inventory, receiving: task.lotComparison.receiving,
+      state: task.lotComparison.different ? "different" : "missing" }
+    : comparison.find(({ packageId }) => packageId === task.id);
+  if (!row) return { kind: "other", label: "Check the imported record", detail: task.observation ?? "Only the import is available." };
+  const detail = row.inventory === "" && row.receiving === "" ? "Neither record has a lot number."
+    : `Inventory has ${lotText(row.inventory)}. Receiving has ${lotText(row.receiving)}.`;
+  if (row.state === "different") return { kind: "different", label: "Records disagree", detail };
+  const label = row.receiving === null ? "No receiving record"
+    : row.inventory === null ? "No inventory record"
+      : !row.inventory && !row.receiving ? "No lot in either record"
+        : !row.inventory ? "No lot in inventory" : "No lot in receiving";
+  return { kind: "missing", label, detail };
+}
+
+const rank = { different: 0, missing: 1, other: 2 };
+
+export function orderQueue<T extends QueueItem>(queue: T[], comparison: LotCheck[]) {
+  return queue.map((task, index) => ({ task, index, issue: issueOf(task, comparison) }))
+    .sort((a, b) => rank[a.issue.kind] - rank[b.issue.kind] || a.index - b.index);
+}
+
+const words = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+const count = (n: number) => words[n] ?? String(n);
+
+export type Brief = { greeting: string; headline: string; message: string; focusId?: string; chips: string[] };
+
+export function brief(context: AskContext, now = new Date()): Brief {
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning." : hour < 17 ? "Good afternoon." : "Good evening.";
+  const ordered = orderQueue(context.queue, context.comparison);
+  const open = ordered.length;
+  const matched = context.runs.reduce((sum, run) => sum + run.matched, 0);
+  const checks = context.runs.length;
+  const managerCount = context.manager.length;
+  const headline = open ? `${count(open)} package${open === 1 ? "" : "s"} need${open === 1 ? "s" : ""} you before close.` : "You’re caught up.";
+  const parts: string[] = [];
+  if (context.receiving === "delayed") parts.push("Receiving records are delayed, so I can’t check newer arrivals yet.");
+  const focus = ordered[0];
+  if (focus) {
+    parts.push(`Start with ${focus.task.record}. ${focus.issue.detail}`);
+    if (focus.issue.kind === "different") parts.push("The records disagree, so it goes first.");
+    const rest = ordered.slice(1);
+    if (rest.length) {
+      const allGaps = rest.every(({ issue }) => issue.kind === "missing");
+      parts.push(`${count(rest.length)} more ${rest.length === 1 ? "is" : "are"} ${allGaps ? "missing a lot or a record" : "waiting in your queue"}.`);
+    }
+  }
+  if (managerCount) parts.push(`${count(managerCount)} ${managerCount === 1 ? "is" : "are"} waiting on a manager.`);
+  if (checks) parts.push(open ? `The other ${matched} from today’s ${checks} checks matched, and I left them alone.`
+    : `All ${matched} matched packages from today’s ${checks} checks are settled.`);
+  const chips = [
+    focus ? "What do I check on the label?" : "How did receiving go today?",
+    ...(open > 1 ? [`Walk me through all ${count(open).toLowerCase()}`] : []),
+    "What matched?",
+    ...(managerCount ? ["What did I leave for my manager?"] : []),
+    "Compare new files",
+  ].slice(0, 5);
+  return { greeting, headline, message: parts.join(" "), focusId: focus?.task.id, chips };
+}
+
 export function ask(input: string, context: AskContext): AskAnswer {
   const text = normalize(input);
   const different = context.comparison.filter(({ state }) => state === "different");
@@ -88,6 +160,16 @@ export function ask(input: string, context: AskContext): AskAnswer {
       body: [row ? describe(row) : "", state, handedOff ? "It’s already in the manager handoff." : queued ? "It’s in To check." : ""].filter(Boolean).join(" "),
       actions: queued || handedOff ? [{ label: `Open ${id}`, action: { kind: "open", id } }] : [],
       series: row && row.state !== "match" ? row.state : undefined,
+    };
+  }
+
+  if (has(text, /\blabels?\b/)) {
+    const first = orderQueue(context.queue, context.comparison)[0];
+    return {
+      intent: "label",
+      title: "What to check on the label",
+      body: "Find the lot or batch number and the package ID on the original label. Compare both with the inventory and receiving records, then note what the label shows as your evidence.",
+      actions: first ? [{ label: `Open ${first.task.record}`, action: { kind: "open", id: first.task.id } }] : [],
     };
   }
 
@@ -145,6 +227,17 @@ export function ask(input: string, context: AskContext): AskAnswer {
       actions: different.filter((row) => context.queue.some((task) => task.id === row.packageId))
         .map((row) => ({ label: `Open ${row.packageId}`, action: { kind: "open" as const, id: row.packageId } })),
       series: "different",
+    };
+  }
+
+  if (has(text, /\b(all|walk me through|list|everything|every one)\b/) && context.queue.length) {
+    const ordered = orderQueue(context.queue, context.comparison);
+    return {
+      intent: "list",
+      title: `${plural(ordered.length, "package")} to check`,
+      body: "Disagreements come first, then missing details.",
+      items: ordered.map(({ task, issue }) => ({ label: task.record, detail: `${issue.label}. ${issue.detail}` })),
+      actions: [{ label: `Open ${ordered[0].task.record}`, action: { kind: "open", id: ordered[0].task.id } }],
     };
   }
 

@@ -153,3 +153,22 @@ animations. Tab order runs from navigation to compare, input, Ask, and the
 quick actions. Open item: the matcher covers receiving vocabulary only, and
 unmatched phrasing gets an honest fallback. Founder preview approval is
 pending before merge to `main`.
+
+## Version 1.29 Field Ledger · 2026-11-24
+
+The founder chose Field Ledger after an audit of 9 competitor sites, a team
+consult, and a board read of three concepts. The board backed it for honesty
+and for keeping Mellow's advice visibly separate from record evidence.
+Retired the Evergreen look, the palette menu, and the Forest, Solar, Indigo
+and Ochre palettes. Saved palette preferences no longer apply, which
+supersedes the 1.28 rule. Replaced the "What do you need?" opener with a
+data-driven briefing after founder feedback that the open question made
+people pause. Added a grouped queue and a composer toolbar. Swapped Google
+Sans for self-hosted Newsreader, Instrument Sans and IBM Plex Mono.
+Verification: lint, type check, build, and 25 tests passed, 3 of them new
+briefing tests. A browser run at 1440px and 390px covered the briefing,
+reply chips, leaving a record for a manager, Not an issue, bold formatting,
+an attachment answer opening the evidence form, and the grouped queue
+updating. There were no console errors, and reduced motion ran no
+animations. Open item: attachments are not stored or read until live AI and
+evidence storage are approved. Founder preview approval is pending.

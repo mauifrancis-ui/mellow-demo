@@ -29,19 +29,14 @@ function describeSlot(slot: Slot) {
   return `${clock(run.checkedAt)}: ${plural(run.checked, "package")} compared, ${run.matched} matched, ${plural(run.different, "difference")}, ${plural(run.missing, "gap")}`;
 }
 
-function topRounded(x: number, y: number, w: number, h: number) {
-  const r = Math.min(4, h, w / 2);
-  const b = y + h;
-  return `M${x},${b}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${b}Z`;
-}
-
 function niceMax(value: number) {
   const step = value > 20 ? 10 : 5;
   return Math.max(step, Math.ceil(value / step) * step);
 }
 
-export function MonitorChart({ runs, delayedAt, focus = null, onFocus }: {
+export function MonitorChart({ runs, delayedAt, focus = null, onFocus, open }: {
   runs: Run[];
+  open: number;
   delayedAt: string | null;
   focus?: Series | null;
   onFocus?: (series: Series | null) => void;
@@ -96,9 +91,11 @@ export function MonitorChart({ runs, delayedAt, focus = null, onFocus }: {
 
   return <figure className="monitor-chart" aria-labelledby="monitor-chart-title">
     <figcaption className="chart-head">
-      <span className="kicker" id="monitor-chart-title">Sample checks today</span>
-      <span className="chart-total"><strong>{total}</strong> packages compared</span>
-      <span className="chart-sub">{totals.different + totals.missing} flagged across {plural(runs.length, "check")}</span>
+      <span className="kicker" id="monitor-chart-title">Sample checks · today</span>
+      <span className="chart-total">
+        <strong>{total}</strong>
+        <span>packages compared<br />{totals.different + totals.missing} flagged · <em>{open} still open</em></span>
+      </span>
     </figcaption>
     <div className="chart-legend" role="group" aria-label="Focus one result">
       {series.map(({ key, label }) => <button key={key} type="button" aria-pressed={focus === key}
@@ -139,9 +136,9 @@ export function MonitorChart({ runs, delayedAt, focus = null, onFocus }: {
                   const isTop = partIndex === parts.length - 1;
                   const h = Math.max(1, bottom - top - (isTop ? 0 : SPACER));
                   const segY = isTop ? top : top + SPACER;
-                  return isTop
-                    ? <path key={part.key} data-series={part.key} d={topRounded(x, segY, barW, bottom - segY)} />
-                    : <rect key={part.key} data-series={part.key} x={x} y={segY} width={barW} height={h} />;
+                  if (part.key === "missing") return <rect key={part.key} data-series={part.key} className="chart-outline"
+                    x={x + 0.75} y={segY + 0.75} width={barW - 1.5} height={Math.max(1, (isTop ? bottom - segY : h) - 1.5)} />;
+                  return <rect key={part.key} data-series={part.key} x={x} y={segY} width={barW} height={isTop ? bottom - segY : h} />;
                 });
               })()}
             </g> : <g className="chart-delayed">
@@ -149,7 +146,6 @@ export function MonitorChart({ runs, delayedAt, focus = null, onFocus }: {
               <text x={cx} y={y(max * 0.45) - 6} textAnchor="middle">Delayed</text>
             </g>}
             {slot.kind === "run" && index === latestRun && !delayedAt && <text className="chart-cap" x={cx} y={y(slot.run.checked) - 6} textAnchor="middle">{slot.run.checked}</text>}
-            {slot.kind === "run" && index === latestRun && !delayedAt && <circle className="chart-latest" cx={cx} cy={HEIGHT - 2} r={3} />}
             {showLabel && <text className="chart-time" x={cx} y={HEIGHT - 10} textAnchor="middle">{clock(time).replace(/\s?[AP]M$/i, "")}</text>}
           </g>;
         })}

@@ -1,8 +1,10 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { ReceivingCheck } from "./ReceivingCheck";
 import { ReceivingMonitor } from "./ReceivingMonitor";
-import { AskMellow } from "./AskMellow";
-import type { AskAction, Series } from "./ask";
+import { Briefing, Conversation } from "./AskMellow";
+import { brief, issueOf, orderQueue, type AskAction, type Series } from "./ask";
+
+const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 import { monitorReceiving, sampleHistory } from "./monitoring";
 import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
@@ -11,23 +13,6 @@ import {
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
-const palettes = [
-  { id: "evergreen", label: "Evergreen" },
-  { id: "field", label: "Forest field guide" },
-  { id: "solar", label: "Solar olive" },
-  { id: "indigo", label: "Indigo ember" },
-  { id: "ochre", label: "Ochre clay" },
-] as const;
-type Palette = typeof palettes[number]["id"];
-const paletteKey = "mellow.preview.palette";
-
-function initialPalette(): Palette {
-  try {
-    return palettes.find(({ id }) => id === localStorage.getItem(paletteKey))?.id ?? "evergreen";
-  } catch {
-    return "evergreen";
-  }
-}
 
 const tabs = ["Today", "Activity", "Learn"] as const;
 type Tab = typeof tabs[number];
@@ -94,7 +79,6 @@ function SourceComparison({ task, review }: { task: Task; review: ReturnType<typ
 }
 
 export default function App() {
-  const [palette, setPalette] = useState(initialPalette);
   const [tab, setTab] = useState<Tab>("Today");
   const nav = useRef<HTMLElement>(null);
   const [pill, setPill] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -120,12 +104,14 @@ export default function App() {
   const handoff = shiftHandoff(workspace);
   const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
-  const sampleOpen = sampleComparison.filter((row) => row.state !== "match"
-    && queue.some((task) => task.sample && task.id === row.packageId));
-  const priority = sampleOpen.find((row) => row.state === "different") ?? sampleOpen[0];
-  const monitorTask = queue.find((task) => task.sample && task.id === "PKG-443");
-  const priorityTask = queue.find((task) => task.lotComparison?.different) ?? queue.find((task) => task.sample && task.id === priority?.packageId);
-  const active = [...queue, ...manager].find((task) => task.id === activeId) ?? priorityTask ?? queue[0];
+  const ordered = orderQueue(queue, sampleComparison);
+  const askContext = { queue, manager, comparison: sampleComparison, runs: posture.runs, receiving: posture.receiving };
+  const briefing = brief(askContext);
+  const doneToday = [...latest.entries()].filter(([, decision]) => decision === "Approved" || decision === "Dismissed")
+    .map(([id, decision]) => ({ id, decision, entry: workspace.history.find((item) => item.task.id === id && item.decision === decision) }))
+    .filter(({ entry }) => entry && new Date(entry.at).toDateString() === new Date().toDateString());
+  const active = [...queue, ...manager].find((task) => task.id === activeId) ?? ordered[0]?.task;
+  const activeIssue = active ? issueOf(active, sampleComparison) : undefined;
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const review = active ? prepareReview(active) : undefined;
@@ -260,21 +246,17 @@ export default function App() {
     focusRecord();
   }
 
-  function taskRows(tasks: Task[]) {
-    return tasks.map((task) => (
-      <li key={task.id}>
-        <button className="queue-row" aria-current={tab === "Today" && active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
-          <span><strong>{task.record}</strong><small>{latest.get(task.id) === "Manager review requested" ? "Needs a manager" : prepareReview(task).state}</small></span>
-          <span className="chevron" aria-hidden="true">›</span>
-        </button>
-      </li>
-    ));
+  function queueRow(task: Task, kind: string, label: string) {
+    const time = task.sample && posture.lastSuccessfulRun ? clock(posture.lastSuccessfulRun.checkedAt) : "Import";
+    return <li key={task.id}>
+      <button className="queue-row" data-kind={kind} aria-current={active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
+        <span className="queue-mark" aria-hidden="true" />
+        <span className="queue-id">{task.record}</span>
+        <span className="queue-issue">{label}</span>
+        <span className="queue-time">{time}</span>
+      </button>
+    </li>;
   }
-
-  const managerPanel = <section className="panel manager-panel" aria-labelledby="manager-title">
-    <h2 id="manager-title">Needs a manager <span>{manager.length}</span></h2>
-    {manager.length ? <ul>{taskRows(manager)}</ul> : <p className="empty">Nothing waiting for a manager.</p>}
-  </section>;
 
   async function copyHandoff() {
     const content = ["Mellow shift handoff · Sample workspace", ...handoff.map(({ text }) => text)].join("\n\n");
@@ -284,11 +266,6 @@ export default function App() {
     } catch {
       setHandoffStatus("Couldn’t copy. Select the handoff text below.");
     }
-  }
-
-  function changePalette(value: Palette) {
-    setPalette(value);
-    try { localStorage.setItem(paletteKey, value); } catch { /* Keep the current choice in memory. */ }
   }
 
   function toggleDelay() {
@@ -303,6 +280,7 @@ export default function App() {
     } else if (action.kind === "tab") setTab(action.tab);
     else if (action.kind === "compare") setCompareRequest((count) => count + 1);
     else if (action.kind === "series") setFocusSeries(action.series);
+    else if (action.kind === "evidence") openEvidence();
     else toggleDelay();
   }
 
@@ -320,28 +298,17 @@ export default function App() {
   }, [tab]);
 
   return (
-    <div className="shell" data-palette={palette}>
+    <div className="shell" data-palette="ledger">
       <header className="masthead"><div className="masthead-inner">
         <div className="wordmark">mellow<span aria-hidden="true">.</span></div>
         <nav aria-label="Main navigation" ref={nav} data-pill={pill ? "" : undefined}>
-          {pill && <span className="nav-pill" aria-hidden="true" style={{ width: pill.width, height: pill.height, transform: `translate(${pill.x}px, ${pill.y}px)` }} />}
+          {pill && <span className="nav-pill" aria-hidden="true" style={{ width: pill.width, transform: `translate(${pill.x}px, ${pill.y + pill.height - 2}px)` }} />}
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => setTab(item)}>{item}</button>)}
         </nav>
-        <div className="preview-settings">
-          <span className="local-label">Sample workspace</span>
-          <label className="palette-picker">
-            <span>Palette</span>
-            <select value={palette} onChange={(event) => changePalette(event.target.value as Palette)}>
-              {palettes.map(({ id, label }) => <option value={id} key={id}>{label}</option>)}
-            </select>
-          </label>
-        </div>
+        <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · Sample workspace</p>
       </div></header>
       <main className="page" key={tab}>
-        {tab === "Today" ? <AskMellow
-          context={{ queue, manager, comparison: sampleComparison, runs: posture.runs, receiving: posture.receiving }}
-          onAction={onAsk}
-          aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
+        {tab === "Today" ? null
           : <header className="page-header">
             <div className="shift-briefing">
               <p className="kicker">{tab === "Activity" ? "Decisions and handoffs" : "Field guide"}</p>
@@ -351,76 +318,93 @@ export default function App() {
           </header>}
         {tab !== "Today" && <p className="feedback" ref={feedback} role="status" tabIndex={-1}>{status}</p>}
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
-        {tab === "Today" && <div className="card-surface review-layout">
-          <ReceivingMonitor posture={posture} record={monitorTask?.record}
-          onReview={monitorTask && active?.id !== monitorTask.id ? () => openTask(monitorTask) : undefined}
-          focusSeries={focusSeries} onFocusSeries={setFocusSeries}
-          onToggleDelay={toggleDelay} />
-          <section className="primary" aria-labelledby="task-title">
-            <div className="review-heading">
-              <div key={active?.id} className="record-identity">
-                {active && <p className="eyebrow">{active.record}{active.sample ? " · Sample package" : " · Imported record"}</p>}
-                <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active?.lotComparison ? (active.lotComparison.different ? "Check the package label" : "Find the missing details") : active?.sample ? (review?.requiresRationale ? "Check the package label" : "Missing lot number") : active ? "Check the imported record" : "You’re caught up"}</h2>
-              </div>
-              <a className="queue-link" href="#work-queue">View queue</a>
-            </div>
-            {error && <p className="error review-feedback" role="alert">{error}</p>}
-            {active && review ? <>
-              <p className="review-instruction" id="evidence-help">{instruction}</p>
-              <SourceComparison key={active.id} task={active} review={review} />
-              {editing && <section className="evidence" aria-label="Add supporting evidence">
-                <div className="evidence-header">
-                  <h3>Add evidence</h3>
-                  {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
-                </div>
-                <p className="evidence-hint">Use {evidenceExamples(active)} for <strong>{active.record}</strong>.</p>
-                <div className="evidence-fields">
-                  <div className="evidence-field">
-                    <label htmlFor="evidence-source">Where did you find it?</label>
-                    <input id="evidence-source" ref={evidenceInput} aria-describedby="evidence-source-hint" value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} />
-                    <p className="supporting-text" id="evidence-source-hint">File name, record ID, or link.</p>
+        {tab === "Today" && <div className="ledger">
+          <div className="ledger-main">
+            <Briefing brief={briefing} lastCheck={posture.lastSuccessfulRun?.checkedAt} delayed={posture.receiving === "delayed"}
+              aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
+            <section className="primary ledger-record" aria-labelledby="task-title">
+              <p className="record-marker" data-manager={pendingManager || undefined} aria-hidden="true">{active ? (pendingManager ? "With manager" : "Now") : ""}</p>
+              <div className="ledger-record-body">
+                <div className="review-heading">
+                  <div key={active?.id} className="record-identity">
+                    {active && <p className="eyebrow">{active.sample ? "Sample package" : "Imported record"}</p>}
+                    <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active ? `${active.record} · ${activeIssue?.label.toLowerCase()}` : "You’re caught up"}</h2>
                   </div>
-                  <div className="evidence-field">
-                    <label htmlFor="evidence-excerpt">What does it show?</label>
-                    <textarea id="evidence-excerpt" rows={2} aria-describedby="evidence-excerpt-hint" value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} />
-                    <p className="supporting-text" id="evidence-excerpt-hint">Copy the relevant line or describe exactly what you see.</p>
-                  </div>
-                  {needsRationale && <div className="evidence-field">
-                    <label htmlFor="evidence-conflict">How does this resolve the conflict?</label>
-                    <textarea id="evidence-conflict" rows={2} aria-describedby="evidence-conflict-hint" value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} />
-                    <p className="supporting-text" id="evidence-conflict-hint">Say which record you trust and why.</p>
-                  </div>}
+                  <a className="queue-link" href="#work-queue">View queue</a>
                 </div>
-                {missingEvidence && <p className="evidence-hint" id="evidence-missing">{missingEvidence}</p>}
-              </section>}
-              <div className="decision-footer" id="review-decision" role="group" aria-label="Decision controls">
-                <div className="actions">
-                  {primaryAction === "record" && <button className="solid" aria-describedby={editing && missingEvidence ? "evidence-missing" : "evidence-help"} disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
-                  {primaryAction === "evidence" && <button className="solid" onClick={openEvidence}>{evidenceAction}</button>}
-                  {!pendingManager && <button className={primaryAction === "manager" ? "solid" : "secondary"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
-                  <details className="review-options" key={active.id}>
-                    <summary>More options</summary>
-                    <div className="review-options-body">
-                      {!editing && primaryAction !== "evidence" && <button onClick={openEvidence}>{evidenceAction}</button>}
-                      <button onClick={() => decide(active, "Dismissed")}>Not an issue</button>
-                      {!needsRationale && <DecisionNote note={draft.note} onChange={(value) => updateDraft("note", value)} />}
+                {error && <p className="error review-feedback" role="alert">{error}</p>}
+                {active && review ? <>
+                  <p className="review-instruction" id="evidence-help">{instruction}</p>
+                  <SourceComparison key={active.id} task={active} review={review} />
+                  {editing && <section className="evidence" aria-label="Add supporting evidence">
+                    <div className="evidence-header">
+                      <h3>Add evidence</h3>
+                      {hasDraft && <span className="draft-label">{error ? "Draft on this page" : "Draft on this device"}</span>}
                     </div>
-                  </details>
-                </div>
-                {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
+                    <p className="evidence-hint">Use {evidenceExamples(active)} for <strong>{active.record}</strong>.</p>
+                    <div className="evidence-fields">
+                      <div className="evidence-field">
+                        <label htmlFor="evidence-source">Where did you find it?</label>
+                        <input id="evidence-source" ref={evidenceInput} aria-describedby="evidence-source-hint" value={draft.reference} onChange={(event) => updateDraft("reference", event.target.value)} maxLength={500} />
+                        <p className="supporting-text" id="evidence-source-hint">File name, record ID, or link.</p>
+                      </div>
+                      <div className="evidence-field">
+                        <label htmlFor="evidence-excerpt">What does it show?</label>
+                        <textarea id="evidence-excerpt" rows={2} aria-describedby="evidence-excerpt-hint" value={draft.excerpt} onChange={(event) => updateDraft("excerpt", event.target.value)} maxLength={2000} />
+                        <p className="supporting-text" id="evidence-excerpt-hint">Copy the relevant line or describe exactly what you see.</p>
+                      </div>
+                      {needsRationale && <div className="evidence-field">
+                        <label htmlFor="evidence-conflict">How does this resolve the conflict?</label>
+                        <textarea id="evidence-conflict" rows={2} aria-describedby="evidence-conflict-hint" value={draft.note} onChange={(event) => updateDraft("note", event.target.value)} maxLength={1000} />
+                        <p className="supporting-text" id="evidence-conflict-hint">Say which record you trust and why.</p>
+                      </div>}
+                    </div>
+                    {missingEvidence && <p className="evidence-hint" id="evidence-missing">{missingEvidence}</p>}
+                  </section>}
+                  <div className="decision-footer" id="review-decision" role="group" aria-label="Decision controls">
+                    <div className="actions">
+                      {primaryAction === "record" && <button className="solid" aria-describedby={editing && missingEvidence ? "evidence-missing" : "evidence-help"} disabled={!canApprove} onClick={() => decide(active, "Approved")}>Record issue</button>}
+                      {primaryAction === "evidence" && <button className="solid" onClick={openEvidence}>{evidenceAction}</button>}
+                      {!pendingManager && <button className={primaryAction === "manager" ? "solid" : "secondary"} onClick={() => decide(active, "Manager review requested")}>Leave for manager</button>}
+                      <details className="review-options" key={active.id}>
+                        <summary>More options</summary>
+                        <div className="review-options-body">
+                          {!editing && primaryAction !== "evidence" && <button onClick={openEvidence}>{evidenceAction}</button>}
+                          <button onClick={() => decide(active, "Dismissed")}>Not an issue</button>
+                          {!needsRationale && <DecisionNote note={draft.note} onChange={(value) => updateDraft("note", value)} />}
+                        </div>
+                      </details>
+                    </div>
+                    {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
+                  </div>
+                </> : <div className="completion">
+                  <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>
+                  <button className="manual-evidence" onClick={() => setTab("Activity")}>{manager.length ? "Open shift handoff" : "See what was checked"}</button>
+                </div>}
+                <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
               </div>
-            </> : <div className="completion">
-              <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>
-              <button className="manual-evidence" onClick={() => setTab("Activity")}>{manager.length ? "Open shift handoff" : "See what was checked"}</button>
-            </div>}
-            <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
-          </section>
-          <aside className="queue-rail" aria-label="Record queues">
-            <section className="panel" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
-              <h2 id="queue-title">To check <span className="count" key={queue.length}>{queue.length}</span></h2>
-              {queue.length ? <ul>{taskRows(queue)}</ul> : <p className="empty">Nothing to check right now.</p>}
             </section>
-            {manager.length > 0 && managerPanel}
+            <Conversation context={askContext} chips={briefing.chips} onAction={onAsk} />
+          </div>
+          <aside className="ledger-side" aria-label="Today at a glance">
+            <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />
+            <section className="ledger-queue" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
+              <div className="queue-head">
+                <h2 id="queue-title" className="kicker">Needs you · <span className="count" key={queue.length}>{queue.length}</span></h2>
+                {queue.length > 1 && <span>Disagreements first</span>}
+              </div>
+              {ordered.length ? <ul>{ordered.map(({ task, issue }) => queueRow(task, issue.kind, issue.label))}</ul>
+                : <p className="empty">Nothing needs you right now.</p>}
+              {manager.length > 0 && <>
+                <div className="queue-head"><h3 className="kicker">With a manager · {manager.length}</h3></div>
+                <ul>{manager.map((task) => queueRow(task, "manager", "Left for a manager"))}</ul>
+              </>}
+              {doneToday.length > 0 && <p className="done-line">
+                <span className="kicker">Done today · {doneToday.length}</span>
+                <span>{doneToday.map(({ id, decision }) => `${id} ${decision === "Approved" ? "recorded" : "not an issue"}`).join(", ")}</span>
+                <button className="text-link" onClick={() => setTab("Activity")}>Activity</button>
+              </p>}
+            </section>
           </aside>
         </div>}
         {tab === "Activity" && <section className="panel handoff" aria-labelledby="handoff-title">

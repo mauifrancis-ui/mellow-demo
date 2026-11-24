@@ -218,3 +218,36 @@ flagged count. The legend is a row of toggle buttons that show each result's
 day total and focus that series. The columns rise in a 28ms stagger on
 arrival, lift 2px on hover, and mark the latest check with a yellow dot and
 a bold time.
+
+## Version 1.29 Field Ledger
+
+Founder decision: Field Ledger is Mellow's visual identity. It supersedes the
+Evergreen look and the palette menu. The rationale, audit and board read are
+in the Mellow Brand Point of View doc.
+
+**Look.** Paper #F7F3EA, ink #1C1B19, graphite #5A5650 for secondary text,
+rules #DDD5C4, pencil #BDB4A2 for settled data, and vermilion #C73E22 only for
+what needs a person and its action. Newsreader is for headings and, in italic,
+for Mellow's own voice. Instrument Sans is for the interface. IBM Plex Mono
+is for facts from the record: IDs, lots, files and times. All three are
+self-hosted. Use 1px rules, 4px corners and no shadows. The masthead has no
+divider and marks the current tab with a 2px ink underline.
+
+**Today.** The left column briefs the person. A kicker gives the time of the
+last check, then a greeting with the number of open packages, then Mellow's
+message. `brief()` in `src/ask.ts` writes that message from live data: what
+to start with and why, what else is open, what waits on a manager, and what
+matched. The current record follows, then reply chips that continue the
+conversation, then a reply box. The reply box has a toolbar for files,
+photos, the camera, bold, italic, lists and package references. Attachments
+answer honestly that live AI is off and offer to add the file as evidence.
+The right column shows the day's total aligned to the last baseline of its
+label, the chart, and a grouped queue: Needs you, With a manager, and Done
+today. Disagreements come first. In the chart, differences are solid
+vermilion and gaps are outlined vermilion, so the two never rely on hue
+alone.
+
+**Motion.** Mellow's message settles in over 200ms. The record reveals over
+200ms. Chart columns grow in a 28ms stagger on arrival. Hover and press take
+120ms. Send darkens to black and its arrow moves 3px. Queue rows show an ink
+rule on hover. Reduced motion removes all timed movement.
