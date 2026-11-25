@@ -1,6 +1,6 @@
 # Working on Mellow
 
-Read [MELLOW_CORE.md](MELLOW_CORE.md), [MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md), and [DECISION_LOG.md](DECISION_LOG.md) before changing product behavior. Use [DESIGN_BOARD.md](DESIGN_BOARD.md) to review proposals and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) to record verification.
+Read [MELLOW_CORE.md](MELLOW_CORE.md), [MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md), and [DECISION_LOG.md](DECISION_LOG.md) before changing product behavior. Use [PRODUCT_TEAM.md](PRODUCT_TEAM.md) for who reviews what, [DESIGN_BOARD.md](DESIGN_BOARD.md) to review proposals and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) to record verification.
 
 Mellow is the product's enduring intelligence layer. The application owns authentication, permissions, evidence storage, workflow state, and decision recording. Mellow explains evidence and proposes next steps. Authorized people decide.
 
@@ -12,13 +12,15 @@ Mellow is the product's enduring intelligence layer. The application owns authen
 
 ## Sprint review cadence (founder rule, 2026-11-25)
 
-Every product, design or brand change runs this sequence. Don't skip a step because a request says "build it" or "deploy". Ask the founder before skipping anything.
+Every product, design or brand change runs this sequence. Don't skip a step because a request says "build it" or "deploy". Ask the founder before skipping anything. Roles, remits and required outputs for each step are in [PRODUCT_TEAM.md](PRODUCT_TEAM.md).
 
-1. **Proposal review (team).** Product design, content and voice, engineering, accessibility, and compliance and risk each review the proposal and record findings with a severity.
+0. **Sprint planning.** The founder sets the goal. The Product Lead writes the problem and scope.
+1. **Proposal review (team).** Every role in PRODUCT_TEAM.md reviews the proposal and records findings with a severity. Compliance and Risk can block.
 2. **Board pass.** Apply the [DESIGN_BOARD.md](DESIGN_BOARD.md) lenses to the proposal and the team findings. Record what each lens backs, changes or rejects.
 3. **Founder decision on the proposal.** Build only what the founder approves.
 4. **Implementation review.** Run lint, type check, build and tests. Exercise the real flows at desktop and phone widths, with keyboard and reduced motion.
 5. **Preview review.** Close the findings, or record each one's owner and impact.
 6. **Founder release decision**, then deploy and verify in production.
+7. **Retro and outcome review.** What worked, what didn't, follow-ups, and what the next sprint will measure.
 
 Record each step in DESIGN_BOARD.md and DECISION_LOG.md. A fix for a bug that is live and breaks a Mellow rule may skip steps 1 to 3 only with the founder's explicit go-ahead.

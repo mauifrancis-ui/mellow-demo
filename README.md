@@ -33,7 +33,7 @@ npm run preview    # serve the production build
 | `tests/` | Node test runner regression tests |
 | `knowledge/` | Inventory of knowledge still to be transferred and approved |
 
-Product guidance lives at the root. Start with [AGENTS.md](AGENTS.md), then read [MELLOW_CORE.md](MELLOW_CORE.md), [MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md), [DECISION_LOG.md](DECISION_LOG.md), [DESIGN_BOARD.md](DESIGN_BOARD.md) and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
+Product guidance lives at the root. Start with [AGENTS.md](AGENTS.md), then read [MELLOW_CORE.md](MELLOW_CORE.md), [MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md), [DECISION_LOG.md](DECISION_LOG.md), [PRODUCT_TEAM.md](PRODUCT_TEAM.md), [DESIGN_BOARD.md](DESIGN_BOARD.md) and [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md).
 
 ## Branches and deployment
 

@@ -248,3 +248,7 @@ The founder reviewed four Ask Mellow brand directions and decided: (1) the produ
 ## Sprint review cadence made mandatory · 2026-11-25
 
 The founder asked that every change run the full sprint cadence: team review, then board pass, then founder decision, then build, preview and release. Recorded in AGENTS.md. The Ask Mellow brand build that had started was paused and stashed. The 1.35 team review and board pass are recorded in DESIGN_BOARD.md and await the founder's decision.
+
+## Product team charter drafted · 2026-11-25
+
+The founder pointed out that "the team" had no written roles, remits or missions. Drafted PRODUCT_TEAM.md with the team mission, nine roles (the founder, the Design Director, the Product Lead, the Product Designer, the Content and Voice Designer, Research and Insights, the Engineer, the Accessibility Specialist, and the Compliance and Risk Lead), the questions each role always asks, a RACI for each cadence step, required outputs, severity levels and working agreements. Added sprint planning (step 0) and a retro (step 7) to the cadence in AGENTS.md. Status: draft, awaiting founder approval. The 1.35 review recorded today predates the charter: it had no Product Lead or Research pass and named findings by pass, not by role.
