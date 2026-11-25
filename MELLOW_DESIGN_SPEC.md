@@ -356,3 +356,9 @@ Browsers without view transitions fall back to the inline fades, and reduced mot
 - Today: the control scrolls the conversation into view and focuses the reply field. No second copy of the conversation.
 - Activity and Learn: a paper drawer, 460px wide, 1px ink border, 4px corners, a floating-layer shadow, pinned under the app bar on the right. It scrolls internally and opens with the spring. Below 900px it's a bottom sheet at up to 82% of the viewport height. It closes with Escape, the close button or the control, and focus returns to the control.
 - One thread shared by both surfaces (keeps the latest six turns).
+
+## Version 1.34 Task and chat are two places
+
+- The record is the work, on plain paper. The conversation on Today sits below it on its own tint-soft panel: a 1px ink top rule, 20px gap above, 20/28px padding, 4px bottom corners. On phones it runs edge to edge.
+- Before any question, the panel is headed "Ask Mellow" (mono kicker). Once there's a thread, the "Conversation" header takes over.
+- Reply chips sit on paper inside the tint, so they read as suggestions, not as the record's action buttons. The floating Ask Mellow drawer is unchanged.

@@ -236,3 +236,7 @@ Founder preview approval is pending.
 - The conversation thread now lives in the app, not the component, so the same turns follow you between Today and the drawer. A vermilion dot on the control means there's a thread waiting.
 - Actions in the drawer that need Today's tools (open a record, compare, add evidence) take you to Today with the thread intact.
 - Founder approval: approved and deployed to production on 2026-11-24 (main at 86efad0). Verified live: sticky app bar, Ask Mellow control, drawer open and close, focus in the reply field.
+
+## Version 1.34 Task and chat are two places · 2026-11-24
+
+The founder said the task and the chat ran together: reply chips looked like more record actions. Gave the Today conversation its own tinted panel under an ink rule, with an "Ask Mellow" heading until a thread starts, and paper chips inside. CSS only, scoped to Today. Verification: build and lint passed; screenshots checked at 1440px with and without a thread, and at 390px. Founder preview approval is pending.

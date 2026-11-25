@@ -487,3 +487,21 @@
   }
 }
 @media (hover: none) { .shell[data-palette="ledger"] .ask-trigger kbd { display: none; } }
+
+/* Task vs. chat: the record is the work on paper; the conversation sits on its own tinted desk below it */
+.ledger-main > .conversation {
+  margin-top: 20px; padding: 20px 28px 22px; gap: 14px;
+  border-top: 1px solid var(--ink); border-radius: 0 0 4px 4px; background: var(--tint-soft);
+}
+.ledger-main > .conversation:not(:has(.conversation-log))::before {
+  content: "Ask Mellow"; font: 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--graphite);
+}
+.ledger-main > .conversation .conversation-log { margin-top: 0; }
+.ledger-main > .conversation .chip { background: var(--paper); }
+@media (hover: hover) and (pointer: fine) {
+  .ledger-main > .conversation .chip:hover { background: var(--paper); border-color: var(--ink); }
+}
+.ledger-main > .conversation .composer textarea { background: transparent; }
+@media (width < 600px) {
+  .ledger-main > .conversation { margin-inline: -20px; padding: 18px 20px 20px; border-radius: 0; }
+}
