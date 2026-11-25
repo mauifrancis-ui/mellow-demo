@@ -281,3 +281,7 @@ The founder set the sprint 2 goal: "Mellow speaks first well" (the proactive mar
 ## Sprint 2 proposal reviewed · 2026-11-25
 
 The founder couldn't recruit, so Research created five fictional industry archetypes and ran synthetic sessions, clearly labeled as weak evidence. The Product Designer's system map found that the filled vermilion dot already means three things in production. The team review and board pass (including a retro pass on 1.31 to 1.34) are recorded in DESIGN_BOARD.md. Six recommendations await the founder's decision, including whether synthetic evidence is enough to build.
+
+## Sprint 2 approved; Product Excellence Review added · 2026-11-25
+
+The founder approved all six sprint 2 recommendations, including building on synthetic evidence with the success measure kept open. The founder also added a Product Excellence Review as a release gate (MELLOW_EVALS.md, Part 2; AGENTS.md step 5b): the top 3 critical user journeys, walked in context with 3 to 5 users with the team and board in the room, scored against the nine Universal Experiences stages, with provocations and innovation ideas recorded. Until real users are recruited, the users are the five fictional archetypes, graded synthetic.

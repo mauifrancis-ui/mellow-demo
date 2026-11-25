@@ -20,6 +20,7 @@ Every product, design or brand change runs this sequence. Don't skip a step beca
 3. **Founder decision on the proposal.** Build only what the founder approves.
 4. **Implementation review.** Run lint, type check, build and tests. Exercise the real flows at desktop and phone widths, with keyboard and reduced motion.
 5. **Preview review.** Close the findings, or record each one's owner and impact.
+5b. **Product Excellence Review (release gate).** Walk the top 3 critical user journeys with 3 to 5 users, with the team and board in the room. Score each journey against the nine Universal Experiences stages, record the provocations and innovation ideas, and meet the gate. See [MELLOW_EVALS.md](MELLOW_EVALS.md), Part 2.
 6. **Founder release decision**, then deploy and verify in production.
 7. **Retro and outcome review.** What worked, what didn't, follow-ups, and what the next sprint will measure.
 

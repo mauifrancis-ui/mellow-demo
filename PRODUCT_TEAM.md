@@ -83,6 +83,7 @@ The cadence itself is in [AGENTS.md](AGENTS.md). R = responsible, A = accountabl
 - **Board pass:** what each lens backs, changes or rejects, and a numbered recommendation for the founder.
 - **Implementation review:** lint, type check, build and test results, plus browser checks at 1440px and 390px with keyboard and reduced motion. For any change to Mellow's behavior, the evaluation set results, including the new cases this change adds.
 - **Preview review:** each finding closed, or given an owner and an impact.
+- **Product Excellence Review:** for each of the top 3 critical user journeys, a 9-stage scorecard, handoff ratings, provocations, "how might we" and bold ideas, and the founder's decisions (MELLOW_EVALS.md, Part 2). The Design Director facilitates; the Product Lead owns the journey list; Research owns the recruit panel.
 - **Release:** the founder's decision, the deploy commit, and verification in production.
 - **Retro:** what worked, what didn't, follow-ups, and what the next sprint will measure.
 
