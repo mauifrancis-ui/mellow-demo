@@ -763,3 +763,7 @@ Reviewed by Compliance and Risk, Research, Product Lead, Product Designer, Conte
 - **Eames:** "Clear this device's data" is the honest way out. Keep it plain.
 
 **Board recommendation:** approve the revised sprint 4 with the Step 1 changes.
+
+### Sprint 4 · founder decision (Step 3) · 2026-11-25
+
+The founder approved the revised sprint 4. He didn't answer the question about naming a checker, so every Rules entry defaults to **"Not yet checked by a person"** plus the date the official page was retrieved. Retrieval is not verification.
