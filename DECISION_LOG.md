@@ -343,3 +343,7 @@ The order for sprints 4 to 6 is approved with the board's changes. Hemp is the f
 - Controls are labeled "not reviewed by a regulatory expert" until one signs off.
 - Expert review blocks real-business use, not the prototype.
 - The product refers people to the State Bar of Texas Lawyer Referral & Information Service and the DSHS hemp program contact, and never to a specific firm.
+
+## v1.38 released · 2026-11-25
+
+The founder approved the release (Step 6). main was fast-forwarded to 1ea7e6c. Checked on production: the sample bar, the app and /welcome/ all load.
