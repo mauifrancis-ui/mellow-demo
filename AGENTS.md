@@ -25,3 +25,11 @@ Every product, design or brand change runs this sequence. Don't skip a step beca
 7. **Retro and outcome review.** What worked, what didn't, follow-ups, and what the next sprint will measure.
 
 Record each step in DESIGN_BOARD.md and DECISION_LOG.md. A fix for a bug that is live and breaks a Mellow rule may skip steps 1 to 3 only with the founder's explicit go-ahead.
+
+**Small bugs (founder rule, 2026-11-25).** A small bug can bypass the full review. It goes on the punchlist in [BACKLOG.md](BACKLOG.md), gets fixed, passes the implementation checks (lint, type check, build, tests, and a browser check of the affected screens), and ships. A bug counts as small only if the fix:
+
+- changes layout, spacing, styling or a typo, and not behavior;
+- doesn't change what Mellow says, decides or stores;
+- doesn't touch evidence, decisions, compliance wording or the evaluation set.
+
+Anything else gets the full cadence. If in doubt, ask the founder. Small fixes are reviewed together at the next retro.
