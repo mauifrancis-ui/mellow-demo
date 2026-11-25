@@ -33,7 +33,7 @@ function formatSize(bytes: number) {
 
 
 
-export function Conversation({ context, chips, turns, onTurns, onAction, onAnswer, onClear }: {
+export function Conversation({ context, chips, turns, onTurns, onAction, onAnswer, onClear, inline = false }: {
   context: AskContext;
   chips: string[];
   turns: Turn[];
@@ -41,6 +41,7 @@ export function Conversation({ context, chips, turns, onTurns, onAction, onAnswe
   onAction: (action: AskAction, answer: AskAnswer) => void;
   onAnswer?: (answer: AskAnswer) => void;
   onClear?: () => void;
+  inline?: boolean;
 }) {
   const input = useRef<HTMLTextAreaElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -109,7 +110,15 @@ export function Conversation({ context, chips, turns, onTurns, onAction, onAnswe
     text: text.slice(0, start) + "PKG-" + text.slice(end), start: start + 4, end: start + 4,
   }));
 
-  return <section className="conversation" aria-label="Talk with Mellow">
+  return <section className={inline ? "conversation conversation-inline" : "conversation"}
+    aria-labelledby={inline ? "conversation-title" : undefined} aria-label={inline ? undefined : "Talk with Mellow"}>
+    {inline && <header className="conversation-heading">
+      <span className="conversation-icon">{stroke(<path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5H4.5zM8.5 10.5h7" />)}</span>
+      <div>
+        <h2 id="conversation-title">Ask Mellow</h2>
+        <p>Get help reading the records or deciding what to check next.</p>
+      </div>
+    </header>}
     {turns.length > 0 && <section className="conversation-log" aria-label="Conversation">
       <div className="log-head">
         <span className="kicker">Conversation</span>
@@ -165,7 +174,7 @@ export function Conversation({ context, chips, turns, onTurns, onAction, onAnswe
     <form className="composer" onSubmit={onSubmit}>
       <label htmlFor="ask-input" className="sr-only">Reply to Mellow</label>
       <textarea id="ask-input" ref={input} rows={2} value={value} onChange={(event) => setValue(event.target.value)} onKeyDown={onKeyDown}
-        placeholder="Reply, or ask about anything else" maxLength={600} aria-describedby="ask-note" />
+        placeholder={turns.length ? "Ask a follow-up…" : "What would you like to check?"} maxLength={600} aria-describedby="ask-note" />
       {attachment && <p className="attachment">
         <span>{stroke(<path d="M20 11.5 12.4 19a5 5 0 0 1-7.1-7.1l7.8-7.8a3.3 3.3 0 0 1 4.7 4.7l-7.6 7.6a1.7 1.7 0 0 1-2.4-2.4l7-7" />)}{attachment.name} · {formatSize(attachment.size)}</span>
         <button type="button" className="tool" aria-label={`Remove ${attachment.name}`} onClick={() => setAttachment(null)}>{stroke(<path d="M6 6l12 12M18 6 6 18" />)}</button>

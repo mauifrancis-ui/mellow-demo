@@ -461,7 +461,7 @@ export default function App() {
               <div className="ledger-record-body">
                 <div className="review-heading">
                   <div key={active?.id} className="record-identity">
-                    {active && <p className="eyebrow">{active.sample ? "Sample package" : "Imported record"}</p>}
+                    {active && <p className="eyebrow">Record review · {active.sample ? "Sample package" : "Imported record"}</p>}
                     <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active ? `${active.record} · ${activeIssue?.label.toLowerCase()}` : "You’re caught up"}</h2>
                   </div>
                   <a className="queue-link" href="#work-queue">View queue</a>
@@ -515,7 +515,7 @@ export default function App() {
                 <p className="feedback review-feedback" id="review-feedback" role="status">{status}</p>
               </div>
             </section>
-            <Conversation context={askContext} chips={briefing.chips} turns={turns} onTurns={setTurns} onAction={onAsk} onAnswer={showAnswer} onClear={backToQueue} />
+            <Conversation inline context={askContext} chips={briefing.chips} turns={turns} onTurns={setTurns} onAction={onAsk} onAnswer={showAnswer} onClear={backToQueue} />
           </div>
           <ContextPanel view={panelView} collapsed={panelCollapsed} needYou={queue.length} lastCheck={posture.lastSuccessfulRun?.checkedAt}
             onBack={backToQueue} onToggle={togglePanel}>

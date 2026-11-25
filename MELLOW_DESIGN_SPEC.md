@@ -1,6 +1,6 @@
 # Mellow Design Spec
 
-Release 01 · Simplify & Trust · Version 1.26.0 · 2026-11-24
+Release 01 · Simplify & Trust · Version 1.34.0 · 2026-11-24
 
 **High standards, low stress.** Help dispensary staff see what needs attention,
 inspect the evidence, and leave the next shift a decision or a clear next
@@ -356,3 +356,16 @@ Browsers without view transitions fall back to the inline fades, and reduced mot
 - Today: the control scrolls the conversation into view and focuses the reply field. No second copy of the conversation.
 - Activity and Learn: a paper drawer, 460px wide, 1px ink border, 4px corners, a floating-layer shadow, pinned under the app bar on the right. It scrolls internally and opens with the spring. Below 900px it's a bottom sheet at up to 82% of the viewport height. It closes with Escape, the close button or the control, and focus returns to the control.
 - One thread shared by both surfaces (keeps the latest six turns).
+
+## Version 1.34 review and conversation
+
+On Today, give the active review and the conversation distinct surfaces.
+Use a warm paper record area with a vermilion edge and a visible Record
+review label. Keep case actions with their evidence. Use the existing
+ink treatment for conversational actions.
+
+Place the inline conversation below the review in a softly tinted surface
+with a speech mark and Ask Mellow heading. Round the suggestions and
+outline the composer to make it clear they belong to the conversation.
+Retain the single shared thread, sample-data disclosure, and existing
+drawer for Activity and Learn.
