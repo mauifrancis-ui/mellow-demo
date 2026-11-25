@@ -78,7 +78,9 @@ values aligned under their labels. Morris kept the recommendation separate
 from the values and kept decisions in the review. The receiving comparison
 is available below it for source verification.
 
-## Version 1.35 proposal review and board pass · Ask Mellow AI brand · 2026-11-25
+## Version 1.35 proposal review and board pass · Ask Mellow AI brand · 2026-11-25 (superseded)
+
+*Superseded the same day by the rerun below. That first pass predates [PRODUCT_TEAM.md](PRODUCT_TEAM.md): it had no Product Lead, Research or AI UX pass, and it named findings by area rather than by role.*
 
 **Proposal.** The four directions on the canvas page "Ask Mellow · AI brand": A Margin Note, B The Period, C Second Shift, D Proof. They're reviewed against the founder's voice and behavior rules of 2026-11-25. The prototype build that started before this review (a provenance stamp, a proactive row dot, and routing rule questions) was paused and is stashed. It's evidence for this review, not an approved build.
 
@@ -118,3 +120,63 @@ is available below it for source verification.
 5. **Ship the rule-question routing fix** as a hotfix, with the founder's go-ahead.
 
 **Process note.** Versions 1.31 to 1.34 (the contextual panel, the motion and app shell, Ask Mellow from anywhere, and the chat panel) shipped without a team review or board pass. A retro pass is offered.
+
+
+## Version 1.35 rerun under PRODUCT_TEAM.md · Ask Mellow · 2026-11-25
+
+### Step 0 · Sprint brief (Product Lead)
+
+**Founder goal.** Give Mellow's AI layer a brand and UX moments that are honest about its capabilities, explain how it knows things, speak first only when the situation calls for it, and never promise what it can't determine.
+
+**Problem.** Receiving leads ask Mellow things the matcher wasn't built for, and today it answers some of them in ways that read as compliance judgments or that dodge questions about itself. Nothing on screen shows what an answer was based on.
+
+**Who and how often.** Every shift lead, on every question. The probe below shows 11 of 17 evaluation cases failing in production.
+
+**Success measures.** The evaluation set passes 100%. Every factual answer shows what was compared and when. No answer contains a compliance verdict, a risk score or a prediction.
+
+**Smallest version.** A hotfix for the compliance, command and self-questions. Then provenance on answers. Proactive signals and the handoff come later.
+
+**Out of scope.** Live AI, regulation content, new visual identity work beyond Field Ledger.
+
+### Step 1 · Proposal review by role
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| AI UX Designer/Engineer | Ran the proposed evaluation set ([MELLOW_EVALS.md](MELLOW_EVALS.md)) against production: 1 pass, 4 partial, 11 fail. Compliance-bait questions get record lists, commands get no refusal, and "Are you an AI?", "How do you know?" and "What did you check?" all hit the fallback. | **Blocker** (live) | Approve the evaluation set as the gate. Hotfix three intent groups ahead of everything else: compliance questions, decision commands, and questions about Mellow itself. Add the off-topic fix (E1). |
+| AI UX Designer/Engineer | Provenance belongs to the answer, not the page. It's computed when the answer is created, from the same run and comparison data. | Info | Add a `basis` to every answer. M2 and M3 ("how do you know") read the last answer's basis. |
+| AI UX Designer/Engineer | A proactive signal needs a dismiss and a "why am I seeing this". Otherwise people can't challenge it. | High | Every proactive note says its trigger ("New in the 9:13 check") and can be dismissed. |
+| Compliance and Risk | Founder rule "only says Mellow" is safe as a name, but some laws require telling people they're talking to AI. The EU AI Act's Article 50 has applied since 2 August 2026. Utah requires disclosure when clearly asked, and gives a safe harbor for disclosing at the start. Colorado replaced its AI Act with a narrower disclosure law that takes effect 1 January 2027. Mellow is a B2B tool for licensed staff, so many consumer rules may not apply. That's a question for counsel, not the team. | **High** | Keep "Mellow" as the only name. Mellow must answer "Are you an AI?" truthfully (M1). When live AI turns on, show a plain one-line disclosure at the first interaction. Counsel to confirm which laws apply. |
+| Compliance and Risk | "CHECKED" on a stamp can read as an attestation. | High | Use "Compared" with the files and time. Guidance is labeled "Not from your records". |
+| Compliance and Risk | Commands like "approve PKG-443" get record facts back. Nothing is approved, but the reply never says Mellow can't decide. | High | Covered by the D1 to D3 hotfix. |
+| Product Designer (systems and IA) | **System note.** Mellow already speaks first in three places, all with the same pattern: the MELLOW margin label with an italic line (the Today briefing, the Activity summary and the Learn intro). That is Mellow's existing proactive object. A new dot would be a second, competing pattern, and it collides with the queue marks (a filled vermilion dot means records disagree, a ring means a gap). | **High** | Reject the dot. Proactive signals reuse the margin note: a MELLOW label plus one italic line on the record or row. One pattern everywhere. |
+| Product Designer (systems and IA) | **System note.** Provenance is a new property of the Answer object, and it points at an existing object, the Check (run). The panel already says "Last check 9:13". | Medium | The stamp reuses that vocabulary: "Compared · 2 files · check at 9:13". No new terms. |
+| Product Designer (systems and IA) | There's no written map of objects (package, record, check, issue, decision, handoff, evidence, answer), their states, or where each appears. Today's collisions came from that gap. | Medium | Produce the system map as the first IA deliverable, on the canvas. |
+| Product Designer | D's rotated stamps fight the ledger's straight rules. C's handoff fits the shift workflow. | Medium | Square stamps. Defer the handoff to its own sprint. |
+| Content and Voice | Self-answers (M1 to M4) need a fixed voice: short, plain and true. "I'm Mellow. I match your question to the records on this device. Live AI is off, so I don't generate answers or judge the law." | High | Write the copy for the hotfix intents, plus the "Compared" and "Not from your records" labels. |
+| Content and Voice | C's "we" overstates what Mellow does. | Medium | Keep "I" for Mellow's actions and "you" for decisions. |
+| Research and Insights | Evidence base: the 2026-11-24 competitor audit (9 sites), today's production probe, and the legal sources above. There is **no direct user research** on how receiving leads read provenance or proactive notes. | Medium | Treat the provenance and proactive designs as hypotheses. Test with 3 to 5 receiving leads before the proactive sprint. |
+| Engineer | The hotfix is small: one routing block ahead of the record intents, three new intents, and evaluation tests. The basis is deterministic. The "seen" state is per device in the demo. | Info | Ship the hotfix with the evaluation tests in CI. Per-user state is an open item for live mode. |
+| Accessibility | The prototype dot had a 28px target, under the 44px minimum, and carried meaning by colour alone. The margin-note pattern avoids both. The stamp's popover needs keyboard open and close and must fit at 390px. | High | Margin-note proactive pattern. A disclosure popover for provenance, tested at 390px and with a keyboard. |
+| Design Director | Directions A and D fit Field Ledger. B as drawn and C's voice don't. The team agrees there's a live blocker, which changes the sprint order. | Info | Present a two-sprint plan with the hotfix first. |
+
+**Sign-off.** All roles sign off on the plan below. Compliance and Risk's sign-off depends on M1 shipping in the hotfix and on counsel confirming the disclosure question before live AI.
+
+### Step 2 · Board pass
+
+- **Morris:** backs it strongly. Self-explanation (M1 to M3), provenance on every answer, and dismissible, explained proactive notes are what let people understand, challenge and override Mellow.
+- **Norman:** backs the hotfix first. Today a person can't tell whether "PKG-443 needs a look" answers "is it compliant". That's a gulf of evaluation.
+- **Rams, Maeda:** back A plus the margin-note proactive pattern. One existing pattern beats a new mark. Stamps only where a fact needs a source.
+- **Vignelli, Kare:** reject the dot and back the system map. A visual language has to be a system before it gets new marks.
+- **Zhuo:** backs D's provenance. The outcome is a decision a reviewer can audit.
+- **Eames:** backs C's handoff for a later sprint.
+- **Ive:** square stamps, one press motion.
+- **Wroblewski, Clark:** 44px targets. The popover must fit at 390px. The margin note works on touch with no hover.
+
+### Board recommendation for founder decision
+
+1. **Hotfix now (sprint 1a).** Route compliance questions, decision commands and questions about Mellow to honest answers (C1 to C5, D1 to D3, M1 to M3, E1). Add the evaluation set to the tests as a gate.
+2. **Approve A, Margin Note,** as Mellow's identity.
+3. **Approve provenance (sprint 1b):** a square "Compared · files · check time" stamp on answers drawn from records, "Not from your records" on guidance, and "How do you know?" answered from it.
+4. **Approve the margin-note proactive pattern** in place of the dot, with its trigger stated and a dismiss (sprint 2, after 3 to 5 user sessions).
+5. **Defer C's handoff** to its own sprint.
+6. **Commission the system map** (Product Designer) and **counsel review** of AI disclosure before live AI.
