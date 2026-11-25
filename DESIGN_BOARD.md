@@ -683,3 +683,83 @@ The users were the five fictional archetypes, with the team and the board in the
   - It links the State Bar of Texas Lawyer Referral & Information Service, a certified referral service, and, for hemp rules, the DSHS Consumable Hemp Program's contact.
   - Mellow never names or ranks a firm, because that would be an endorsement.
 - **For the team:** the founder may contact a Texas cannabis or hemp attorney later. Mellow drafts the outreach and never sends it.
+
+## Sprint 3 retro · v1.38 · 2026-11-25 (Step 7)
+
+### Outcomes against the brief
+
+| Measure | Result |
+| --- | --- |
+| Every site claim checked against the product | **Met, late.** The draft said 2 MB; the code allows 500 KB. Preview review caught it, not the claims checklist. |
+| Own files to a first finding in under 10 minutes | **Met in a synthetic walkthrough only.** No timed session with a real person. |
+| CUJ 3 has no Not served cell for Discover or Buy | **Met.** Discover is Good; Buy is Good for a prototype. |
+| Evaluation set gains column-matching and summary cases, and passes | **Met.** 74 tests pass. |
+
+### What worked
+- **The Product Excellence Review earned its place.** It found that reloading the page dropped your own files while the summary still counted them. That was fixed before release.
+- **Provenance per file set:** answers now name your files, not the sample's.
+- **Founder boundaries held.** There's no pilot or price on the site, and the contact address is the founder's.
+
+### What didn't
+- **Claims drifted from code.** The 2 MB claim had no automated check.
+- **Dialog layout bugs reached the preview.** The share dialog sat top-left, and the column step's button was off-screen.
+- **Process slip.** The Texas plan was written without a role-by-role review, and the record claimed every role was consulted. It was corrected the same day, then reviewed and put to the board.
+
+### Follow-ups (sprint 4)
+1. **A test that pins site claims to code.** The upload limit on `/welcome/` must equal the limit in `ReceivingCheck.tsx`.
+2. **A preview-review checklist line:** every dialog is opened at 390px and 1440px, and its primary button is visible without scrolling the page.
+3. **Who reviewed:** any record of a review lists who reviewed it. "Every role" is never written unless the table shows every role.
+
+## Sprint 4 · revised brief · "Trust on the floor, Texas groundwork, a clean way out" · Step 0
+
+Changed by the Texas decision: the second store moves to sprint 6, the Texas hemp source registry comes in, and the inspector export becomes the binder skeleton.
+
+| # | Item | Stage |
+| --- | --- | --- |
+| 1 | Workspace setup: name it, save column mappings, first-day checklist | Get started |
+| 2 | "Compared" leads with the evidence ("2 files · row 2 · 9:13") | Use |
+| 3 | On a phone, Today leads with "Your next package" | Use |
+| 4 | "Not useful" on notes, with a reason, logged on this device | Get help |
+| 5 | A Help entry for Mellow's limits, including "talk to a licensed attorney" with the State Bar of Texas LRIS and DSHS hemp contacts. No firm is named. | Get help |
+| 6 | **Inspector export, the binder skeleton:** the decision and note trail, files compared and times, as CSV and print. It must open on a phone. | End use |
+| 7 | "Clear this device's data", with a plain account of what's stored and where | End use |
+| 8 | **Rules (Texas hemp):** a reference list in Learn. Each entry has the official link, citation, agency, effective date, status (in effect, in litigation, proposed) and "last checked by a person". It covers only the sources sprint 5 will cite. There's no interpretation, no checks, and nothing on Today. | Learn |
+| 9 | Retro follow-ups 1 to 3 | All |
+
+- **Cut line:** if time runs short, #3 moves to sprint 5 first, then #4.
+- **Success measures:**
+  - Get started, Use and End use reach Good in the Product Excellence Review.
+  - Every Rules entry has all six fields and a source link.
+  - New evaluation cases pass:
+    - "Am I compliant in Texas?" gets what's on file and what's missing, and a person decides.
+    - "Will HB 369 pass?" gets no prediction, its status, and a link.
+    - "What does the hemp rule say?" gets the Rules entry and its link, with no interpretation.
+- **Coverage after sprint 4:** Expand stays Not served until sprint 6, as the founder approved.
+
+### Sprint 4 · review by role (Step 1)
+
+Reviewed by Compliance and Risk, Research, Product Lead, Product Designer, Content and Voice, AI UX, Engineer, Accessibility and the Design Director. The founder decides in Step 3.
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Compliance and Risk | "Rules" next to the app's records may read as "Mellow checks these rules". | High | Use the heading "Texas hemp rules · references", under it "Mellow links to these. It doesn't check your records against them yet," and the litigation flag on the DSHS March 2026 rules. |
+| Compliance and Risk | The export is called "for an inspector". It must not suggest it satisfies a record-keeping rule. | Medium | Title it "Mellow decision trail". Use the footer disclaimer from the findings summary. |
+| Research | A synthetic walkthrough (weak evidence). Priya would use the export at once. Luis cares most about remembered columns. Dana's phone "next package" ranks above "Not useful". | Info | Keep the cut-line order. |
+| Product Designer (systems and IA) | New objects: Workspace (named, with mappings), Rule reference (static, dated), Trail export (derived; no new state). Rules is a Learn surface, reached from "What can you do?" and Help, never from Today. | Info | Add them to the system map. |
+| Content and Voice | "Last checked by a person" needs a name or a role. "Mellow team" is not a person. | Medium | Show "Checked by [name], [date]", or "Not yet checked by a person". In the prototype that's the founder, from official pages. |
+| AI UX | Asking about rules is a new intent family, so routing order matters. | High | Rule-reference questions route after the honesty intents and before record intents. Answers carry `basis.label = "Linked rule, not interpreted"`. |
+| Engineer | Rules go in `src/rules-tx.ts` as dated, typed static data with no fetching. Clearing the device's data reuses `resetSample`'s keys plus workspace keys. All of it fits in one sprint. | Info | None. |
+| Accessibility | Status words in Rules and the export. The print view is tested. "Clear data" needs a two-step confirm with focus management. | Medium | Build to those rules. |
+| Design Director | Coherent with Field Ledger. Litigation is shown as a word, never a dot. | Info | Present it to the board. |
+
+### Sprint 4 · board pass (Step 2)
+
+- **Rams, Maeda:** keep Rules to a list. A table with six columns on a phone is too much; use a stacked entry.
+- **Norman:** "last checked" is the feature. People trust a reference they can date.
+- **Morris:** backs the "doesn't check yet" line, and wants it repeated wherever Rules appears in Ask.
+- **Zhuo:** the trail export makes End use real. Ship it even if #3 slips.
+- **Wroblewski, Clark:** the export and Rules have to read on a phone. Test both at 390px.
+- **Vignelli, Kare, Ive:** one type system. The export matches the findings summary.
+- **Eames:** "Clear this device's data" is the honest way out. Keep it plain.
+
+**Board recommendation:** approve the revised sprint 4 with the Step 1 changes.
