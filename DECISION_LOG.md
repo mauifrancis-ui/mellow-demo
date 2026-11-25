@@ -239,4 +239,4 @@ Founder preview approval is pending.
 
 ## Version 1.34 Task and chat are two places · 2026-11-24
 
-The founder said the task and the chat ran together: reply chips looked like more record actions. Gave the Today conversation its own tinted panel under an ink rule, with an "Ask Mellow" heading until a thread starts, and paper chips inside. CSS only, scoped to Today. Verification: build and lint passed; screenshots checked at 1440px with and without a thread, and at 390px. Founder preview approval is pending.
+The founder said the task and the chat ran together: reply chips looked like more record actions. Gave the Today conversation its own tinted panel under an ink rule, with an "Ask Mellow" heading until a thread starts, and paper chips inside. CSS only, scoped to Today. Verification: build and lint passed; screenshots checked at 1440px with and without a thread, and at 390px. Founder approved and deployed to production on 2026-11-24.
