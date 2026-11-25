@@ -362,3 +362,16 @@ Browsers without view transitions fall back to the inline fades, and reduced mot
 - The record is the work, on plain paper. The conversation on Today sits below it on its own tint-soft panel: a 1px ink top rule, 20px gap above, 20/28px padding, 4px bottom corners. On phones it runs edge to edge.
 - Before any question, the panel is headed "Ask Mellow" (mono kicker). Once there's a thread, the "Conversation" header takes over.
 - Reply chips sit on paper inside the tint, so they read as suggestions, not as the record's action buttons. The floating Ask Mellow drawer is unchanged.
+
+## Mellow's voice and behavior rules (founder decisions, 2026-11-25)
+
+1. **Name.** The product says only "Mellow". Never "Mellow AI", never a character name or avatar.
+2. **Honest about capability.** Mellow states its limits plainly where they apply ("Live AI is off", "I can't read photos yet") and never implies it did work it didn't do.
+3. **Explainable.** Every answer that states a fact shows how Mellow knows it: which files or records were compared, and when. An answer Mellow can't trace to a record says so.
+4. **Who speaks first depends on the situation.**
+   - Mellow speaks first only with a deterministic fact the person needs now: a new difference or gap, a delayed or failed check, a handoff that's due.
+   - Proactive means a quiet signal (a dot on the row or one line in the briefing), never a popup or modal.
+   - Anything interpretive (why, what it means, what to do about a rule) waits until the person asks.
+5. **No promises it can't keep deterministically.** Answers and provenance stamps state what was compared, never "compliant", "safe", a risk score or a prediction. Unsure stays visibly unsure.
+
+Brand direction under review on the design canvas, page "Ask Mellow · AI brand": the team recommends Margin Note (A) as the base, Proof stamps (D) on answers that cite records, and the Period dot (B) for proactive signals.

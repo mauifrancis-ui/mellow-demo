@@ -240,3 +240,7 @@ Founder preview approval is pending.
 ## Version 1.34 Task and chat are two places · 2026-11-24
 
 The founder said the task and the chat ran together: reply chips looked like more record actions. Gave the Today conversation its own tinted panel under an ink rule, with an "Ask Mellow" heading until a thread starts, and paper chips inside. CSS only, scoped to Today. Verification: build and lint passed; screenshots checked at 1440px with and without a thread, and at 390px. Founder approved and deployed to production on 2026-11-24.
+
+## Mellow voice and behavior rules · 2026-11-25
+
+The founder reviewed four Ask Mellow brand directions and decided: (1) the product only ever says "Mellow"; it must be honest about its capabilities and explain how it knows what it says; (2) whether Mellow or the person speaks first depends on the situation, proactive vs. reactive; (3) Mellow never promises anything it can't be deterministic about, especially compliance and risk. The team turned (2) into a rule: Mellow goes first only with a deterministic fact needed now, shown as a quiet signal; interpretation waits to be asked. Rules recorded in MELLOW_DESIGN_SPEC.md. No product change yet; the brand direction itself is still open.
