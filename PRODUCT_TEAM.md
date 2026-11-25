@@ -18,6 +18,7 @@ Help cannabis receiving and compliance teams find, understand and resolve record
 | **Product Designer** | Turns problems into flows and screens people can use under pressure. | Proposals, canvas artboards, interaction and motion specs, the design spec ([MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md)). | Final copy; feasibility calls. |
 | **Content and Voice Designer** | Makes Mellow sound like one honest colleague everywhere. | Mellow's voice and behavior rules, all UI copy, answer templates, limit and error language, naming. | Regulatory interpretation. |
 | **Research and Insights** | Grounds decisions in evidence about real users and the market. | External audits, competitor reviews, user tasks and scenarios, outcome measures after release. | Deciding what to build. |
+| **AI UX Designer/Engineer** | Makes Mellow's intelligence behave in ways people can understand, check, correct and trust. | How Mellow behaves in the product: intent coverage and routing; answer structure; provenance and explainability (what Mellow compared, and when); how it shows confidence and limits; the triggers and quiet signals that decide when Mellow speaks first; fallbacks and refusals; human-in-the-loop controls (override, dismiss, undo); the behavior spec for live AI; and the **evaluation set**: the questions, including adversarial and compliance-bait ones, every change must pass. | Final copy (Content), regulatory interpretation (Compliance), visual style (Design). |
 | **Engineer** | Builds it so it works, stays fast, and can be tested and undone. | Feasibility and cost, architecture, implementation, tests, the build, branches and deploys, production verification. | Deploying without founder approval. |
 | **Accessibility Specialist** | Makes sure everyone can do the job with any device or input. | WCAG checks, 44px targets, keyboard and screen-reader flows, reduced motion, contrast, phone layouts. | Visual style beyond access needs. |
 | **Compliance and Risk Lead** | Makes sure Mellow never claims more than it can prove. | Alignment with [MELLOW_CORE.md](MELLOW_CORE.md): deterministic claims only, provenance, regulatory honesty, sample-data labeling, data handling, audit trail. **Can block a release.** | Product priorities. |
@@ -29,6 +30,7 @@ Help cannabis receiving and compliance teams find, understand and resolve record
 - **Product Designer:** Can a receiving lead do this mid-shift, on a phone, without help? What happens when it goes wrong?
 - **Content and Voice:** Does Mellow say only what it knows, in plain words? Does it say "Mellow", never "AI"?
 - **Research:** What evidence supports this? What did the audit or the users show?
+- **AI UX Designer/Engineer:** What will people ask that we didn't plan for, and what does Mellow do then? Can a person see why Mellow said it, challenge it, and override it? Does the evaluation set still pass, and did we add the cases this change creates?
 - **Engineer:** Is it deterministic and testable? What does it cost and how do we roll it back?
 - **Accessibility:** Keyboard, screen reader, zoom, 390px, reduced motion: does all of it work?
 - **Compliance and Risk:** Could this be read as a compliance claim, an attestation or a prediction? Can every fact be traced to a record?
@@ -37,22 +39,22 @@ Help cannabis receiving and compliance teams find, understand and resolve record
 
 The cadence itself is in [AGENTS.md](AGENTS.md). R = responsible, A = accountable, C = consulted, I = informed.
 
-| Step | Director | Product | Design | Content | Research | Engineer | Access | Compliance | Founder |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 0 Sprint planning | R | R | C | C | C | C | I | C | **A** |
-| 1 Proposal review | **A** | R | R | R | R | R | R | R | I |
-| 2 Board pass | **A** | C | R | C | C | C | C | C | I |
-| 3 Founder decision on proposal | R | C | C | C | I | C | I | C | **A** |
-| 4 Build and implementation review | C | C | R | R | I | **A** | R | R | I |
-| 5 Preview review | **A** | R | R | R | I | R | R | R | C |
-| 6 Founder release decision and deploy | R | I | I | I | I | R | I | C | **A** |
-| 7 Retro and outcome review | R | **A** | C | C | R | C | C | C | I |
+| Step | Director | Product | Design | Content | Research | AI UX | Engineer | Access | Compliance | Founder |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 0 Sprint planning | R | R | C | C | C | C | C | I | C | **A** |
+| 1 Proposal review | **A** | R | R | R | R | R | R | R | R | I |
+| 2 Board pass | **A** | C | R | C | C | C | C | C | C | I |
+| 3 Founder decision on proposal | R | C | C | C | I | C | C | I | C | **A** |
+| 4 Build and implementation review | C | C | R | R | I | R | **A** | R | R | I |
+| 5 Preview review | **A** | R | R | R | I | R | R | R | R | C |
+| 6 Founder release decision and deploy | R | I | I | I | I | C | R | I | C | **A** |
+| 7 Retro and outcome review | R | **A** | C | C | R | R | C | C | C | I |
 
 ## Required outputs
 
 - **Proposal review:** one findings table. Each row has the role, the finding, a severity (below) and a recommendation. Every role either signs off or lists what blocks it.
 - **Board pass:** what each lens backs, changes or rejects, and a numbered recommendation for the founder.
-- **Implementation review:** lint, type check, build and test results, plus browser checks at 1440px and 390px with keyboard and reduced motion.
+- **Implementation review:** lint, type check, build and test results, plus browser checks at 1440px and 390px with keyboard and reduced motion. For any change to Mellow's behavior, the evaluation set results, including the new cases this change adds.
 - **Preview review:** each finding closed, or given an owner and an impact.
 - **Release:** the founder's decision, the deploy commit, and verification in production.
 - **Retro:** what worked, what didn't, follow-ups, and what the next sprint will measure.
@@ -61,7 +63,7 @@ Record all of it in [DESIGN_BOARD.md](DESIGN_BOARD.md) and [DECISION_LOG.md](DEC
 
 ## Severity
 
-- **Blocker:** breaks a Mellow rule or MELLOW_CORE, misleads about compliance, loses data, or fails accessibility basics. It can't ship.
+- **Blocker:** fails the evaluation set, breaks a Mellow rule or MELLOW_CORE, misleads about compliance, loses data, or fails accessibility basics. It can't ship.
 - **High:** a real user harm or confusion. Fix it before release, or the founder accepts the risk in writing.
 - **Medium:** fix it in this sprint, or log it with an owner.
 - **Low or Info:** a note for later.
@@ -72,4 +74,5 @@ Record all of it in [DESIGN_BOARD.md](DESIGN_BOARD.md) and [DECISION_LOG.md](DEC
 2. Compliance and Risk can block. Only the founder can overrule a block, in writing.
 3. Every review names who found what. Nothing is "the team thinks" without a role attached.
 4. Disagreements are recorded, not smoothed over. The Director presents both sides to the founder.
-5. Live bugs that break a Mellow rule are raised the moment they're found, with a hotfix proposal.
+5. Every Mellow behavior bug becomes a permanent case in the evaluation set before it is fixed.
+6. Live bugs that break a Mellow rule are raised the moment they're found, with a hotfix proposal.
