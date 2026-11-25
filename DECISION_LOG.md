@@ -171,7 +171,7 @@ reply chips, leaving a record for a manager, Not an issue, bold formatting,
 an attachment answer opening the evidence form, and the grouped queue
 updating. There were no console errors, and reduced motion ran no
 animations. Open item: attachments are not stored or read until live AI and
-evidence storage are approved. Founder preview approval is pending.
+evidence storage are approved. Founder approved and deployed to production on 2026-11-24 (main at 86efad0).
 
 ## Version 1.30 conversation, Activity and Learn · 2026-11-24
 
@@ -235,4 +235,4 @@ Founder preview approval is pending.
 - Decision: add an "Ask Mellow" control to the sticky app bar, with `/` as a keyboard shortcut. On Today it scrolls to the conversation and focuses the reply field. On Activity and Learn it opens a floating drawer (a bottom sheet on phones) that overlays the page instead of pushing it.
 - The conversation thread now lives in the app, not the component, so the same turns follow you between Today and the drawer. A vermilion dot on the control means there's a thread waiting.
 - Actions in the drawer that need Today's tools (open a record, compare, add evidence) take you to Today with the thread intact.
-- Founder approval: pending preview.
+- Founder approval: approved and deployed to production on 2026-11-24 (main at 86efad0). Verified live: sticky app bar, Ask Mellow control, drawer open and close, focus in the reply field.
