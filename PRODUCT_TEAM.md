@@ -15,7 +15,7 @@ Help cannabis receiving and compliance teams find, understand and resolve record
 | **Founder** (Maui) | Sets direction and decides. | Sprint goals, approving proposals, release decisions, brand. | Day-to-day execution. |
 | **Design Director** | Keeps every change on the product's point of view and runs the cadence. | The sprint plan, the review agenda, the brand point of view (Field Ledger), presenting to the founder, enforcing the cadence. | Writing code; overruling compliance blocks. |
 | **Product Lead** | Makes sure we solve a real problem the right size. | The problem statement, scope, success measures, cut lines, and the backlog of open items and debt. | Visual decisions; release authority. |
-| **Product Designer** | Turns problems into flows and screens people can use under pressure. | Proposals, canvas artboards, interaction and motion specs, the design spec ([MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md)). | Final copy; feasibility calls. |
+| **Product Designer** | A systems thinker who designs the whole product, not single screens: how its parts, objects and states fit together, so people can use it under pressure. | **Systems:** the product's objects (package, record, check, decision, handoff, evidence) and how they relate; their states and transitions; patterns and components that work the same on every surface. **Information architecture:** navigation, page and panel structure, what lives where and why, naming and labels, grouping and hierarchy, wayfinding, how people find things and move between them. **Flows and specs:** proposals, canvas artboards, interaction and motion specs, the design spec ([MELLOW_DESIGN_SPEC.md](MELLOW_DESIGN_SPEC.md)), and an up-to-date map of the product's structure. | Final copy; feasibility calls. |
 | **Content and Voice Designer** | Makes Mellow sound like one honest colleague everywhere. | Mellow's voice and behavior rules, all UI copy, answer templates, limit and error language, naming. | Regulatory interpretation. |
 | **Research and Insights** | Grounds decisions in evidence about real users and the market. | External audits, competitor reviews, user tasks and scenarios, outcome measures after release. | Deciding what to build. |
 | **AI UX Designer/Engineer** | Makes Mellow's intelligence behave in ways people can understand, check, correct and trust. | How Mellow behaves in the product: intent coverage and routing; answer structure; provenance and explainability (what Mellow compared, and when); how it shows confidence and limits; the triggers and quiet signals that decide when Mellow speaks first; fallbacks and refusals; human-in-the-loop controls (override, dismiss, undo); the behavior spec for live AI; and the **evaluation set**: the questions, including adversarial and compliance-bait ones, every change must pass. | Final copy (Content), regulatory interpretation (Compliance), visual style (Design). |
@@ -27,7 +27,7 @@ Help cannabis receiving and compliance teams find, understand and resolve record
 
 - **Design Director:** Does this fit Field Ledger and the cadence? Is the founder seeing a real choice?
 - **Product Lead:** Whose problem, how often, and how will we know it worked? What's the smallest version?
-- **Product Designer:** Can a receiving lead do this mid-shift, on a phone, without help? What happens when it goes wrong?
+- **Product Designer:** Where does this live in the system, and what else does it touch? Is this a new object, a new state of an existing one, or a new view of it? Does it follow the patterns we already have, or does it need a new one, and should that pattern then apply everywhere? Would someone know where to find this, and what it's called, without being told? Can a receiving lead do this mid-shift, on a phone, without help? What happens when it goes wrong?
 - **Content and Voice:** Does Mellow say only what it knows, in plain words? Does it say "Mellow", never "AI"?
 - **Research:** What evidence supports this? What did the audit or the users show?
 - **AI UX Designer/Engineer:** What will people ask that we didn't plan for, and what does Mellow do then? Can a person see why Mellow said it, challenge it, and override it? Does the evaluation set still pass, and did we add the cases this change creates?
@@ -52,7 +52,7 @@ The cadence itself is in [AGENTS.md](AGENTS.md). R = responsible, A = accountabl
 
 ## Required outputs
 
-- **Proposal review:** one findings table. Each row has the role, the finding, a severity (below) and a recommendation. Every role either signs off or lists what blocks it.
+- **Proposal review:** one findings table, plus the Product Designer's note on where the change sits in the system and the information architecture: what it adds, changes or retires. Each row has the role, the finding, a severity (below) and a recommendation. Every role either signs off or lists what blocks it.
 - **Board pass:** what each lens backs, changes or rejects, and a numbered recommendation for the founder.
 - **Implementation review:** lint, type check, build and test results, plus browser checks at 1440px and 390px with keyboard and reduced motion. For any change to Mellow's behavior, the evaluation set results, including the new cases this change adds.
 - **Preview review:** each finding closed, or given an owner and an impact.
