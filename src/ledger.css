@@ -247,7 +247,7 @@
 .chip[aria-pressed="true"] { border-color: var(--ink); background: var(--tint); }
 .ledger-day ul { margin: 0; padding: 0; list-style: none; }
 .decision-row {
-  display: grid; grid-template-columns: 72px 12px 84px minmax(0, 1fr) minmax(0, 1.1fr) auto; gap: 12px; align-items: center;
+  display: grid; grid-template-columns: 72px 12px 84px max-content minmax(0, 1fr) auto; gap: 12px 16px; align-items: center;
   min-height: 52px; border-bottom: 1px solid var(--rule);
 }
 .decision-row time { font: 13px var(--mono); color: var(--graphite); }
@@ -749,3 +749,8 @@
 /* Punchlist: the global "label input" field style turned these radios into 44px circles. */
 .not-useful label { justify-content: flex-start; font-weight: 400; }
 .not-useful input[type="radio"] { flex: none; width: 18px; height: 18px; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 50%; background: none; box-shadow: none; accent-color: var(--ink); appearance: auto; }
+
+/* Punchlist: decision words wrapped at body size while user-typed evidence sat in 12px mono. Mono stays for times and IDs only. */
+.decision-word { font: 15px/1.3 var(--sans); white-space: nowrap; }
+.evidence-toggle, .evidence-none { font: 14px/1.3 var(--sans); }
+.evidence-toggle { text-decoration: underline; text-decoration-color: var(--rule-strong); text-underline-offset: 4px; }

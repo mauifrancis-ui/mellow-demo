@@ -97,7 +97,7 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
                   <time dateTime={entry.at}>{clock(entry.at)}</time>
                   <span className="queue-mark" aria-hidden="true" />
                   <span className="queue-id">{entry.task.record}</span>
-                  <span>{meta.label}</span>
+                  <span className="decision-word">{meta.label}</span>
                   {hasDetail ? <button type="button" className="evidence-toggle" aria-expanded={open} onClick={() => setExpanded(open ? null : entry.id)}>{reference ?? "Note"}</button>
                     : <span className="evidence-none">No evidence added</span>}
                   <span className="decision-action">

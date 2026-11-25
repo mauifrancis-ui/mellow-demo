@@ -30,6 +30,9 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
 
 ## Punchlist · 2026-11-25
 
+- Reported by the founder: Activity decision rows wrapped "Issue recorded" at body size, while the evidence people typed sat in 12px dotted mono. Decision words are now 15px sans on one line, and evidence is 14px sans with a quiet underline. Mono stays for times and IDs only.
+- Open (needs the founder): Activity marks a recorded issue with a filled vermilion dot and "Left for a manager" with a ring. The mark grammar reserves those for "records disagree" and "gap". This changes design meaning, so it's not a punchlist fix.
+
 - Reported by the founder: the "Not useful" radios showed as large circles with the labels pushed right. The global `label input` field style (44px, full width) was applied to radio buttons. Fixed with styles scoped to `.not-useful`. Our preview review tested the flow but didn't screenshot the control. Retro: screenshot every new control at both widths.
 
 - Fixed after the v1.39 production check: the site still said the stamp shows "Compared" and "which rows". It now says "which files, which package, and when", and that answers not drawn from your records say so. This is site copy only.
