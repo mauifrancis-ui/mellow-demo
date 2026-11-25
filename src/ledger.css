@@ -746,3 +746,6 @@
   .phone-next-issue { font-size: 15px; color: var(--voice); text-align: right; }
   .phone-next:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
 }
+/* Punchlist: the global "label input" field style turned these radios into 44px circles. */
+.not-useful label { justify-content: flex-start; font-weight: 400; }
+.not-useful input[type="radio"] { flex: none; width: 18px; height: 18px; min-height: 0; margin: 0; padding: 0; border: 0; border-radius: 50%; background: none; box-shadow: none; accent-color: var(--ink); appearance: auto; }
