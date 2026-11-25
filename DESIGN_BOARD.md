@@ -180,3 +180,19 @@ is available below it for source verification.
 4. **Approve the margin-note proactive pattern** in place of the dot, with its trigger stated and a dismiss (sprint 2, after 3 to 5 user sessions).
 5. **Defer C's handoff** to its own sprint.
 6. **Commission the system map** (Product Designer) and **counsel review** of AI disclosure before live AI.
+
+### Journey addendum (Universal Experiences), added before the founder decision
+
+The founder adopted the Universal Experiences journey on 2026-11-25, while this review awaited decision. The Product Lead and Research applied it.
+
+| Stage | Mindset | How Ask Mellow affects it today | What the recommendation moves |
+| --- | --- | --- | --- |
+| **Try** | "Show me it works, without risk." | The demo is where prospects try Mellow. A compliance-bait answer here ("violation?" answered with a gap list) is the first impression a compliance buyer gets, and it can be screenshotted into the Buy decision. | The hotfix protects Try and the Try-to-Buy handoff. **This raises the hotfix's priority.** |
+| **Learn** | "Can I trust it?" | "Are you an AI?" and "What can you do?" hit the fallback, so people can't learn Mellow's limits from Mellow itself. | M1 to M4 make Mellow explain itself. |
+| **Use** | "Get me through my shift." | Answers don't show what they were based on, so people re-check by hand. | The provenance stamp. |
+| **Get help** *(spans all)* | "I'm stuck." | "I can't help with that one yet" is a dead end at every stage. | Every fallback names what Mellow can do and offers a path: a person, the field guide, or a file to compare. |
+| **Get started** | "Get me to first value." | The briefing already speaks first with a real finding, which is good. | The margin-note proactive pattern extends what already works here. |
+
+**Journey gaps the team flags.** Buy, Expand and End use have no product surface yet, and End use needs a counsel view of records retention. These are outside this sprint but are recorded for the roadmap.
+
+**Effect on the recommendation.** No change to the six items. The Get help finding is folded into item 1: the hotfix also replaces the dead-end fallback with what Mellow can do and a path forward.

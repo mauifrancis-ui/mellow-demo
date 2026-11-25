@@ -8,6 +8,33 @@ These are review roles that Claude runs, the same way [DESIGN_BOARD.md](DESIGN_B
 
 Help cannabis receiving and compliance teams find, understand and resolve record problems faster and more honestly than they could alone. Mellow explains and proposes; people decide. Every shipped change should make Mellow more useful, more truthful about what it knows, or easier to trust in an audit.
 
+## How we judge product excellence: the Universal Experiences journey
+
+The team uses IBM's Universal Experiences framework ([Carbon: Building experiences](https://www.carbondesignsystem.com/building-experiences/overview); [IBM Design: Love is a universal experience](https://medium.com/design-ibm/love-is-a-universal-experience-c437570eb693)) as its shared language for the whole customer relationship, not just the screens we ship. Two ideas from it are our bar:
+
+- **Pervasive excellence.** Quality has to hold in every interaction, from the first time someone hears about Mellow to the day they leave. Handoffs between stages are where trust is won or lost.
+- **Get help spans every stage.** Help isn't a page. It's how Mellow behaves whenever someone is stuck, ideally before they are.
+
+| Stage | The person's mindset | What it means for Mellow | Outcome we aim for | Lead role |
+| --- | --- | --- | --- | --- |
+| **Discover** | "Is there something that fixes my record mismatches?" | Finding Mellow and seeing what it does for receiving and compliance work, with honest claims and no compliance guarantees. | They can tell in a minute what Mellow does and doesn't do. | Product Lead, Content |
+| **Learn** | "Will it fit how we work, and can I trust it?" | How Mellow compares records, what it can't do (decide, judge the law), where data lives, and what "sample data" means. | Questions are answered before they commit. Limits are clear up front. | Content, Research |
+| **Try** | "Show me it works on my problem, without risk." | The sample workspace: a real finding in minutes, with files that stay on the device and nothing to undo. | Time to first finding is under 10 minutes. Nothing a person does in a trial is mistaken for a real record. | Product Designer, AI UX |
+| **Buy** | "Can I get this approved and paid for without a fight?" | Owner and compliance approval, a security and data review, and clear pricing. **Not built yet.** | The approver has what they need for sign-off on one page. | Product Lead, Compliance |
+| **Get started (Onboard)** | "Get me set up and productive fast." | Connecting inventory and receiving sources (CSV now, Metrc later), the first check, and the first resolved record. | First compared check within 10 minutes of setup. This is a hypothesis to measure, borrowed from IBM's own time-to-value goal. | Product Designer, Engineer |
+| **Use** | "Help me get through my shift." | The briefing, queue, record decisions, evidence, Ask Mellow, the handoff, and updates people can see coming. | Daily work gets faster. Advanced features are found when they're needed, not forced. | Product Designer, AI UX |
+| **Get help** *(spans all)* | "I'm stuck, so fix it fast and don't make me leave." | Mellow's honest limits, in-product explanations ("How do you know?"), manager handoff, error recovery and drafts that survive. | Most blockers are resolved without leaving the product. No dead-end fallbacks. | AI UX, Content |
+| **Expand** | "We're growing. Can it grow with us?" | More sources, more locations and licenses, more jurisdictions, team roles, and live AI once it's approved. **Mostly not built yet.** | Growth adds value without a rebuild or retraining. | Product Lead, Engineer |
+| **End use** | "Let me leave cleanly, and keep what I'm required to keep." | Exporting the decision history and evidence, deleting data securely, and records retention by jurisdiction (to be confirmed with counsel). **Not built yet.** | They leave with their records intact and trust intact, open to coming back. | Compliance, Engineer |
+
+**How the team applies it**
+
+1. Every proposal names the stages it touches, the mindset at each one, and the outcome it should move.
+2. Every proposal checks the handoffs in and out of those stages. For example, a Try finding has to survive into Get started.
+3. Every proposal says how it behaves under Get help: what happens when someone is stuck at that point.
+4. Research keeps evidence for each stage's mindset and flags any stage where we're designing without evidence.
+5. The Product Designer's system map shows which objects and surfaces serve which stage, and which stages have nothing yet.
+
 ## Who's on the team
 
 | Role | Mission | Owns | Doesn't own |
@@ -26,7 +53,7 @@ Help cannabis receiving and compliance teams find, understand and resolve record
 ## What each role always asks
 
 - **Design Director:** Does this fit Field Ledger and the cadence? Is the founder seeing a real choice?
-- **Product Lead:** Whose problem, how often, and how will we know it worked? What's the smallest version?
+- **Product Lead:** Whose problem, how often, and how will we know it worked? What's the smallest version? Which journey stages does it touch, and does it hold up across the handoffs between them?
 - **Product Designer:** Where does this live in the system, and what else does it touch? Is this a new object, a new state of an existing one, or a new view of it? Does it follow the patterns we already have, or does it need a new one, and should that pattern then apply everywhere? Would someone know where to find this, and what it's called, without being told? Can a receiving lead do this mid-shift, on a phone, without help? What happens when it goes wrong?
 - **Content and Voice:** Does Mellow say only what it knows, in plain words? Does it say "Mellow", never "AI"?
 - **Research:** What evidence supports this? What did the audit or the users show?
@@ -52,7 +79,7 @@ The cadence itself is in [AGENTS.md](AGENTS.md). R = responsible, A = accountabl
 
 ## Required outputs
 
-- **Proposal review:** one findings table, plus the Product Designer's note on where the change sits in the system and the information architecture: what it adds, changes or retires. Each row has the role, the finding, a severity (below) and a recommendation. Every role either signs off or lists what blocks it.
+- **Sprint brief and proposal review:** a journey line naming the stages touched, the mindset at each, the outcome it should move, and its Get help behavior. Then one findings table, plus the Product Designer's note on where the change sits in the system and the information architecture: what it adds, changes or retires. Each row has the role, the finding, a severity (below) and a recommendation. Every role either signs off or lists what blocks it.
 - **Board pass:** what each lens backs, changes or rejects, and a numbered recommendation for the founder.
 - **Implementation review:** lint, type check, build and test results, plus browser checks at 1440px and 390px with keyboard and reduced motion. For any change to Mellow's behavior, the evaluation set results, including the new cases this change adds.
 - **Preview review:** each finding closed, or given an owner and an impact.
