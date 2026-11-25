@@ -77,3 +77,44 @@ Vignelli and Kare favored one structured row per package with the source
 values aligned under their labels. Morris kept the recommendation separate
 from the values and kept decisions in the review. The receiving comparison
 is available below it for source verification.
+
+## Version 1.35 proposal review and board pass · Ask Mellow AI brand · 2026-11-25
+
+**Proposal.** The four directions on the canvas page "Ask Mellow · AI brand": A Margin Note, B The Period, C Second Shift, D Proof. They're reviewed against the founder's voice and behavior rules of 2026-11-25. The prototype build that started before this review (a provenance stamp, a proactive row dot, and routing rule questions) was paused and is stashed. It's evidence for this review, not an approved build.
+
+### Team review
+
+| Pass | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Compliance and risk | **Live bug.** "Is a blank lot a violation under the regulation?" matches the gaps intent and answers with a list of today's gaps, which reads as a compliance answer. It breaks rule 5. | High · live | Route rule, violation and compliance questions to an honest "I can't tell you whether that's allowed" answer before any record intent. Add a regression test. Founder go-ahead needed to ship it ahead of the bundle. |
+| Compliance and risk | "CHECKED" on a stamp can be read as an attestation in an audit. Mellow compares records; it doesn't check them against the law. | High | Use **"Compared"**, and name the files and time. Never put a stamp on interpretive answers. Use "Not from your records" for guidance, not "Not verified", which implies a verification step exists. |
+| Compliance and risk | Proactive signals must come only from deterministic triggers: a new difference or gap, a delayed check, a handoff that's due. | Rule | Keep "noticed", "risk" and predictive words out of proactive copy. |
+| Product design | B's dot clashes with the queue grammar, where a filled vermilion dot already means "records disagree" and a ring means "gap". A third vermilion dot makes all three ambiguous. | High | Give Mellow's signal a distinct mark (for example the margin-note tick), or redesign the queue marks first. B can't ship as drawn. |
+| Product design | D's rotated stamps read as playful and fight the ledger's straight rules. | Medium | Keep stamps square, with a 1px ink rule and mono type. Motion is a short press only. |
+| Product design | C's handoff moment fits the shift workflow, but its "we" voice overstates what Mellow does. | Medium | Defer it to its own sprint. Borrow the drafted handoff, not the voice. |
+| Content and voice | A matches the shipped voice. "Mellow" only, with plain limits, holds in all four directions. | Info | Keep A's lines as the voice reference. |
+| Engineering | Provenance can be computed deterministically from the comparison and run data that answers already use. It's cheap, and testable per intent. | Info | Attach provenance when the answer is created, so the time is the answer's, not the render's. |
+| Engineering | "New since you last looked" is stored per device in localStorage. It's fine for the demo, but the real product needs a per-user timestamp from the server. | Medium | Label it as device-local in the spec. Open item for live mode. |
+| Accessibility | The prototype dot's hit area is 28px, under the spec's 44px minimum. A dot alone carries meaning by colour and shape. | High | Use a 44px target, an accessible name, and a visible label on hover and focus. The stamp keeps its word, so it doesn't rely on colour. |
+| Accessibility | The stamp's source list must open with the keyboard and close with Escape, and overlay rather than push content (the dropdown rule). | Medium | A summary or details disclosure with an overlay popover, retested on phones. |
+
+### Board pass
+
+- **Rams, Maeda:** back A as the base: the least interface that still tells the truth. Stamps only where a fact needs a source, never as ornament.
+- **Eames:** back C's handoff for a later sprint. It's the real moment people pass work between shifts.
+- **Vignelli, Kare:** reject B as drawn. One shape can't mean three things. Resolve the marker grammar before adding a signal.
+- **Norman:** back D with changes. Provenance must look tappable and say "What I compared". The person should be able to see why a signal appeared and dismiss it.
+- **Zhuo:** back D. The outcome is decisions a reviewer can audit, and the stamp creates that evidence.
+- **Ive:** square stamps, no rotation, one motion (the press).
+- **Wroblewski, Clark:** 44px targets. The popover has to fit at 390px.
+- **Morris:** strongest support for A + D. People must be able to understand, challenge and override Mellow, and it must state its limits. Proactive signals must be explainable and dismissible.
+
+### Board recommendation for founder decision
+
+1. **Approve A (Margin Note) as Mellow's identity.**
+2. **Approve D's provenance, revised:** a square "Compared · files · time" stamp on answers drawn from records, and "Not from your records" on guidance.
+3. **Hold B.** Redesign the proactive mark so it doesn't collide with the queue marks, then review it again.
+4. **Defer C's handoff** to its own sprint.
+5. **Ship the rule-question routing fix** as a hotfix, with the founder's go-ahead.
+
+**Process note.** Versions 1.31 to 1.34 (the contextual panel, the motion and app shell, Ask Mellow from anywhere, and the chat panel) shipped without a team review or board pass. A retro pass is offered.

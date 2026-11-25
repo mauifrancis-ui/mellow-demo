@@ -244,3 +244,7 @@ The founder said the task and the chat ran together: reply chips looked like mor
 ## Mellow voice and behavior rules · 2026-11-25
 
 The founder reviewed four Ask Mellow brand directions and decided: (1) the product only ever says "Mellow"; it must be honest about its capabilities and explain how it knows what it says; (2) whether Mellow or the person speaks first depends on the situation, proactive vs. reactive; (3) Mellow never promises anything it can't be deterministic about, especially compliance and risk. The team turned (2) into a rule: Mellow goes first only with a deterministic fact needed now, shown as a quiet signal; interpretation waits to be asked. Rules recorded in MELLOW_DESIGN_SPEC.md. No product change yet; the brand direction itself is still open.
+
+## Sprint review cadence made mandatory · 2026-11-25
+
+The founder asked that every change run the full sprint cadence: team review, then board pass, then founder decision, then build, preview and release. Recorded in AGENTS.md. The Ask Mellow brand build that had started was paused and stashed. The 1.35 team review and board pass are recorded in DESIGN_BOARD.md and await the founder's decision.
