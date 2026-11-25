@@ -196,3 +196,21 @@ The founder adopted the Universal Experiences journey on 2026-11-25, while this 
 **Journey gaps the team flags.** Buy, Expand and End use have no product surface yet, and End use needs a counsel view of records retention. These are outside this sprint but are recorded for the roadmap.
 
 **Effect on the recommendation.** No change to the six items. The Get help finding is folded into item 1: the hotfix also replaces the dead-end fallback with what Mellow can do and a path forward.
+
+
+### Steps 3 to 5 · Founder decision, implementation review and preview review (v1.36)
+
+**Founder decision.** Approved all six recommendations ("deploy the build and do it"), including release once the implementation and preview reviews close with no blockers. Sprint 1 builds items 1 (the hotfix and evaluation gate) and 3 (provenance). Item 4, the margin-note proactive pattern, waits for sprint 2 after user sessions. The prototype dot was removed.
+
+| Role | Implementation and preview review | Status |
+| --- | --- | --- |
+| AI UX Designer/Engineer | The evaluation set is automated: 51 of 51 tests pass, and the production probe of 16 questions now answers all of them honestly. Every existing suggestion chip still routes to the same intent. | Closed |
+| AI UX Designer/Engineer | Over-match: "What evidence is required for…" now gets the "can't judge" answer. That's honest, but less helpful. | **Medium**, owner AI UX. Logged as the next evaluation case. |
+| Product Designer (systems and IA) | **Found in build:** "Can / Can't" and "Compared" rows showed the hollow ring that means "gap" in the queue. Fixed: non-package rows carry no package mark. The stamp reuses the existing "check at" vocabulary. | Closed |
+| Content and Voice | Self, decision, judgment and risk copy is plain, says "I" for Mellow and "a person decides", and contains no verdict words (checked by test). | Closed |
+| Compliance and Risk | No compliance verdicts, audit predictions or risk scores in any answer (checked by test). "Compared", never "Checked". "Are you an AI?" is answered truthfully. Counsel review of AI disclosure stays open for live AI. | Closed, plus one open item |
+| Accessibility | The stamp is a native disclosure: it opens with Enter or Space, closes with Escape, and has an accessible name. The popover stays inside the viewport at 1440px and 390px. With reduced motion, no animations run. | Closed |
+| Engineer | Lint, type check, build and 51 tests pass. No console errors at either width. | Closed |
+| Research | No user sessions yet. Provenance comprehension stays a hypothesis for the sprint 2 sessions. | Open, owner Research |
+
+**Preview review result.** No blockers or open highs. Ready for release under the founder's go-ahead.

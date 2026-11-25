@@ -505,3 +505,28 @@
 @media (width < 600px) {
   .ledger-main > .conversation { margin-inline: -20px; padding: 18px 20px 20px; border-radius: 0; }
 }
+
+/* Provenance stamp: every factual answer says what Mellow checked (rule 3), unsure answers say so (rule 5) */
+.basis { position: relative; justify-self: start; }
+.basis > summary {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 32px; padding: 0 10px; list-style: none; cursor: pointer;
+  border: 1px solid var(--ink); border-radius: 4px; font: 12px var(--mono); color: var(--ink); background: transparent;
+}
+.basis > summary::-webkit-details-marker { display: none; }
+.basis-word { font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+.basis:not([data-verified]) > summary { border-color: var(--vermilion); color: var(--vermilion-dark); }
+.basis > summary:hover { background: var(--tint-soft); }
+.basis[open] > summary { background: var(--ink); color: var(--paper); }
+.basis:not([data-verified])[open] > summary { background: var(--vermilion-dark); border-color: var(--vermilion-dark); }
+.basis-sources {
+  position: absolute; z-index: 30; top: calc(100% + 6px); left: 0; width: max-content; max-width: min(360px, 80vw); padding: 12px 14px;
+  border: 1px solid var(--ink); border-radius: 4px; background: var(--paper); box-shadow: 0 10px 24px rgb(28 27 25 / 12%);
+}
+.basis-sources .kicker { margin: 0 0 6px; }
+.basis-sources ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
+.basis-sources li::before { content: "· "; color: var(--graphite); }
+@media (prefers-reduced-motion: no-preference) {
+  .basis > summary { animation: stamp var(--motion-press) var(--spring) both; animation-delay: 220ms; }
+  @keyframes stamp { from { opacity: 0; transform: scale(1.06); } }
+  .basis[open] .basis-sources { animation: drawer-in var(--motion-arrive) var(--ease) both; }
+}

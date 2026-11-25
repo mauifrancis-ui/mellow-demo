@@ -13,7 +13,8 @@ export const queueView: PanelView = { kind: "queue" };
 
 export function panelFor(answer: AskAnswer): PanelView | null {
   switch (answer.intent) {
-    case "package": return answer.focusId ? { kind: "package", id: answer.focusId } : null;
+    case "package":
+    case "judgment": return answer.focusId ? { kind: "package", id: answer.focusId } : null;
     case "gaps": return { kind: "series", series: "missing" };
     case "differences": return { kind: "series", series: "different" };
     case "matched": return { kind: "series", series: "matched" };
@@ -21,6 +22,7 @@ export function panelFor(answer: AskAnswer): PanelView | null {
     case "source": return { kind: "summary" };
     case "handoff": return { kind: "handoff" };
     case "list":
+    case "order":
     case "next":
     case "label": return queueView;
     default: return null;

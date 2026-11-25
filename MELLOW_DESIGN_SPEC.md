@@ -375,3 +375,18 @@ Browsers without view transitions fall back to the inline fades, and reduced mot
 5. **No promises it can't keep deterministically.** Answers and provenance stamps state what was compared, never "compliant", "safe", a risk score or a prediction. Unsure stays visibly unsure.
 
 Brand direction under review on the design canvas, page "Ask Mellow · AI brand": the team recommends Margin Note (A) as the base, Proof stamps (D) on answers that cite records, and the Period dot (B) for proactive signals.
+
+
+## Version 1.36 Honest answers and provenance
+
+- **Routing order.** Questions about Mellow itself, "how do you know", decision commands, compliance and legal questions, and risk questions are matched before any record answer. A record list can never stand in for a judgment.
+- **Answers.**
+  - "I'm Mellow": what Mellow is and that live AI is off.
+  - "What I can and can't do": Can and Can't rows.
+  - "Here's what that was based on": reads the previous answer's basis.
+  - "I can't make decisions": offers to open the record.
+  - "I can't tell you whether that's allowed" or "I can't predict an audit": states what the records show and points to the regulator or a manager.
+  - "I don't score risk": shows the working order instead.
+- **Get help.** The fallback names what Mellow can do and offers the field guide. It's never a dead end.
+- **Provenance stamp.** A square disclosure under factual answers: a 1px ink rule, mono type, the word "COMPARED", then "2 files · N packages · check at 9:39 AM". Guidance gets "NOT FROM YOUR RECORDS" in vermilion. Opening it overlays "What I compared" (it doesn't push the content). It opens with Enter or Space and closes with Escape. Motion is one press as it lands.
+- **Rows.** Answer rows that aren't packages carry no package mark. The filled dot and the ring keep their queue meanings.

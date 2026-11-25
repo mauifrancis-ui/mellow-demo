@@ -1,5 +1,5 @@
 import { useRef, useState, type CSSProperties, type ChangeEvent, type Dispatch, type FormEvent, type KeyboardEvent, type ReactNode, type SetStateAction } from "react";
-import { addTurn, ask, followUps, type AskAction, type AskAnswer, type AskContext, type Brief, type Turn } from "./ask";
+import { addTurn, ask, followUps, type AskAction, type AskAnswer, type AskContext, type Basis, type Brief, type Turn } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
@@ -26,6 +26,21 @@ export function Briefing({ brief, lastCheck, delayed, aside }: {
 }
 
 type Attachment = { name: string; size: number };
+
+function BasisStamp({ basis }: { basis: Basis }) {
+  const word = basis.verified ? "Compared" : "Not from your records";
+  const time = basis.at ? ` · check at ${clock(basis.at)}` : "";
+  return <details className="basis" data-verified={basis.verified || undefined}
+    onKeyDown={(event) => { if (event.key === "Escape") (event.currentTarget as HTMLDetailsElement).open = false; }}>
+    <summary aria-label={`${word}: ${basis.label}${time}. Show what Mellow looked at.`}>
+      <span className="basis-word">{word}</span><span>{basis.label}{basis.at ? ` · check at ${clock(basis.at)}` : ""}</span>
+    </summary>
+    <div className="basis-sources">
+      <p className="kicker">{basis.verified ? "What I compared" : "What this is based on"}</p>
+      <ul>{basis.sources.map((source) => <li key={source}>{source}</li>)}</ul>
+    </div>
+  </details>;
+}
 
 function formatSize(bytes: number) {
   return bytes > 1_000_000 ? `${(bytes / 1_000_000).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1000))} KB`;
@@ -59,7 +74,7 @@ export function Conversation({ context, chips, turns, onTurns, onAction, onAnswe
       title: "I can’t read attachments yet",
       body: `Live AI is off, so I can’t look inside ${attachment.name}. Add it to the record as evidence and a person can review it.`,
       actions: [{ label: "Add evidence", action: { kind: "evidence" } }],
-    } : ask(trimmed, context);
+    } : ask(trimmed, { ...context, previous: turns.at(-1)?.answer });
     const asked = trimmed || attachment?.name || "";
     onTurns((previous) => addTurn(previous, asked, answer));
     setShowEarlier(false);
@@ -134,7 +149,7 @@ export function Conversation({ context, chips, turns, onTurns, onAction, onAnswe
                 {turn.answer.items && turn.answer.items.length > 0 && <ul className="answer-rows">
                   {turn.answer.items.map((item, index) => {
                     const body = <>
-                      <span className="queue-mark" aria-hidden="true" />
+                      {item.kind ? <span className="queue-mark" aria-hidden="true" /> : <span aria-hidden="true" />}
                       <span className="queue-id">{item.label}</span>
                       <span className="answer-row-text"><span>{item.title ?? item.detail}</span>{item.title && <small>{item.detail}</small>}</span>
                     </>;
@@ -147,6 +162,7 @@ export function Conversation({ context, chips, turns, onTurns, onAction, onAnswe
                   {actions.map((item, index) => <button key={item.label} className="ledger-button" data-variant={index === 0 ? "ink" : "line"}
                     onClick={() => onAction(item.action, turn.answer)}>{item.label}</button>)}
                 </div>}
+                {turn.answer.basis && <BasisStamp basis={turn.answer.basis} />}
                 {latest && <div className="answer-next" role="group" aria-label="Suggested next questions">
                   <span className="kicker">Next</span>
                   {followUps(turn.answer, context).map((chip) => <button key={chip} type="button" className="chip" onClick={() => submit(chip)}>{chip}</button>)}

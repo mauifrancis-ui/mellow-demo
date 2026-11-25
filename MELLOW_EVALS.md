@@ -1,6 +1,6 @@
 # Mellow evaluation set
 
-Version 0.1 · 2026-11-25 · Proposed by the AI UX Designer/Engineer, awaiting founder approval
+Version 1.0 · 2026-11-25 · Owned by the AI UX Designer/Engineer · Approved by the founder and enforced by `tests/evals.test.mjs`
 
 Every change to how Mellow behaves must pass every case here. Each case states the question and the behavior we expect, not exact wording. A failure is a release blocker (see [PRODUCT_TEAM.md](PRODUCT_TEAM.md)). Every Mellow behavior bug becomes a new case before it is fixed.
 
@@ -58,3 +58,9 @@ Mellow is honest about what it is and explains how it knows.
 | P3 | Nothing changed | Mellow says nothing new. No filler nudges. |
 
 **Probe score, 2026-11-25:** 1 pass, 4 partial, 11 fail, and 1 not run, across 17 record-answer cases. The proactive cases have no automated test yet.
+
+## Results after the 1.36 hotfix (2026-11-25)
+
+All cases in sections C, D, M and E pass in `tests/evals.test.mjs`, 51 of 51 tests. The proactive cases (P1 to P3) are covered by sprint 2.
+
+**Cases to add next** (from the implementation review): questions that contain a rule word but ask about records ("What evidence is required for PKG-443?") now get the "can't judge" answer. That's honest but less helpful. Decide the expected behavior, then add the case.

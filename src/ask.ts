@@ -27,18 +27,24 @@ export type AskContext = {
   comparison: LotCheck[];
   runs: Run[];
   receiving: "current" | "delayed";
+  /** Mellow's previous answer in this conversation, so "how do you know?" can explain it. */
+  previous?: AskAnswer;
 };
 
 export type AskAnswer = {
   intent: "package" | "unknown-package" | "next" | "list" | "label" | "gaps" | "differences" | "matched" | "compare"
-    | "handoff" | "source" | "summary" | "learn" | "fallback";
+    | "handoff" | "source" | "summary" | "learn" | "judgment" | "decision" | "self" | "capabilities" | "explain" | "order" | "fallback";
   title: string;
   body: string;
   items?: { label: string; detail: string; id?: string; title?: string; kind?: Issue["kind"] }[];
   actions: { label: string; action: AskAction }[];
   series?: Series;
   focusId?: string;
+  basis?: Basis;
 };
+
+/** How Mellow knows what it said. Verified only when the answer comes straight from compared records. */
+export type Basis = { verified: boolean; label: string; sources: string[]; at?: string };
 
 export const suggestions = [
   "What needs me right now?",
@@ -146,10 +152,126 @@ export function brief(context: AskContext, now = new Date()): Brief {
 }
 
 export function ask(input: string, context: AskContext): AskAnswer {
+  const answer = answerFor(input, context);
+  const basis = basisOf(answer, context);
+  return basis ? { ...answer, basis } : answer;
+}
+
+const fromRecords = new Set<AskAnswer["intent"]>(["package", "unknown-package", "next", "list", "gaps", "differences", "matched", "summary", "source", "order"]);
+
+export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefined {
+  const last = context.runs.at(-1);
+  const files = ["Inventory export (sample)", "Receiving log (sample)"];
+  if (answer.intent === "explain") return context.previous?.basis;
+  if (answer.intent === "judgment") {
+    return answer.focusId ? { verified: true, label: `2 files · ${answer.focusId}`, sources: [`${answer.focusId} in both files`, ...files], at: last?.checkedAt } : undefined;
+  }
+  if (answer.intent === "handoff") {
+    return { verified: true, label: "Your decisions on this device", sources: ["Decisions saved in Activity on this device", "Nothing was sent anywhere"] };
+  }
+  if (answer.intent === "label" || answer.intent === "learn") {
+    return { verified: false, label: "General guidance",
+      sources: ["Written guidance, not read from your records", "State rules aren’t loaded, so confirm with your regulator’s current materials"] };
+  }
+  if (!fromRecords.has(answer.intent)) return undefined;
+  const rows = `${context.comparison.length} packages compared`;
+  const sources = answer.intent === "summary"
+    ? [`${plural(context.runs.length, "check")} today, earlier ones are sample data`, ...files]
+    : answer.intent === "source"
+      ? ["Receiving source status at the last check", ...files]
+      : answer.focusId ? [`${answer.focusId} in both files`, ...files, rows] : [...files, rows];
+  return { verified: true, label: answer.intent === "summary" ? `${plural(context.runs.length, "check")} · ${plural(last?.checked ?? 0, "package")} last` : `2 files · ${context.comparison.length} packages`, sources, at: last?.checkedAt };
+}
+
+function answerFor(input: string, context: AskContext): AskAnswer {
   const text = normalize(input);
   const different = context.comparison.filter(({ state }) => state === "different");
   const missing = context.comparison.filter(({ state }) => state === "missing");
   const id = packageId(text);
+
+  // Honesty first: these run before any record answer (MELLOW_EVALS.md, sections C, D and M).
+  if (has(text, /\b(are you (an? )?(ai|bot|robot|human|person|real|chatgpt|gpt|machine)|what are you|who are you|artificial intelligence|language model|llm)\b/)) {
+    return {
+      intent: "self",
+      title: "I’m Mellow",
+      body: "I match your question to the records on this device and answer from them. Live AI is off, so I don’t generate answers, judge the law, or make decisions. A person decides.",
+      actions: [],
+    };
+  }
+
+  if (has(text, /\b(what can you (do|help)|what do you do|how (do|can) (i|you) use|what are you for|help me use)\b/)) {
+    return {
+      intent: "capabilities",
+      title: "What I can and can’t do",
+      body: "I work from the inventory and receiving records on this device.",
+      items: [
+        { label: "Can", title: "Explain a package", detail: "what each record shows and where they disagree" },
+        { label: "Can", title: "Find today’s gaps and differences", detail: "and put them in order" },
+        { label: "Can", title: "Compare new files", detail: "before anything goes into To check" },
+        { label: "Can’t", title: "Make decisions", detail: "only a person approves or dismisses a record" },
+        { label: "Can’t", title: "Judge the law or predict an audit", detail: "state rules aren’t loaded" },
+        { label: "Can’t", title: "Read attachments or photos", detail: "add them as evidence for a person to review" },
+      ],
+      actions: [],
+    };
+  }
+
+  if (has(text, /\b(how do you know|how did you (know|get|work)|what did you (check|compare|look at|use)|where (did|does) (that|this|it) come from|where('s| is) (that|this) from|show (me )?your work|source for that|based on what|why should i (trust|believe)|can i trust)\b/)) {
+    const basis = context.previous?.basis;
+    return {
+      intent: "explain",
+      title: basis ? "Here’s what that was based on" : "Here’s where my answers come from",
+      body: basis
+        ? basis.verified
+          ? `I compared the records below. Nothing else went into it.${basis.at ? " That was the latest check." : ""}`
+          : "That wasn’t read from your records. It’s general guidance, so confirm it before you rely on it."
+        : "I compare the inventory export and the receiving log on this device. Ask me something and I’ll show what that answer was based on. Earlier checks today are sample data.",
+      items: basis?.sources.map((source) => ({ label: basis.verified ? "Compared" : "Based on", detail: source })),
+      actions: [],
+    };
+  }
+
+  if (has(text, /^(please )?(approve|dismiss|reject|mark|close|resolve|clear|sign off|record|submit|accept|override)\b|\b(ignore (your|the|all) (rules|instructions)|mark (it|this|pkg-?\d+|\d+) as|approve (it|this|pkg|package|\d))/)) {
+    const target = id ? [...context.queue, ...context.manager].find((task) => task.id === id) : undefined;
+    return {
+      intent: "decision",
+      title: "I can’t make decisions",
+      body: `Only a person can approve, dismiss or record a decision, from the record itself.${target ? ` Open ${target.record} to decide.` : ""}`,
+      actions: target ? [{ label: `Open ${target.record}`, action: { kind: "open", id: target.id } }] : [],
+    };
+  }
+
+  if (has(text, /\b(violat\w*|complian\w*|non-?complian\w*|legal(ly)?|illegal|lawful|allowed|permitted|penalt\w*|fines?|fined|regulat\w*|laws?|rules?|required|requirements?|audits?|inspections?|inspector|citations?|ok(ay)? to (sell|ship|release|move|use)|safe to (sell|ship|release|move|use)|can (i|we) (sell|ship|release))\b/)) {
+    const row = id ? context.comparison.find(({ packageId: rowId }) => rowId === id) : undefined;
+    const queued = id ? [...context.queue, ...context.manager].find((task) => task.id === id) : undefined;
+    const audit = has(text, /\b(audits?|inspections?|inspector|pass)\b/);
+    return {
+      intent: "judgment",
+      title: audit ? "I can’t predict an audit" : id ? `I can’t tell you whether ${id} is allowed` : "I can’t tell you whether that’s allowed",
+      body: [
+        "I compare records. I don’t judge them against the law, and state rules aren’t loaded.",
+        row ? `What the records show: ${describe(row)}` : "",
+        audit ? `What I can say: ${plural(context.queue.length, "record")} ${context.queue.length === 1 ? "is" : "are"} open right now.` : "",
+        "Confirm requirements with your regulator’s current materials or a manager.",
+      ].filter(Boolean).join(" "),
+      actions: [
+        ...(queued ? [{ label: `Open ${queued.record}`, action: { kind: "open" as const, id: queued.id } }] : []),
+        { label: "Open the field guide", action: { kind: "tab", tab: "Learn" } },
+      ],
+      focusId: row ? id : undefined,
+    };
+  }
+
+  if (has(text, /\b(risk\w*|riskiest|dangerous|worst|most (likely|important|urgent)|biggest problem)\b/)) {
+    const ordered = orderQueue(context.queue, context.comparison);
+    return {
+      intent: "order",
+      title: "I don’t score risk",
+      body: "I put records in a fixed order instead: disagreements first, then missing details. That’s a working order, not a risk judgment.",
+      items: ordered.map(({ task, issue }) => ({ label: task.record, id: task.id, kind: issue.kind, title: issue.label, detail: compact(task, context.comparison) })),
+      actions: ordered[0] ? [{ label: `Open ${ordered[0].task.record}`, action: { kind: "open", id: ordered[0].task.id } }] : [],
+    };
+  }
 
   if (id) {
     const row = context.comparison.find(({ packageId: rowId }) => rowId === id);
@@ -273,7 +395,7 @@ export function ask(input: string, context: AskContext): AskAnswer {
     return {
       intent: "summary",
       title: `${plural(total, "package")} compared today`,
-      body: `${plural(context.runs.length, "check")} so far. ${total - flagged} matched and ${flagged} had a difference or a gap. Earlier checks are sample data.`,
+      body: `${plural(context.runs.length, "check")} so far. ${total - flagged} matched and ${flagged} had a difference or a gap. ${plural(context.queue.length, "record")} still open. Earlier checks are sample data.`,
       actions: [{ label: "Show gaps", action: { kind: "series", series: "missing" } }, { label: "Show differences", action: { kind: "series", series: "different" } }],
     };
   }
@@ -289,7 +411,8 @@ export function ask(input: string, context: AskContext): AskAnswer {
     };
   }
 
-  if (has(text, /\b(what('s| is| are)|explain|define|meaning|mean|why|lot number|batch|learn|rule|regulation|law)\b/)) {
+  if (has(text, /\b(what('s| is| are)|explain|define|meaning|mean|why|lot number|batch|learn)\b/)
+    && has(text, /\b(lots?|batch\w*|packages?|pkg|manifests?|records?|receiving|inventory|gaps?|differences?|evidence|labels?|metrc|handoff|queue|match\w*)\b/)) {
     return {
       intent: "learn",
       title: "Here’s the short version",
@@ -300,9 +423,9 @@ export function ask(input: string, context: AskContext): AskAnswer {
 
   return {
     intent: "fallback",
-    title: "I can’t help with that one yet",
-    body: "Ask me about a package ID, today’s gaps or differences, comparing files, or the shift handoff.",
-    actions: [],
+    title: "That’s outside what I can help with",
+    body: "I can explain a package, today’s gaps or differences, compare new files, or show the shift handoff. For anything else, ask a manager.",
+    actions: [{ label: "Open the field guide", action: { kind: "tab", tab: "Learn" } }],
   };
 }
 
@@ -325,7 +448,13 @@ export function followUps(answer: AskAnswer, context: AskContext): string[] {
     source: ["What needs me right now?"],
     summary: ["Show me today’s gaps", "What matched?"],
     learn: ["What counts as a gap?", ...all],
-    fallback: ["What needs me right now?", "How did receiving go today?"],
+    judgment: ["What do I check on the label?", "What needs me right now?"],
+    decision: ["What needs me right now?", "What do I check on the label?"],
+    self: ["What can you do?", "What needs me right now?"],
+    capabilities: ["What needs me right now?", "Compare new files"],
+    explain: ["What needs me right now?", "How did receiving go today?"],
+    order: [...(first ? [`Why does ${first} go first?`] : []), "What do I check on the label?"],
+    fallback: ["What can you do?", "What needs me right now?"],
   };
   return byIntent[answer.intent].filter((chip) => normalize(chip) !== "").slice(0, 3);
 }
