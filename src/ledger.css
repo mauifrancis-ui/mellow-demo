@@ -429,6 +429,9 @@
   }
   /* Room so focus outlines are never clipped by the scroll edge */
   .ledger-main { margin-inline: -6px; padding-inline: 6px; }
+  /* Rows bleed 8px past the column for their hover band; give that room inside the scroller, and never scroll sideways. */
+  .ledger-side { margin-right: -8px; padding-right: 8px; }
+  .ledger-main, .ledger-side { overflow-x: hidden; }
   .context-panel .panel-bar { position: sticky; top: -28px; z-index: 2; margin-top: -28px; padding-top: 28px; background: var(--paper); }
   .context-panel:not([data-collapsed]) .panel-bar { padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
 }
@@ -503,7 +506,7 @@
 }
 .ledger-main > .conversation .composer textarea { background: transparent; }
 @media (width < 600px) {
-  .ledger-main > .conversation { margin-inline: -20px; padding: 18px 20px 20px; border-radius: 0; }
+  .ledger-main > .conversation { margin-inline: -16px; padding: 18px 16px 20px; border-radius: 0; }
 }
 
 /* Provenance stamp: every factual answer says what Mellow checked (rule 3), unsure answers say so (rule 5) */
@@ -586,3 +589,5 @@
 
 /* An open "Why this?" sits above the rows after it (each row's arrival animation makes its own layer). */
 .ledger-queue li:has(.note-why[open]), .briefing-note:has(.note-why[open]) { position: relative; z-index: 40; }
+/* Rows fill their column edge to edge, so their focus ring is drawn just inside them. */
+.shell[data-palette="ledger"] .ledger-queue .queue-row:focus-visible { outline-offset: -3px; }
