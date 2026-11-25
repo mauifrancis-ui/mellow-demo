@@ -390,3 +390,23 @@ Brand direction under review on the design canvas, page "Ask Mellow · AI brand"
 - **Get help.** The fallback names what Mellow can do and offers the field guide. It's never a dead end.
 - **Provenance stamp.** A square disclosure under factual answers: a 1px ink rule, mono type, the word "COMPARED", then "2 files · N packages · check at 9:39 AM". Guidance gets "NOT FROM YOUR RECORDS" in vermilion. Opening it overlays "What I compared" (it doesn't push the content). It opens with Enter or Space and closes with Escape. Motion is one press as it lands.
 - **Rows.** Answer rows that aren't packages carry no package mark. The filled dot and the ring keep their queue meanings.
+
+
+## Version 1.37 Mellow speaks first
+
+- **Triggers (deterministic only):**
+  - a new difference or gap in a check
+  - the receiving source delayed, or back
+  - a record waiting on a manager for more than a shift (8 hours)
+
+  "Your open record changed" is deferred until live source sync.
+- **The margin note:** the MELLOW label, one italic line, "Why this?" (an overlay with the trigger, what was compared, and "You'll see this once"), and a 44px dismiss.
+- **Where notes appear:** in the Today briefing (`aria-live="polite"`, one announcement per change) and under the affected queue row (tint-soft).
+- **Batching:** more than two new in one check makes one briefing line and no row notes.
+- **The words that carry state:**
+  - **NEW** is a word on the row, in vermilion-dark. It lasts until the row is opened, across later checks.
+  - **The phone sheet bar** reads "4 need you · 1 new".
+  - **The dot means one thing:** the filled vermilion dot means "records disagree" and nothing else. NOW is a word in vermilion-dark with no dot. Ask Mellow shows "1 waiting" instead of a dot.
+- **Activity · Mellow notes today:** every note Mellow said first, in order, marked Shown or Dismissed with its time. These are never decisions. The trail comes from the events that create notes, so a note replaced by a later one still appears.
+- **Demo:** "Simulate a new check" in "What I checked". The first adds PKG-610; the second adds three (batched).
+- **Small vermilion text:** always vermilion-dark `#A93319` (5.97:1 on paper).

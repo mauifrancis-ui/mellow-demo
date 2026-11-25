@@ -5,8 +5,9 @@ const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "num
 
 const stroke = (path: ReactNode) => <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{path}</svg>;
 
-export function Briefing({ brief, lastCheck, delayed, aside }: {
+export function Briefing({ brief, lastCheck, delayed, aside, note }: {
   brief: Brief;
+  note?: ReactNode;
   lastCheck?: string;
   delayed: boolean;
   aside?: ReactNode;
@@ -22,6 +23,7 @@ export function Briefing({ brief, lastCheck, delayed, aside }: {
       <span className="kicker" aria-hidden="true">Mellow</span>
       <p className="mellow-voice" key={brief.message}><span className="sr-only">Mellow says: </span>{brief.message}</p>
     </div>
+    <div className="briefing-note" aria-live="polite">{note}</div>
   </header>;
 }
 

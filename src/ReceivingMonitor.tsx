@@ -4,9 +4,10 @@ import type { Series } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
-export function ReceivingMonitor({ posture, open, onToggleDelay, focusSeries = null, onFocusSeries }: {
+export function ReceivingMonitor({ posture, open, onToggleDelay, onSimulateCheck, focusSeries = null, onFocusSeries }: {
   posture: ReceivingPosture;
   open: number;
+  onSimulateCheck?: () => void;
   focusSeries?: Series | null;
   onFocusSeries?: (series: Series | null) => void;
   onToggleDelay: () => void;
@@ -35,7 +36,10 @@ export function ReceivingMonitor({ posture, open, onToggleDelay, focusSeries = n
           </tbody>
         </table>}
         <p>Earlier checks are fictional sample data. These records can show a difference. A person verifies the physical package.</p>
-        <button className="ledger-button" data-variant="line" onClick={onToggleDelay}>{delayed ? "Restore sample source" : "Simulate a source delay"}</button>
+        <div className="monitor-actions">
+          {onSimulateCheck && <button className="ledger-button" data-variant="line" onClick={onSimulateCheck} disabled={delayed}>Simulate a new check</button>}
+          <button className="ledger-button" data-variant="line" onClick={onToggleDelay}>{delayed ? "Restore sample source" : "Simulate a source delay"}</button>
+        </div>
       </div>
     </details>
   </section>;

@@ -347,3 +347,75 @@ Proposal on the canvas page "Sprint 2 · Mellow speaks first": the system map, t
 4. Approve **logging notes** in Activity as Mellow events, not decisions.
 5. Approve **"Simulate a new check"** so Try shows the feature, plus the **evidence-question fix**.
 6. Decide whether **synthetic evidence is enough to build**. The board's view: build it, because the pattern is conservative and reversible. Keep the success measure open until real leads try it.
+
+
+### Sprint 2 · implementation and preview review · v1.37
+
+| Role | Finding | Status |
+| --- | --- | --- |
+| AI UX Designer/Engineer | `notes.ts` is pure and deterministic. P1 to P6, E5 and the trail are tested: 62 of 62 tests pass. | Closed |
+| AI UX Designer/Engineer | "Your open record changed" can't happen in the demo, because sample records never update. It's deferred until live source sync. **This deviates from the approved four triggers; founder to note.** | Deferred, owner Engineer |
+| Engineer | **Found in build:** a later check (such as restoring the source) cleared NEW, contrary to the spec. Fixed so NEW lasts until opened, and added a test. | Closed |
+| Engineer | **Found in build:** "Since the 10:41 check, the 10:41 check…" when two checks land in the same minute (a demo artifact). Same-minute checks now drop "Since". | Closed |
+| Compliance and Risk | **Found in build:** the Activity trail lost notes that a later note replaced. The trail is now derived from the events that create notes, so nothing drops out. | Closed |
+| Product Designer (systems and IA) | **Found in build:** the "Why this?" overlay was see-through under the next queue row (each row's animation makes its own layer). Fixed. Simulated rows said "Import"; they now show the check that found them. | Closed |
+| Product Designer (systems and IA) | The mark grammar is fixed: the dot means "disagree" only, and NOW, NEW and "1 waiting" are words. | Closed |
+| Accessibility | Dismiss and "Why this?" are 44px. "Why this?" opens with the keyboard and closes with Escape. Small vermilion text is vermilion-dark. The briefing note is announced politely. With reduced motion, no animations run. No console errors at 1440px or 390px. | Closed |
+| Content and Voice | No interpretive or risk words in any note (checked by test). "Since the 8:43 check" wording is in place. | Closed |
+| Research | Synthetic evidence only. The success measure stays open. | Open, owner Research |
+
+**Preview review result.** No blockers. One deviation for the founder to note: the record-changed trigger is deferred.
+
+### Product Excellence Review · v1.37 · 2026-11-25
+
+Run under MELLOW_EVALS.md Part 2. **Evidence grade: Synthetic.** The users were the five fictional archetypes (Dana, Marcus, Priya, Luis and Jo), with the team and the board in the room. The scorecard is on the canvas ("Product Excellence Review · v1.37").
+
+**Scorecard.** Ratings are Excellent (E), Good (G), Friction (F), Broken (B), Not served (NS) and N/A (–).
+
+| CUJ | Discover | Learn | Try | Buy | Get started | Use | Get help | Expand | End use |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 · Resolve a mismatch on shift | – | – | – | – | G | **F** (Dana: on a phone the queue hides behind Show, so NEW rows are out of sight) | G | – | – |
+| 2 · Ask Mellow and trust the answer | – | G | – | – | G | **F** (Luis: reads "Compared" as "approved") | G | – | – |
+| 3 · Try Mellow on our own files | **NS** (no way in but a URL) | **F** (limits found only by asking) | **F** (exact CSV columns needed, no template; Simulate is hidden in a fold) | **NS** | **NS** (no setup for real sources) | G | G | – | **NS** (no clear-my-data control) |
+
+**Handoffs.** Get started → Use: Good. Use → Get help: Good. **Try → Buy: Not served.** A buyer leaves with nothing to show an approver.
+
+**Provocations (recorded verbatim).**
+- Product Lead: "If a buyer tries Mellow for ten minutes, what do they leave with to show their boss?"
+- Research: "Would a real lead ever open 'What I checked' to find 'Simulate a new check'?"
+- AI UX: "What if tapping a note opened the conversation with 'Why this?' already asked?"
+- Product Designer: "Should the stamp lead with *what* was compared, so 'Compared' can't read as a verdict?"
+- Content: "Do we need a separate note line, or can the briefing itself update in place, in one voice?"
+- Compliance: "Can an inspector get the Activity trail as a file?"
+- Accessibility: "How does a screen-reader user hear a new note mid-form?"
+- Engineer: "What happens when checks arrive every five minutes instead of on demand?"
+- Design Director: "What would make Mellow's first sixty seconds unforgettable?"
+- Rams: "With one new item, do we need both the briefing note and the row note?"
+- Norman: "What's the person's model of a 'check'? Do they know one ran?"
+- Morris: "Can a person tell Mellow a note wasn't useful?"
+- Eames: "Where does a shift really start? At clock-in, not at the briefing?"
+- Wroblewski: "Why is the queue hidden on the device most leads use?"
+
+**How might we, plus a bold idea.**
+
+| # | How might we… | Bold idea |
+| --- | --- | --- |
+| 1 | …make "Compared" impossible to misread? | Lead with the evidence: "2 files · row 2 · 9:13", with a one-line before-and-after preview of the two records. |
+| 2 | …get a buyer from Try to Buy? | "Share these findings": a one-page evidence summary (what was compared, what differed, no verdicts) to forward to an approver. |
+| 3 | …make Try on your own files take under 10 minutes? | Drop in any CSV. Mellow maps the columns, previews 5 rows, then compares. A downloadable template. |
+| 4 | …put new work in front of phone-first leads? | On a phone, Today leads with "Your next package", and the sheet opens to the NEW row. |
+| 5 | …let people correct Mellow? | "Not useful" on a note, with a reason, logged and used to tune triggers. No AI needed. |
+| 6 | …show what Mellow does without hunting for demo controls? | "Watch a shift": a guided Try mode that plays a scripted day, with checks arriving and notes appearing. |
+| 7 | …make the trail inspector-ready? | Export decisions and Mellow notes as a dated PDF or CSV. |
+
+**Gate check.**
+- No Broken cells: **met**.
+- Every Friction cell has an owner and a sprint 3 slot:
+  - **CUJ 1 Use:** Product Designer (idea 4)
+  - **CUJ 2 Use:** Content and Research (idea 1, plus real sessions)
+  - **CUJ 3 Learn:** Content
+  - **CUJ 3 Try:** Product Designer and Engineer (ideas 3 and 6)
+- Not served stages are listed for founder acceptance: CUJ 3's Discover, Buy, Get started and End use, plus the Try → Buy handoff.
+- The evaluation set passes, 62 of 62.
+
+**The gate is met, pending the founder's acceptance of the Not served list.**

@@ -244,6 +244,14 @@ function answerFor(input: string, context: AskContext): AskAnswer {
   if (has(text, /\b(violat\w*|complian\w*|non-?complian\w*|legal(ly)?|illegal|lawful|allowed|permitted|penalt\w*|fines?|fined|regulat\w*|laws?|rules?|required|requirements?|audits?|inspections?|inspector|citations?|ok(ay)? to (sell|ship|release|move|use)|safe to (sell|ship|release|move|use)|can (i|we) (sell|ship|release))\b/)) {
     const row = id ? context.comparison.find(({ packageId: rowId }) => rowId === id) : undefined;
     const queued = id ? [...context.queue, ...context.manager].find((task) => task.id === id) : undefined;
+    if (has(text, /\bevidence\b/) && !has(text, /\b(violat\w*|complian\w*|legal|illegal|fines?|penalt\w*|audits?)\b/)) {
+      return {
+        intent: "label",
+        title: "What to check, not what’s required",
+        body: "I can’t say what the law requires. What a person usually checks: the lot or batch number and the package ID on the original label, against both records. Note what the label shows as your evidence.",
+        actions: queued ? [{ label: `Open ${queued.record}`, action: { kind: "open", id: queued.id } }] : [],
+      };
+    }
     const audit = has(text, /\b(audits?|inspections?|inspector|pass)\b/);
     return {
       intent: "judgment",

@@ -56,6 +56,12 @@ Mellow is honest about what it is and explains how it knows.
 | P1 | A new difference or gap appears in a check | One quiet signal on the row or briefing. No popup. States the fact and the check time. |
 | P2 | The receiving source is delayed | Mellow says so first, with the time of the last good check. (Today's briefing does this.) |
 | P3 | Nothing changed | Mellow says nothing new. No filler nudges. |
+| P4 | More than two new in one check | One batched line in the briefing. No row notes. Rows carry the NEW word. |
+| P5 | A note was dismissed | The same trigger never fires again. Dismissing doesn't clear NEW or change the record. |
+| P6 | A dialog is open | Nothing new is said until it closes. |
+| E5 | "What evidence is required for PKG-443?" | Says it can't say what the law requires, then gives label-check guidance marked "Not from your records". |
+
+P1 to P6 run in `tests/notes.test.mjs`, and E5 runs in `tests/evals.test.mjs`. The "your open record changed" trigger is deferred: the demo's records never change on their own, so it needs live source sync to happen at all.
 
 **Probe score, 2026-11-25:** 1 pass, 4 partial, 11 fail, and 1 not run, across 17 record-answer cases. The proactive cases have no automated test yet.
 

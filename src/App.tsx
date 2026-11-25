@@ -6,6 +6,8 @@ import { Briefing, Conversation } from "./AskMellow";
 import { ActivityPage } from "./ActivityPage";
 import { LearnPage } from "./LearnPage";
 import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextPanel";
+import { NoteLine } from "./NoteLine";
+import { notesFor, noteTrail, sampleChecks, type NewIssue, type Note, type SourceEvent } from "./notes";
 import { panelFor, queueView, sameView, type PanelView } from "./panel";
 import { addTurn, ask, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
 
@@ -32,6 +34,12 @@ function smooth(update: () => void, kind: "page" | "panel" = "page") {
 
 const tabs = ["Today", "Activity", "Learn"] as const;
 const panelKey = "mellow.panel";
+const dismissedKey = "mellow.notes.dismissed";
+
+type NoteEvent = { id: string; text: string; trigger: string; at: string; dismissedAt?: string };
+function readDismissed(): NoteEvent[] {
+  try { return JSON.parse(localStorage.getItem(dismissedKey) ?? "[]") as NoteEvent[]; } catch { return []; }
+}
 
 function initialCollapsed() {
   try {
@@ -143,6 +151,12 @@ export default function App() {
   const [compareRequest, setCompareRequest] = useState(0);
   const [turns, setTurns] = useState<Turn[]>([]);
   const [askOpen, setAskOpen] = useState(false);
+  const [extraRows, setExtraRows] = useState<LotCheck[]>([]);
+  const [newIssues, setNewIssues] = useState<NewIssue[]>([]);
+  const [opened, setOpened] = useState<string[]>([]);
+  const [restoredAt, setRestoredAt] = useState<string | null>(null);
+  const [dismissedLog, setDismissedLog] = useState<NoteEvent[]>(readDismissed);
+  const [sources, setSources] = useState<SourceEvent[]>([]);
   const askButton = useRef<HTMLButtonElement>(null);
   const [activeId, setActiveId] = useState("");
   const [editRecordId, setEditRecordId] = useState("");
@@ -157,14 +171,26 @@ export default function App() {
   const handoff = shiftHandoff(workspace);
   const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
-  const ordered = orderQueue(queue, sampleComparison);
-  const askContext = { queue, manager, comparison: sampleComparison, runs: posture.runs, receiving: posture.receiving };
+  const comparison = extraRows.length ? [...sampleComparison, ...extraRows] : sampleComparison;
+  const ordered = orderQueue(queue, comparison);
+  const askContext = { queue, manager, comparison, runs: posture.runs, receiving: posture.receiving };
+  const notes = notesFor({
+    checks: posture.runs.map((entry) => entry.checkedAt), newIssues, receiving: posture.receiving, restoredAt,
+    lastGoodAt: posture.lastSuccessfulRun?.checkedAt,
+    waiting: handoff.map(({ task }) => ({ taskId: task.id, record: task.record,
+      since: [...workspace.history].reverse().find((entry) => entry.task.id === task.id && entry.decision === "Manager review requested")?.at ?? new Date().toISOString() })),
+    dismissed: new Set(dismissedLog.map(({ id }) => id)), now: new Date().toISOString(),
+  });
+  const fresh = [...notes.fresh].filter((id) => !opened.includes(id));
+  const trail = noteTrail({ checks: posture.runs.map((entry) => entry.checkedAt), newIssues, sources, now: new Date().toISOString(),
+    waiting: handoff.map(({ task }) => ({ taskId: task.id, record: task.record,
+      since: [...workspace.history].reverse().find((entry) => entry.task.id === task.id && entry.decision === "Manager review requested")?.at ?? new Date().toISOString() })) });
   const briefing = brief(askContext);
   const doneToday = [...latest.entries()].filter(([, decision]) => decision === "Approved" || decision === "Dismissed")
     .map(([id, decision]) => ({ id, decision, entry: workspace.history.find((item) => item.task.id === id && item.decision === decision) }))
     .filter(({ entry }) => entry && new Date(entry.at).toDateString() === new Date().toDateString());
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? ordered[0]?.task;
-  const activeIssue = active ? issueOf(active, sampleComparison) : undefined;
+  const activeIssue = active ? issueOf(active, comparison) : undefined;
   const following = active && nextRecord(workspace.tasks, queue, active.id);
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const review = active ? prepareReview(active) : undefined;
@@ -354,7 +380,31 @@ export default function App() {
     smooth(() => setPanelCollapsed(next), "panel");
   }
 
+  function dismissNote(note: Note) {
+    const event: NoteEvent = { id: note.id, text: note.text, trigger: note.trigger, at: note.at, dismissedAt: new Date().toISOString() };
+    setDismissedLog((current) => {
+      const next = [...current.filter(({ id }) => id !== note.id), event];
+      try { localStorage.setItem(dismissedKey, JSON.stringify(next)); } catch { /* Keep it for this visit. */ }
+      return next;
+    });
+  }
+
+  function simulateCheck() {
+    const index = Math.min(newIssues.length ? 1 : 0, sampleChecks.length - 1);
+    const rows: LotCheck[] = sampleChecks[index].map((row) => ({ ...row, state: row.receiving === null ? "missing" : "different" }));
+    const fresh = rows.filter((row) => !comparison.some(({ packageId }) => packageId === row.packageId));
+    if (!fresh.length) { setStatus("No new sample checks left. Reload the page to start over."); return; }
+    const time = new Date().toISOString();
+    const tasks = comparisonTasks(fresh, "Sample inventory export", "Sample receiving log");
+    if (!save((current) => ({ ...current, tasks: [...current.tasks, ...tasks.filter(({ id }) => !current.tasks.some((task) => task.id === id))] }))) return;
+    setExtraRows((current) => [...current, ...fresh]);
+    setPosture((current) => monitorReceiving(current, [...comparison, ...fresh], "current", time));
+    setNewIssues((current) => [...current, ...tasks.map((task, i) => ({ taskId: task.id, record: task.record, kind: fresh[i].state === "different" ? "different" as const : "missing" as const, at: time }))]);
+    setRestoredAt(null);
+  }
+
   function openTask(task: Task) {
+    setOpened((current) => current.includes(task.id) ? current : [...current, task.id]);
     setActiveId(task.id);
     setEditRecordId("");
     goTo("Today");
@@ -362,14 +412,17 @@ export default function App() {
   }
 
   function queueRow(task: Task, kind: string, label: string, index = 0) {
-    const time = task.sample && posture.lastSuccessfulRun ? clock(posture.lastSuccessfulRun.checkedAt) : "Import";
+    const foundIn = newIssues.find((issue) => issue.taskId === task.id)?.at;
+    const time = foundIn ? clock(foundIn) : task.sample && posture.lastSuccessfulRun ? clock(posture.lastSuccessfulRun.checkedAt) : "Import";
     return <li key={task.id} style={{ "--i": index } as CSSProperties}>
       <button className="queue-row" data-kind={kind} aria-current={active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
         <span className="queue-mark" aria-hidden="true" />
         <span className="queue-id">{task.record}</span>
         <span className="queue-issue">{label}</span>
+        {fresh.includes(task.id) && <span className="queue-new">New</span>}
         <span className="queue-time">{time}</span>
       </button>
+      {notes.rows.get(task.id) && <NoteLine note={notes.rows.get(task.id)!} onDismiss={dismissNote} compact />}
     </li>;
   }
 
@@ -385,7 +438,10 @@ export default function App() {
 
   function toggleDelay() {
     const time = new Date().toISOString();
-    setPosture((current) => monitorReceiving(current, sampleComparison, current.receiving === "current" ? "delayed" : "current", time));
+    setRestoredAt(posture.receiving === "delayed" ? time : null);
+    setSources((current) => [...current, posture.receiving === "delayed"
+      ? { kind: "restored", at: time } : { kind: "delayed", at: time, lastGoodAt: posture.lastSuccessfulRun?.checkedAt }]);
+    setPosture((current) => monitorReceiving(current, comparison, current.receiving === "current" ? "delayed" : "current", time));
   }
 
   function onAsk(action: AskAction) {
@@ -445,7 +501,7 @@ export default function App() {
             <path d="M4.5 5.5h15v10h-8l-4.5 3.5v-3.5H4.5z" /><path d="M8.5 10.5h7" />
           </svg>
           <span className="ask-trigger-label">Ask Mellow</span>
-          {turns.length > 0 && tab !== "Today" && !askOpen && <span className="ask-dot" aria-hidden="true" />}
+          {turns.length > 0 && tab !== "Today" && !askOpen && <span className="ask-waiting">1 waiting</span>}
           <kbd aria-hidden="true">/</kbd>
         </button>
       </div></header>
@@ -455,6 +511,7 @@ export default function App() {
         {tab === "Today" && <div className="ledger">
           <div className="ledger-main">
             <Briefing brief={briefing} lastCheck={posture.lastSuccessfulRun?.checkedAt} delayed={posture.receiving === "delayed"}
+              note={notes.briefing ? <NoteLine key={notes.briefing.id} note={notes.briefing} onDismiss={dismissNote} /> : undefined}
               aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
             <section className="primary ledger-record" aria-labelledby="task-title">
               <p className="record-marker" data-manager={pendingManager || undefined} aria-hidden="true">{active ? (pendingManager ? "With manager" : "Now") : ""}</p>
@@ -517,10 +574,10 @@ export default function App() {
             </section>
             <Conversation context={askContext} chips={briefing.chips} turns={turns} onTurns={setTurns} onAction={onAsk} onAnswer={showAnswer} onClear={backToQueue} />
           </div>
-          <ContextPanel view={panelView} collapsed={panelCollapsed} needYou={queue.length} lastCheck={posture.lastSuccessfulRun?.checkedAt}
+          <ContextPanel view={panelView} collapsed={panelCollapsed} needYou={queue.length} fresh={fresh.length} lastCheck={posture.lastSuccessfulRun?.checkedAt}
             onBack={backToQueue} onToggle={togglePanel}>
             {panelView.kind === "queue" && <>
-            <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />
+            <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} onSimulateCheck={simulateCheck} />
             <section className="ledger-queue" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
               <div className="queue-head">
                 <h2 id="queue-title" className="kicker">Needs you · <span className="count" key={queue.length}>{queue.length}</span></h2>
@@ -540,20 +597,23 @@ export default function App() {
             </section>
             </>}
             {panelView.kind === "package" && <PackageTrail id={panelView.id} task={[...queue, ...manager, ...workspace.tasks].find((item) => item.id === panelView.id)}
-              row={sampleComparison.find(({ packageId }) => packageId === panelView.id)} queued={queue.some((item) => item.id === panelView.id)}
+              row={comparison.find(({ packageId }) => packageId === panelView.id)} queued={queue.some((item) => item.id === panelView.id)}
               decision={latest.get(panelView.id)} entries={workspace.history.filter((entry) => entry.task.id === panelView.id)}
               lastCheck={posture.lastSuccessfulRun?.checkedAt} isActive={active?.id === panelView.id} onOpen={openTask} />}
             {panelView.kind === "series" && <>
-              <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />
-              <SeriesList series={panelView.series} rows={sampleComparison} open={[...queue, ...manager]} latest={latest}
+              <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} onSimulateCheck={simulateCheck} />
+              <SeriesList series={panelView.series} rows={comparison} open={[...queue, ...manager]} latest={latest}
                 matched={posture.runs.reduce((sum, run) => sum + run.matched, 0)} activeId={active?.id} onOpen={openTask} />
             </>}
-            {panelView.kind === "summary" && <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} />}
+            {panelView.kind === "summary" && <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} onSimulateCheck={simulateCheck} />}
             {panelView.kind === "handoff" && <HandoffPanel handoff={handoff} status={handoffStatus} onCopy={() => void copyHandoff()} onOpen={openTask} />}
           </ContextPanel>
         </div>}
         {tab === "Activity" && <ActivityPage history={workspace.history} latest={latest} handoff={handoff} open={queue.length}
           flaggedToday={posture.runs.reduce((sum, run) => sum + run.exceptions, 0)} handoffStatus={handoffStatus}
+          notes={[...trail.map(({ id, text, trigger, at }) => dismissedLog.find((event) => event.id === id) ?? { id, text, trigger, at }),
+            ...dismissedLog.filter((event) => !trail.some(({ id }) => id === event.id)
+              && new Date(event.dismissedAt ?? event.at).toDateString() === new Date().toDateString())]}
           onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} />}
         {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)} />}
       </main>

@@ -139,3 +139,10 @@ test("Existing domain questions still route as before", () => {
   assert.equal(ask("Why does PKG-443 go first?", context).intent, "package");
   assert.equal(ask("Show me today’s gaps", context).intent, "gaps");
 });
+
+test("E5 · What evidence is required? says it can't say what the law requires, then gives guidance", () => {
+  const answer = ask("What evidence is required for PKG-443?", context);
+  assert.equal(answer.intent, "label");
+  assert.match(answer.body, /^I can’t say what the law requires\./);
+  assert.equal(answer.basis.verified, false);
+});

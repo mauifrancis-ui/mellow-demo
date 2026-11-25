@@ -45,8 +45,7 @@
 
 /* The current record */
 .ledger-record { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 16px; }
-.record-marker { margin: 0; padding-top: 30px; font: 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--vermilion); }
-.record-marker:not(:empty)::before { content: "● "; }
+.record-marker { margin: 0; padding-top: 30px; font: 500 12px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--vermilion-dark); }
 .record-marker[data-manager] { color: var(--graphite); }
 .ledger-record-body { display: grid; gap: 12px; min-width: 0; }
 .shell[data-palette="ledger"] .ledger-record .review-heading { padding: 0; border: 0; }
@@ -147,7 +146,7 @@
 .queue-head > span { font-size: 13px; color: var(--graphite); }
 .shell[data-palette="ledger"] .ledger-queue .kicker { color: var(--ink); }
 .shell[data-palette="ledger"] .ledger-queue .queue-row {
-  display: grid; grid-template-columns: 12px 76px minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  display: grid; grid-template-columns: 12px 76px minmax(0, 1fr) auto auto; gap: 10px; align-items: center;
   width: calc(100% + 16px); min-height: 44px; margin: 0 -8px; padding: 0 8px; border: 0; border-bottom: 1px solid var(--rule);
   border-radius: 0; background: transparent; box-shadow: none; text-align: left; color: var(--ink);
 }
@@ -449,7 +448,8 @@
   border-radius: 3px; font: 12px var(--mono); color: var(--graphite);
 }
 .shell[data-palette="ledger"] .ask-trigger[data-open] kbd { border-color: rgb(247 243 234 / 35%); color: var(--paper); }
-.ask-dot { position: absolute; top: -3px; right: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--vermilion); box-shadow: 0 0 0 2px var(--paper); }
+.ask-waiting { font: 11px var(--mono); color: var(--vermilion-dark); }
+.shell[data-palette="ledger"] .ask-trigger[data-open] .ask-waiting { color: var(--paper); }
 
 .ask-drawer {
   position: fixed; z-index: 60; top: 76px; right: 24px; display: flex; flex-direction: column;
@@ -530,3 +530,59 @@
   @keyframes stamp { from { opacity: 0; transform: scale(1.06); } }
   .basis[open] .basis-sources { animation: drawer-in var(--motion-arrive) var(--ease) both; }
 }
+
+
+/* Sprint 2 · mark grammar: the filled dot means "records disagree" only. NOW, NEW and "1 waiting" are words. */
+.shell[data-palette="ledger"] .ledger-queue .queue-row:not(:has(.queue-new)) { grid-template-columns: 12px 76px minmax(0, 1fr) auto; }
+.queue-new {
+  font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--vermilion-dark);
+  border: 1px solid var(--vermilion-dark); border-radius: 3px; padding: 1px 5px;
+}
+.panel-new { font: 12px var(--mono); color: var(--vermilion-dark); }
+
+/* Sprint 2 · Mellow speaks first: the margin note. One pattern wherever Mellow goes first. */
+.mellow-note {
+  position: relative; display: grid; grid-template-columns: 72px minmax(0, 1fr) auto auto; gap: 4px 12px; align-items: center;
+  margin-top: 10px; padding: 4px 0 4px 0;
+}
+.mellow-note > .kicker { margin: 0; }
+.mellow-note .mellow-voice { margin: 0; font-size: 18px; }
+.mellow-note[data-compact] { grid-template-columns: 64px minmax(0, 1fr) auto auto; margin: 0 -8px; padding: 0 8px 4px 20px; background: var(--tint-soft); border-bottom: 1px solid var(--rule); }
+.mellow-note[data-compact] .mellow-voice { font-size: 15px; }
+.mellow-note[data-compact] > .kicker { font-size: 11px; }
+.note-why { position: relative; }
+.note-why > summary {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; list-style: none; cursor: pointer;
+  font: 500 13px var(--sans); color: var(--ink); text-decoration: underline; text-underline-offset: 3px;
+}
+.note-why > summary::-webkit-details-marker { display: none; }
+.note-why-body {
+  position: absolute; z-index: 30; top: calc(100% + 2px); right: 0; width: max-content; max-width: min(340px, 80vw); padding: 12px 14px;
+  border: 1px solid var(--ink); border-radius: 4px; background: var(--paper); box-shadow: 0 10px 24px rgb(28 27 25 / 12%);
+  display: grid; gap: 6px; font-size: 14px; line-height: 1.4;
+}
+.note-why-body p { margin: 0; }
+.note-why-small { color: var(--graphite); font-size: 13px; }
+.note-dismiss { width: 44px; height: 44px; }
+.briefing-note:empty { display: none; }
+.briefing-note .mellow-note { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--rule); }
+@media (width < 600px) {
+  .mellow-note, .mellow-note[data-compact] { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .mellow-note > .kicker { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .mellow-note { animation: settle var(--motion-arrive) var(--ease) both; }
+  .note-why[open] .note-why-body { animation: drawer-in var(--motion-arrive) var(--ease) both; }
+}
+
+.monitor-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.mellow-events { display: grid; gap: 8px; margin-bottom: 28px; }
+.mellow-events-help { margin: 0; font-size: 13px; color: var(--graphite); }
+.mellow-events ul { margin: 0; padding: 0; list-style: none; display: grid; }
+.mellow-events li { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; padding: 10px 0; border-top: 1px solid var(--rule); }
+.mellow-events time { font: 12px var(--mono); color: var(--graphite); padding-top: 3px; }
+.mellow-events .mellow-voice { display: block; font-size: 16px; }
+.mellow-events small { display: block; margin-top: 2px; font: 12px var(--mono); color: var(--graphite); }
+
+/* An open "Why this?" sits above the rows after it (each row's arrival animation makes its own layer). */
+.ledger-queue li:has(.note-why[open]), .briefing-note:has(.note-why[open]) { position: relative; z-index: 40; }

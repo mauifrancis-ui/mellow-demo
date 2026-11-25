@@ -8,8 +8,9 @@ const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "num
 
 // The right-hand panel on Today. It shows whatever supports the current turn,
 // keeps the "needs you" count visible when collapsed, and never moves on its own.
-export function ContextPanel({ view, collapsed, needYou, lastCheck, onBack, onToggle, children }: {
+export function ContextPanel({ view, collapsed, needYou, fresh = 0, lastCheck, onBack, onToggle, children }: {
   view: PanelView;
+  fresh?: number;
   collapsed: boolean;
   needYou: number;
   lastCheck?: string;
@@ -23,6 +24,7 @@ export function ContextPanel({ view, collapsed, needYou, lastCheck, onBack, onTo
       <button type="button" className="panel-summary" aria-expanded={!collapsed} aria-controls="context-body" onClick={onToggle}>
         <span className="panel-count" data-open={needYou > 0 || undefined}>{needYou}</span>
         <span className="panel-count-label">need you</span>
+        {fresh > 0 && <span className="panel-new">· {fresh} new</span>}
         {lastCheck && <span className="panel-last">Last check {clock(lastCheck)}</span>}
       </button>
       <div className="panel-head">

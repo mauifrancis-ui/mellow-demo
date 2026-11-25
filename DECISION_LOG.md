@@ -285,3 +285,7 @@ The founder couldn't recruit, so Research created five fictional industry archet
 ## Sprint 2 approved; Product Excellence Review added · 2026-11-25
 
 The founder approved all six sprint 2 recommendations, including building on synthetic evidence with the success measure kept open. The founder also added a Product Excellence Review as a release gate (MELLOW_EVALS.md, Part 2; AGENTS.md step 5b): the top 3 critical user journeys, walked in context with 3 to 5 users with the team and board in the room, scored against the nine Universal Experiences stages, with provocations and innovation ideas recorded. Until real users are recruited, the users are the five fictional archetypes, graded synthetic.
+
+## Version 1.37 Mellow speaks first · built and reviewed · 2026-11-25
+
+Built the founder-approved sprint 2 scope: deterministic margin notes (three of the four approved triggers; record-changed is deferred until live sync), "Why this?", dismiss, batching, the NEW word, "1 waiting", NOW without a dot, the phone "· 1 new", the Activity note trail, "Simulate a new check", and the evidence-question fix. Verification: lint, type check, build and 62 tests passed. The browser review at 1440px and 390px with keyboard and reduced motion found and fixed four issues before preview. The Product Excellence Review (synthetic) met the gate with no Broken cells. Friction items have owners for sprint 3. Awaiting the founder's acceptance of the Not served list and the release decision.

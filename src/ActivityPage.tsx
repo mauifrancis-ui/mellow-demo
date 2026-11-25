@@ -30,8 +30,9 @@ function dayLabel(iso: string) {
   return date.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" });
 }
 
-export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, onReopen, onOpen, onCopy }: {
+export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, notes = [], onReopen, onOpen, onCopy }: {
   history: Entry[];
+  notes?: { id: string; text: string; trigger: string; at: string; dismissedAt?: string }[];
   latest: Map<string, Decision>;
   handoff: { task: Task; summary: string; text: string }[];
   open: number;
@@ -116,6 +117,14 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
     </div>
 
     <aside className="ledger-side" aria-label="Today at a glance">
+      {notes.length > 0 && <section className="mellow-events" aria-labelledby="notes-title">
+        <h2 id="notes-title" className="kicker">Mellow notes today · {notes.length}</h2>
+        <p className="mellow-events-help">What Mellow said first, and what was dismissed. These are not decisions.</p>
+        <ul>{notes.map((note) => <li key={note.id}>
+          <time dateTime={note.at}>{new Date(note.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
+          <span><span className="mellow-voice">{note.text}</span><small>{note.trigger}{note.dismissedAt ? ` · Dismissed ${new Date(note.dismissedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : " · Shown"}</small></span>
+        </li>)}</ul>
+      </section>}
       <section aria-labelledby="numbers-title">
         <h2 id="numbers-title" className="kicker">Today in numbers</h2>
         <dl className="day-numbers">
