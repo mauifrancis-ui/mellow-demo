@@ -28,6 +28,10 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
 6. "Watch a shift": a guided Try mode that plays a scripted day.
 7. Export the decision and note trail for inspectors (PDF or CSV).
 
+## Punchlist · 2026-11-25
+
+- Fixed after the v1.39 production check: the site still said the stamp shows "Compared" and "which rows". It now says "which files, which package, and when", and that answers not drawn from your records say so. This is site copy only.
+
 ## Texas roadmap (team decision 2026-11-25)
 
 - Sprint 4: the regulation source registry (references only), plus the binder skeleton.
