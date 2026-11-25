@@ -435,3 +435,4 @@ Brand direction under review on the design canvas, page "Ask Mellow · AI brand"
 - **The decision trail** shares the findings sheet: CSV with formula-safe cells, and print. It's titled "Mellow decision trail", never "for an inspector".
 - **Clear this device's data** takes two steps, says what's stored, and moves focus to the confirm button.
 - **On a phone,** Today opens with "Your next package".
+- **Marks are for triage only** (2026-11-25). The filled vermilion dot, the vermilion ring and the ink ring appear only where a record still needs someone: the queue, answers and the handoff. Activity is history, so it states decisions in words, with no marks.

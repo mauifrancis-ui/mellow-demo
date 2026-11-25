@@ -833,3 +833,39 @@ Requested by the founder ("make sure that we know we're speaking to humans and w
 - No real person outside the team has used v1.39. The Product Excellence Review used fictional archetypes.
 - No person has checked the Rules entries. The page copies were checked by Claude, which isn't a person, and each entry still says "No one has checked this yet".
 - No attorney has reviewed the referral wording or the disclaimers.
+
+## Activity marks · team review and board pass · 2026-11-25
+
+**Founder request.** "Let's run it by the team, this is something they should be able to work out with their design system." The founder delegated the decision to the team, within the design system. Release still needs the founder.
+
+**Problem.** The design system gives each queue mark one meaning:
+- a filled vermilion dot: records disagree;
+- a vermilion ring: a gap;
+- an ink ring: with a manager, or other.
+
+Activity reused marks for *decisions*:
+- "Issue recorded" got a filled vermilion dot, even when the issue was a gap;
+- "Reopened" got a vermilion ring;
+- "Not an issue" got a grey dot that exists nowhere else.
+
+### Team review (Step 1)
+
+Reviewed by the Product Designer, the Design Director, Content and Voice, Accessibility, the Engineer and Compliance and Risk.
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Product Designer (systems and IA) | Marks describe a record's *state* for triage. Activity is a *history* of decisions. Putting state marks on decisions gives one mark two meanings. Showing the record's issue mark instead would put triage marks on settled history. | High | Activity carries no marks. The decision is said in words. Marks stay in the queue and in answers, where they mean triage. |
+| Compliance and Risk | A red dot on "Issue recorded" for a missing-record case misstates what the records showed, which matters in an exported trail. | High | Remove it. The trail export already uses words only. |
+| Content and Voice | The words already say the decision. Filter chips let people scan by decision. | Info | None. |
+| Accessibility | The marks were `aria-hidden`, so screen-reader users lose nothing. Without them, sighted users read the same words. | Info | None. |
+| Design Director (type) | The decision words were larger than queue issue text (14px), which the founder flagged. | Medium | Decision words at 14px to match `.queue-issue`, and evidence at 13px as secondary. |
+| Engineer | Remove the mark column and its four mark styles. The row grid drops one column. | Info | None. |
+
+### Board pass (Step 2)
+
+- **Vignelli, Kare:** one mark, one meaning, everywhere, or the system means nothing. They back removing the marks.
+- **Rams, Maeda:** a history needs no triage signals. Less, but better.
+- **Norman:** the filter chips are the scanning tool in Activity. Marks there invited the wrong reading.
+- **Morris:** the exported trail and the screen must say the same thing. Words do.
+
+**Decision (team, under the founder's delegation):** Activity shows no marks. Decision words are 14px and evidence is 13px. The shift-handoff list keeps its ink ring, which already means "with a manager". Recorded in MELLOW_DESIGN_SPEC.md.
