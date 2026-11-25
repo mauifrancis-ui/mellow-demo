@@ -610,7 +610,7 @@ The users were the five fictional archetypes, with the team and the board in the
 - **The 2027 session (convenes 2027-01-12):** pre-filed bills include HB 369 and HB 362 (adult use), SB 237 (adult use) and HB 330 (TCUP expansion). After the November 2026 midterms, Democrats control the Texas House and Republicans keep the Senate. **The team takes no view on passage.**
 - **Law here moves monthly.** Every reference needs its source, its effective date, its status (in effect, under litigation, proposed) and a "last verified by a person" date.
 
-**Team decision on sequencing.** The Product Lead was accountable; every role was consulted.
+**Proposed sequencing (Step 0 draft).** Written by the Product Lead from Research and Compliance's findings. *Correction: an earlier version of this entry said every role was consulted. They weren't. The role-by-role review and the board pass follow below.*
 
 | Sprint | Name | What it carries | Why here |
 | --- | --- | --- | --- |
@@ -631,3 +631,37 @@ The users were the five fictional archetypes, with the team and the board in the
 1. The sequence above.
 2. Which segment goes first in sprint 5: TCUP dispensing organizations or consumable hemp.
 3. Who the regulatory expert is, and when they start (it should be during sprint 4).
+
+### Texas · team review (Step 1)
+
+| Pass | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Compliance and risk (can block) | "Met" next to a cited rule reads as an attestation that the business complies with that rule. Mellow can only say what the records show. | High | Use **On file / Missing / Can't check from these files**. Never use "met", "compliant" or "ready". |
+| Compliance and risk | No control ships without a named regulatory expert's sign-off. | Blocks sprint 5 build | Name the expert before sprint 5 starts. |
+| Compliance and risk | Bill content next to live checks risks being read as a forecast or as advocacy. | High | Keep it in a separate view, off by default. Show the text and status only. Never feed it into counts or notes. |
+| Research | None of the archetypes is Texas-specific, and the evidence is synthetic. TCUP dispensing organizations are vertically integrated (they grow, process and sell). They may have little vendor receiving, which is Mellow's core. Hemp retailers and manufacturers buy from many suppliers, which fits Mellow's model better. | Medium | Lean toward hemp for sprint 5. Add a Texas hemp retail archetype, labeled fictional. |
+| Product Lead | Sprint 4 already carries a lot. A registry that nothing uses yet is a link list. | Medium | Limit the registry to the sources the sprint 5 segment needs. |
+| Product Designer (systems and IA) | The model is rule, then control, then the evidence an inspector asks for, then the records behind it. Every count must open into that chain. Scenarios are a mode, not a layer on Today. | Rule | Put Rules under Learn and Inspection prep in its own view. "What if" sits beside it, never inside. |
+| Content and voice | "Readiness", "posture" and "will pass" are out. Every scenario surface says "Proposed, not law". | Rule | Add these to the voice rules. |
+| AI UX (owns evals) | People will ask "am I compliant in Texas?" and "will HB 369 pass?". | High | Route both to honest answers. "Am I compliant" gets: here's what's on file and what's missing, and a person decides. "Will it pass" gets: Mellow doesn't predict; here's its status and text. Add eval cases. |
+| Engineer | Bills need to be kept apart from live rules at the type level. | Medium | Make the registry a static, dated JSON file with a `verified_by` field and no scraping. Keep proposed rules in a separate module whose type checks can't import. |
+| Accessibility | Status must never be shown by color alone, and the binder has to print legibly. | Medium | Use words for status. Test the binder with print styles and a screen reader. |
+
+### Texas · board pass (Step 2)
+
+- **Zhuo:** the binder is the hero. Someone gets through an inspection with less dread, so lead with it and build the rest behind it.
+- **Norman:** people's question is "am I ready?". Answer what's on file, what's missing and where it lives, and close that gap honestly without a score.
+- **Rams, Maeda:** a registry with nothing using it is decoration. Ship only the sources sprint 5 will cite.
+- **Morris:** the strongest caution is on scenarios. A compliance tool modeling bills is read as forecasting however neutral the copy is. Keep it opt-in and off by default, with the bill text one tap away. Re-review it when bills are amended in session.
+- **Vignelli, Kare:** mark proposed content with type (italic Newsreader and the word "Proposed"), not with a new color or dot. The mark grammar stays as it is.
+- **Wroblewski, Clark:** when the inspector walks in, the lead has a phone. The binder has to open and read on a phone.
+- **Eames:** the constraints are the design. Neutral, dated and cited is what makes this trustworthy.
+- **Ive:** treat the binder as a document someone hands over, with the same ink rule and type as the findings share.
+
+**Board recommendation.**
+1. Approve the order: sprint 4 groundwork, sprint 5 inspection prep, sprint 6 "What if".
+2. Make two changes:
+   - Narrow the sprint 4 registry to the sprint 5 segment's sources.
+   - Make "What if" opt-in, off by default, in its own view.
+3. Prefer hemp for the first segment (Research), with the founder deciding.
+4. Blocking condition: a named regulatory expert before the sprint 5 build.
