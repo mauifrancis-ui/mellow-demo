@@ -296,3 +296,54 @@ Whether people understand what Mellow compared (the stamp) and whether a proacti
 **Out of scope.** Live AI, the handoff (direction C), and Buy, Expand and End use.
 
 **Dependencies.** The founder lines up 3 to 5 receiving leads. Build waits for the session findings.
+
+### Sprint 2 · proposal review by role · v1.37 proposal
+
+Proposal on the canvas page "Sprint 2 · Mellow speaks first": the system map, the margin-note proactive pattern on Today, and the note states and rules. The founder couldn't recruit, so Research ran **synthetic** sessions with five fictional archetypes ([research/archetypes.md](research/archetypes.md); results in [research/sprint-2-synthetic-sessions.md](research/sprint-2-synthetic-sessions.md)). The founder's request; evidence grade weak.
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Product Designer (systems and IA) | **A collision is already live.** The filled vermilion dot means three things today: "records disagree" (queue and answers), "you're on this record" (NOW), and "a conversation is waiting" (Ask Mellow button, shipped in 1.33). A proactive dot would have made four. | **High** | The filled dot means "disagree" only. NOW keeps its word and loses the dot. Ask Mellow shows "1 waiting". Proactive "new" is the word NEW. |
+| Product Designer (systems and IA) | A Note is a new object with states: shown, dismissed, and expired (once its record is opened or decided). It must not change the Issue's state. | Medium | Add Note to the system map and spec. Dismissing hides the note, never the record. |
+| Product Designer | On a phone, the queue is a collapsed sheet, so row notes can go unseen. | High | Carry it in the briefing line and the sheet bar ("4 need you · 1 new"). |
+| AI UX Designer/Engineer | All four triggers are deterministic (a check, a record change, a source status, a handoff timestamp). "Why this?" reuses the stamp's vocabulary. | Info | Add cases before build: P4 (more than two new in one check makes one batched line), P5 (a dismissed trigger never fires again), P6 (no note while a dialog is open). |
+| AI UX Designer/Engineer | Evidence-question over-match from sprint 1: "What evidence is required for PKG-443?" | Medium | Expected behavior: one line, "I can't say what the law requires", then the label-check guidance with "Not from your records". Add it as a case and fix it in this sprint. |
+| Content and Voice | "Since 8:43" reads as the person's last visit (predicted by A2). The delayed-source note promises "I'll say when it's back". | Medium | Use "Since the 8:43 check". Keep the promise only if the build includes the source-restored note. |
+| Compliance and Risk | Dismissing hides information without a trail (predicted by A3). Notes contain no verdicts or risk words. | Medium | Log notes shown and dismissed in Activity as Mellow events, never as decisions. |
+| Accessibility | Vermilion `#C73E22` small text is 4.27:1 on tint-soft (**fails** 4.5:1) and 4.58:1 on paper (barely passes). Dismiss and "Why this?" are 44px. The briefing update needs one polite announcement per check, not one per note. | **High** | Small vermilion text (NEW, the "1 new" counts) uses vermilion-dark `#A93319` (5.97:1). Use `aria-live="polite"` on the briefing line only. |
+| Engineer | The demo has no checks arriving on their own. Notes would only appear after a person compares files, so Try never shows the feature. | Medium | Add "Simulate a new check" next to "Simulate a delay". Store note state per device for now. |
+| Research and Insights | Synthetic tally: 4 of 5 noticed unprompted, 5 of 5 said what it means, 4 of 5 why, 0 of 5 interrupting, and 1 of 5 misread "Compared". **This doesn't meet the success measure, which needs real leads.** | Medium | Treat the success measure as open. Real sessions remain debt, with "Compared" first on the list. |
+| Product Lead | The mark-grammar fix touches shipped UI (NOW and the Ask button), so scope grows. It's a precondition for the feature. | Info | Include it. Out of scope stays as briefed. |
+| Design Director | Fits Field Ledger. The one-pattern rule (the margin note) now holds across every place Mellow speaks first. | Info | Present for decision. |
+
+**Sign-off.** All roles sign off with the changes above. Research's sign-off is conditional: synthetic evidence only.
+
+### Sprint 2 · board pass, including the retro pass on 1.31 to 1.34
+
+**On the proposal.**
+- **Rams, Maeda:** back it. One pattern, four triggers, and a "never" list is restraint by design.
+- **Vignelli, Kare:** strongly back the mark-grammar fix: one shape, one meaning. Words for state (NOW, NEW, 1 waiting).
+- **Norman:** backs "Why this?" and dismiss. Wants "Since the 8:43 check" (a gulf of evaluation).
+- **Morris:** backs it. Notes are explainable, dismissible and logged, and the person stays in control.
+- **Zhuo:** backs logging in Activity. The outcome is a reviewable shift.
+- **Eames:** backs batching. It matches how deliveries arrive in bursts.
+- **Wroblewski, Clark:** back the phone sheet bar and 44px controls. They want a real phone session.
+- **Ive:** one arrival motion, no motion on update.
+
+**Retro pass on what shipped without review.**
+
+| Version | What shipped | Board finding | Action |
+| --- | --- | --- | --- |
+| 1.31 | A contextual, collapsible side panel | Collapsed by default on phones, which hides the queue (Wroblewski). It surfaced again in this proposal. | Covered by the sheet bar's "1 new". |
+| 1.32 | Organic motion, a pinned app bar, columns that scroll independently | Reduced motion is respected. Two scroll areas can hide that there's more content (Norman). | Low. Revisit with real sessions. |
+| 1.33 | Ask Mellow from anywhere | The waiting dot reuses the "disagree" dot (Vignelli, Kare). | Fixed by this proposal ("1 waiting"). |
+| 1.34 | The tinted chat panel | Clear separation of task and chat. No issues. | None. |
+
+### Board recommendation for founder decision
+
+1. Approve the **margin-note proactive pattern**: four triggers, "Why this?", dismiss, and batching when there are more than two.
+2. Approve the **mark-grammar fix**: the filled dot means "disagree" only. NOW without a dot. Ask Mellow shows "1 waiting". NEW is a word.
+3. Approve the **copy and access changes**: "Since the 8:43 check", vermilion-dark for small red text, and one polite announcement per check.
+4. Approve **logging notes** in Activity as Mellow events, not decisions.
+5. Approve **"Simulate a new check"** so Try shows the feature, plus the **evidence-question fix**.
+6. Decide whether **synthetic evidence is enough to build**. The board's view: build it, because the pattern is conservative and reversible. Keep the success measure open until real leads try it.

@@ -277,3 +277,7 @@ Recorded in DESIGN_BOARD.md. The evaluation set went from 1 pass, 4 partial and 
 ## Sprint 2 planned · 2026-11-25
 
 The founder set the sprint 2 goal: "Mellow speaks first well" (the proactive margin note). User input comes from 3 to 5 receiving leads that the founder will line up. The brief is in DESIGN_BOARD.md, and the session plan and script are in research/sprint-2-sessions.md. Build waits for the session findings.
+
+## Sprint 2 proposal reviewed · 2026-11-25
+
+The founder couldn't recruit, so Research created five fictional industry archetypes and ran synthetic sessions, clearly labeled as weak evidence. The Product Designer's system map found that the filled vermilion dot already means three things in production. The team review and board pass (including a retro pass on 1.31 to 1.34) are recorded in DESIGN_BOARD.md. Six recommendations await the founder's decision, including whether synthetic evidence is enough to build.
