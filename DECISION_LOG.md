@@ -298,3 +298,7 @@ The founder reported that the expanded right panel needed a small horizontal nud
 
 The founder approved shipping 1.37.1 without review and set a standing rule: small bugs bypass the full review and go on a punchlist (BACKLOG.md), reviewed together at the next retro. The rule and its limits are in AGENTS.md.
 Released 1.37.1 to production 2026-11-25 (main at e1d2171). Verified live at 1040px with the panel expanded: nothing scrolls sideways, the page doesn't overflow, and the row times sit fully inside the panel.
+
+## Marketing site audited · 2026-11-25
+
+The founder shared `mellow-landing-FINAL.html` for an update. The team audit found four blockers (fabricated testimonials, a fake CSV analysis, readiness scores and verdicts, and invented regulatory claims) and recommended a rebuild in sprint 3. Recorded in DESIGN_BOARD.md and on the canvas page "Marketing site · audit". The founder's original file is unchanged.

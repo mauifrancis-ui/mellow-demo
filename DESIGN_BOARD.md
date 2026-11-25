@@ -419,3 +419,32 @@ Run under MELLOW_EVALS.md Part 2. **Evidence grade: Synthetic.** The users were 
 - The evaluation set passes, 62 of 62.
 
 **The gate is met, pending the founder's acceptance of the Not served list.**
+
+## Marketing site audit · `mellow-landing-FINAL.html` · 2026-11-25
+
+The founder found the marketing page and asked for it to be brought up to the current specs. Before any redesign, the team audited it. The canvas page "Marketing site · audit" has the full-page render and its demo results.
+
+| Role | Finding | Severity |
+| --- | --- | --- |
+| Compliance and Risk | **Fabricated testimonials.** Three quotes with names, real-sounding companies and states, five stars and "Verified pilot". There was no pilot with these people. They can't be published, and any future testimonial needs a real person's consent. | **Blocker** |
+| AI UX Designer/Engineer | **A fake analysis.** "Upload your own CSV" ignores the file and plays a canned run: "Sunrise Wellness · Denver, CO", "Parsing 847 inventory records", and the same three issues for any file. | **Blocker** |
+| Compliance and Risk | **Verdicts and scores.** A readiness score that rises from 74% to 91% as you click "Mark resolved", "Not Ready" turning to "Ready", "Always audit-ready", "Audit packet ready", and "Walk into any inspection confident". This breaks MELLOW_CORE (no readiness values) and founder rule 5 (no compliance verdicts or predictions). | **Blocker** |
+| Compliance and Risk | **Invented regulatory claims.** "This will flag in any routine inspection and can result in a hold", "will trigger a discrepancy on inspection", "recommended cadence is every 3 to 5 days", "why it matters under your state's requirements". State rules aren't loaded. | **Blocker** |
+| Compliance and Risk | **The lead form goes nowhere.** It takes name, email, dispensary and state, then says "You're on the list" and promises contact within 24 hours, alongside privacy promises. No data is sent or handled. | High |
+| Content and Voice, Engineer | **Capability claims the product can't back:** "No formatting required" (it needs `package_id` and `lot_number`), "no integrations required", "always watching" and "monitors continuously", "1-click audit packet export", Metrc transfer status, expiry and waste-log checks, "100% your data stays private", "60s to first readiness score". | High |
+| Design Director | **The retired look:** Evergreen greens, Inter, pill buttons, glass blur and shadows. A pulsing green dot next to the wordmark breaks the mark grammar (the dot means "records disagree"). | High |
+| Product Designer (systems and IA) | **It depicts a product that doesn't exist** (Dashboard, What to Fix, Issue Detail, Audit Trail with a dark green main panel). The real demo (Today, Activity, Learn, Ask Mellow) is never linked. | High |
+| Research and Insights | In journey terms, this page is **Discover, Learn, Try and Buy**. It fakes Try instead of handing off to the real demo, and Try → Buy ends at a form that goes nowhere. It's the "Not served" Discover stage from the v1.37 review, and fixing it closes the Try → Buy handoff. | High |
+| Accessibility | Placeholders used as labels; navigation items are `div`s; "✕" has no accessible name; the modal doesn't move or trap focus; white text at 38 to 50% opacity; blinking dots and animations ignore reduced motion. | Medium |
+| Compliance and Risk | Four embedded photos, licenses unknown. One shows people in a store. | Medium |
+| Engineer | A leftover "Download HTML" button floats over the page. It's a single 913 KB file with duplicated CSS. | Low |
+
+**Team recommendation.** Rebuild it, don't reskin it.
+- **Look and story:** Field Ledger, and an honest story in Mellow's voice: what Mellow compares, what it won't judge, and what you see in two minutes.
+- **Primary CTA:** opens the real demo.
+- **Lead capture:** waits for a real destination and a privacy policy, or becomes a plain "Email us".
+- **Testimonials:** none until there are real, consented ones.
+- **Photos:** only with a known license.
+- **Timing:** fold it into sprint 3 with the Try → Buy work.
+
+**Open question for the founder:** is this page published anywhere? If it is, the blockers should come down now.

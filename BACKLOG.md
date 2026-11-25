@@ -11,6 +11,8 @@ Small bugs bypass the full review (see AGENTS.md). Each one is fixed, checked an
 
 ## Sprint 3 candidates
 
+0. **Rebuild the marketing site** (audit in DESIGN_BOARD.md, 2026-11-25): Field Ledger, honest claims, a real demo handoff, no fabricated testimonials or scores.
+
 From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at sprint planning.
 
 1. Make "Compared" impossible to misread: lead with the evidence ("2 files · row 2 · 9:13").
