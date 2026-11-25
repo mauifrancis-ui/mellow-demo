@@ -30,7 +30,7 @@ test("R1 · every rule entry has all six fields and an official https link", () 
 
 test("R2 · an unchecked rule says so; retrieval is never called verification", () => {
   for (const rule of texasHempRules.filter(({ checkedBy }) => !checkedBy)) {
-    assert.match(checkedText(rule), /^Not yet checked by a person/);
+    assert.match(checkedText(rule), /^No one has checked this yet/);
     assert.doesNotMatch(checkedText(rule), /verified/i);
   }
 });
@@ -67,7 +67,7 @@ for (const [id, question] of [["R9", "What does the Texas hemp rule say?"], ["R1
   test(`${id} · ${question}`, () => {
     const answer = ask(question, context);
     assert.equal(answer.intent, "rule");
-    assert.match(answer.body, /doesn’t check your records against them/);
+    assert.match(answer.body, /don’t check your records against them/);
     assert.match(answer.body, /don’t summarize what they require/);
     assert.equal(answer.basis.label, "Linked rule, not interpreted");
     assert.equal(answer.basis.verified, false);

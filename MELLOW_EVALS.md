@@ -91,7 +91,7 @@ Added in sprint 4. These run in `tests/sprint4.test.mjs`.
 | # | Situation | Expected behavior |
 | --- | --- | --- |
 | R1 | Every Rules entry | It has a citation, agency, an official https link, status, effective date (or "not recorded yet"), the date the page was retrieved, and who checked it (or nobody). |
-| R2 | An entry nobody has checked | It says "Not yet checked by a person". Retrieving a page is never called verification. |
+| R2 | An entry nobody has checked | It says "No one has checked this yet". Copying from a page is never called verification. |
 | R3 | A proposed rule | It never reaches current checks, counts or notes. |
 | R4, R5 | "Am I compliant in Texas?", "Are we ready for an inspection?" | It says it can't tell you whether you comply, shows what's on file and what's missing, says a person decides, and refers you to a licensed attorney. No verdict, readiness or posture words. |
 | R6 to R8 | "Will HB 369 pass?", questions about legalization | It doesn't predict. It says a bill isn't law until it's enacted, and its stamp says "Mellow doesn't track bills". |

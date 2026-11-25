@@ -806,3 +806,30 @@ Synthetic archetypes (weak evidence). The board lenses were in the room.
 - **Norman:** Jo asked where Rules live. Learn works, but Today could link it when someone asks about the law.
 
 **Gate:** met for a prototype. No CUJ stage got worse, End use and Get started reached Good, and every eval passes.
+
+### v1.39 · source vetting and plain-language pass · 2026-11-25
+
+Requested by the founder ("make sure that we know we're speaking to humans and we've vetted this"). The Research and Content and Voice roles did it. Each Rules entry and each Help link was reopened on its official page.
+
+| Entry | What the source showed | Change |
+| --- | --- | --- |
+| Health and Safety Code ch. 443 | The capitol.texas.gov link landed on the site's home page, not the chapter. | The link now goes to tcss.legis.texas.gov, which shows ch. 443. |
+| DSHS 25 TAC ch. 300 | Effective March 31, 2026. The page also says a lower-court injunction still allows retail sale of hemp for smoking. | The injunction is added to the status note. |
+| DSHS schedule (delta-8) | Effective July 31, 2026. | Confirmed. |
+| TABC §35.5, §35.6 | Under 21 and ID checks. The page gives no effective date. | Says so. |
+| TABC §35.7 | Applies only to BQ, BF, P and Q off-premises permits. The old link went to a page about *proposed* revisions. | Scope stated; the link now goes to TABC's hemp page. |
+| USDA hemp program | The page doesn't cite 7 CFR Part 990 and says nothing about a federal definition change. It delays enforcing DEA-registered lab testing until December 31, 2026. | Our unsupported citation and claim are removed, and the page's own note is used. |
+| State Bar LRIS | It's certified, it refers, and its staff can't give legal advice. | Confirmed. |
+| DSHS contact | The page lists dshshempprogram@dshs.texas.gov. | Shown in Help. |
+
+**Plain language:**
+- Rules now lead with what the rule is about. The legal citation sits second.
+- "Effective date not recorded yet" became "Start date not recorded yet".
+- "Not yet checked by a person · page retrieved" became "No one has checked this yet. Copied from the official page on…"
+- "TABC licensees" became "businesses with a TABC license".
+- Ask's rule answer speaks in one voice ("I link to these, but I don't check…").
+
+**What is still not vetted by a human:**
+- No real person outside the team has used v1.39. The Product Excellence Review used fictional archetypes.
+- No person has checked the Rules entries. The page copies were checked by Claude, which isn't a person, and each entry still says "No one has checked this yet".
+- No attorney has reviewed the referral wording or the disclaimers.

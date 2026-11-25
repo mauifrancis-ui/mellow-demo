@@ -302,8 +302,8 @@ function answerFor(input: string, context: AskContext): AskAnswer {
     return {
       intent: "rule",
       title: "Texas hemp rules, linked",
-      body: `${rulesScope} Here’s what each one is and where to read it. I don’t summarize what they require.`,
-      items: rules.map((rule) => ({ label: rule.jurisdiction, title: rule.citation, detail: `${rule.agency} · ${rule.status} · ${effectiveText(rule)}` })),
+      body: "I link to these, but I don’t check your records against them yet, and I don’t summarize what they require. Here’s each one and where to read it.",
+      items: rules.map((rule) => ({ label: rule.jurisdiction, title: rule.title, detail: `${rule.citation} · ${rule.status} · ${effectiveText(rule)}` })),
       actions: [{ label: "Open Texas hemp rules", action: { kind: "rules" } }],
     };
   }

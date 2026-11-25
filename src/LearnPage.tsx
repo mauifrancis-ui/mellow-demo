@@ -61,11 +61,11 @@ export function LearnPage({ issues, query, onQuery, onAsk, onClearDevice }: {
         <p className="rules-scope">{rulesScope}</p>
         {rules.length ? <ul className="rule-list">{rules.map((rule) => <li key={rule.id} className="rule-entry">
           <p className="kicker">{rule.jurisdiction} · {rule.agency}</p>
-          <h3><a href={rule.url} target="_blank" rel="noreferrer">{rule.citation}<span className="sr-only"> (opens in a new tab)</span></a></h3>
-          <p className="rule-what">{rule.title}</p>
+          <h3><a href={rule.url} target="_blank" rel="noreferrer">{rule.title}<span className="sr-only"> (opens in a new tab)</span></a></h3>
+          <p className="rule-what">{rule.citation}</p>
           <dl className="rule-facts">
             <div><dt>Status</dt><dd>{rule.status}</dd></div>
-            <div><dt>Date</dt><dd>{effectiveText(rule)}</dd></div>
+            <div><dt>Since</dt><dd>{effectiveText(rule)}</dd></div>
             <div><dt>Checked</dt><dd>{checkedText(rule)}</dd></div>
           </dl>
           {rule.statusNote && <p className="rule-note">{rule.statusNote}</p>}
@@ -104,7 +104,7 @@ function HelpSection({ onClearDevice }: { onClearDevice: () => void }) {
     <p>For a decision about your business, talk to a licensed attorney. Mellow doesn’t recommend or rank law firms.</p>
     <ul className="help-links">
       <li><a href="https://www.texasbar.com/Content/NavigationMenu/ForThePublic/DoYouNeedaLawyer/LawyerReferralServiceLRIS/default.htm" target="_blank" rel="noreferrer">State Bar of Texas Lawyer Referral &amp; Information Service<span className="sr-only"> (opens in a new tab)</span></a><small>A certified referral service. It refers; it doesn’t give legal advice.</small></li>
-      <li><a href="https://www.dshs.texas.gov/consumable-hemp-program" target="_blank" rel="noreferrer">DSHS Consumable Hemp Program<span className="sr-only"> (opens in a new tab)</span></a><small>Questions about the hemp rules. Its contact is on its page.</small></li>
+      <li><a href="https://www.dshs.texas.gov/consumable-hemp-program" target="_blank" rel="noreferrer">DSHS Consumable Hemp Program<span className="sr-only"> (opens in a new tab)</span></a><small>For questions about the hemp rules. Its page lists dshshempprogram@dshs.texas.gov.</small></li>
     </ul>
     <h3 className="kicker">Your data on this device</h3>
     <p>Everything Mellow keeps is in this browser’s storage on this device. Nothing is sent to a server.</p>
