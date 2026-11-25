@@ -273,3 +273,7 @@ Released to production 2026-11-25 (main at 528655d). Verified live: the violatio
 ## Sprint 1 retro · 2026-11-25
 
 Recorded in DESIGN_BOARD.md. The evaluation set went from 1 pass, 4 partial and 11 fail to every case passing. Comprehension wasn't measured because there have been no user sessions. Six follow-ups were assigned to owners, including a retro board pass on 1.31 to 1.34, which shipped without review.
+
+## Sprint 2 planned · 2026-11-25
+
+The founder set the sprint 2 goal: "Mellow speaks first well" (the proactive margin note). User input comes from 3 to 5 receiving leads that the founder will line up. The brief is in DESIGN_BOARD.md, and the session plan and script are in research/sprint-2-sessions.md. Build waits for the session findings.

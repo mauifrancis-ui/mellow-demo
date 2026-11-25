@@ -256,3 +256,43 @@ The Product Lead was accountable; Research and AI UX were responsible; all other
 ### What sprint 2 should measure
 
 Whether people understand what Mellow compared (the stamp) and whether a proactive note helps or interrupts. Both need users or an agreed proxy.
+
+## Sprint 2 brief · "Mellow speaks first well" · 2026-11-25
+
+**Step 0, sprint planning.** The founder set the goal; the Product Lead wrote the brief.
+
+**Founder goal.** Mellow speaks first only when the situation calls for it, with a deterministic fact the person needs now, in a way that helps and never interrupts. (Founder rule 4, and board recommendation 4.)
+
+**Problem.** Today Mellow speaks first in one place, the Today briefing, which runs once at the top. New differences, a delayed check, or a handoff coming due during a shift go unsaid unless the person asks. A noisy or vague signal would be worse than silence.
+
+**Journey.**
+
+| Stage | Mindset | Outcome this sprint should move |
+| --- | --- | --- |
+| Use | "Help me get through my shift." | A new finding reaches the person at the record or row where they'll act on it. |
+| Get started | "Get me to first value." | The first session's briefing and notes point to the first record to fix. |
+| Get help *(spans all)* | "I'm stuck." | Every note says why it appeared and can be dismissed, so a note never becomes a blocker. |
+
+**Hypothesis.** A one-line MELLOW margin note on the record or row, saying the trigger and when ("New in the 9:13 check"), helps leads act sooner without feeling interrupted.
+
+**Success measures.**
+- The P1 to P3 evaluation cases are automated and pass.
+- No note fires without a deterministic trigger (checked by test).
+- In sessions, at least 4 of 5 leads can say what a note means and why it appeared without help. At most 1 of 5 calls it interrupting.
+
+**Scope and order.**
+
+| # | Work | Owner | Gate |
+| --- | --- | --- | --- |
+| 1 | System map: objects, states, surfaces, where Mellow speaks, and journey stages | Product Designer | Feeds the proposal |
+| 2 | Session plan and script for 3 to 5 receiving leads | Research | The founder recruits |
+| 3 | Proposal: the margin-note proactive pattern, with its triggers, placement, copy, dismiss and "why am I seeing this" | Product Designer, AI UX, Content | Step 1 review, then step 2 board |
+| 4 | Evaluation cases P1 to P3, plus the evidence-question case | AI UX | Before build |
+| 5 | Sessions on a clickable prototype of #3 | Research, with the founder | Before build |
+| 6 | Build, implementation review and preview review | Engineer, with all roles | Founder release decision |
+
+**Folded in from the retro.** The evidence-question over-match fix (#4). The retro board pass on 1.31 to 1.34 runs with this sprint's board pass.
+
+**Out of scope.** Live AI, the handoff (direction C), and Buy, Expand and End use.
+
+**Dependencies.** The founder lines up 3 to 5 receiving leads. Build waits for the session findings.
