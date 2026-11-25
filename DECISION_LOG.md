@@ -363,3 +363,13 @@ Built as approved (DESIGN_BOARD.md, sprint 4):
   - Review records name their reviewers.
 
 Rules entries were written from official pages retrieved 2026-11-25. Nobody has checked them, and each says so. 92 tests pass. Awaiting the founder's release decision.
+
+## v1.39 released · 2026-11-25
+
+The founder approved the release (Step 6): "Let's deploy the best most up to date experience from discovery to end of life."
+- **Marketing site brought up to date with v1.39.** Content and Voice checked each new claim against the product:
+  - the Does list adds the trail export, Texas hemp rules as references, remembered columns and clearing the device;
+  - the Doesn't list now says rules are linked, not checked, and adds "predict what lawmakers will do";
+  - the phone section says Today opens on your next package;
+  - all three screenshots were retaken from v1.39, with matching alt text.
+- **Still not vetted by people:** real users, a named checker for the rules, and attorney review of the referral and disclaimers.
