@@ -165,3 +165,6 @@ export const sampleChecks = [
     { packageId: "PKG-613", inventory: "SAMPLE-3", receiving: null },
   ],
 ] as const;
+
+/** Reasons a person can give when a note wasn’t useful. Logged on this device with the note (sprint 4). */
+export const notUsefulReasons = ["I already knew", "Wrong package or time", "Too many notes", "Something else"] as const;

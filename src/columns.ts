@@ -70,3 +70,22 @@ export function previewRows(csv: string, columns: { package: string | null; lot:
     lot: columns.lot ? row[columns.lot] || "(blank)" : "?",
   }));
 }
+
+// Remembered columns (sprint 4, Get started). A choice is reused only for a file with exactly
+// the same headers, and Mellow says so. The preview still shows before anything is compared.
+export type SavedColumns = { signature: string; package: string; lot: string };
+
+export function headerSignature(headers: string[]) {
+  return [...headers].map(normal).sort().join("|");
+}
+
+export function rememberedChoice(headers: string[], saved: SavedColumns[]) {
+  const signature = headerSignature(headers);
+  const match = saved.find((entry) => entry.signature === signature);
+  return match && headers.includes(match.package) && headers.includes(match.lot) ? { package: match.package, lot: match.lot } : undefined;
+}
+
+export function rememberColumns(saved: SavedColumns[], headers: string[], choice: { package: string; lot: string }, keep = 10): SavedColumns[] {
+  const signature = headerSignature(headers);
+  return [...saved.filter((entry) => entry.signature !== signature), { signature, ...choice }].slice(-keep);
+}

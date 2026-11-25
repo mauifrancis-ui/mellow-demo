@@ -100,6 +100,7 @@ Record all of it in [DESIGN_BOARD.md](DESIGN_BOARD.md) and [DECISION_LOG.md](DEC
 
 1. No step is skipped without the founder saying so. "Build it" means build what was approved, not skip the review.
 2. Compliance and Risk can block. Only the founder can overrule a block, in writing.
+3. Every review record names who reviewed it. "Every role" is written only when the table shows every role (sprint 3 retro).
 3. Every review names who found what. Nothing is "the team thinks" without a role attached.
 4. Disagreements are recorded, not smoothed over. The Director presents both sides to the founder.
 5. Every Mellow behavior bug becomes a permanent case in the evaluation set before it is fixed.

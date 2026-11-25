@@ -30,10 +30,11 @@ function dayLabel(iso: string) {
   return date.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" });
 }
 
-export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare }: {
+export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare, onExport }: {
   onShare?: () => void;
+  onExport?: () => void;
   history: Entry[];
-  notes?: { id: string; text: string; trigger: string; at: string; dismissedAt?: string }[];
+  notes?: { id: string; text: string; trigger: string; at: string; dismissedAt?: string; feedback?: string }[];
   latest: Map<string, Decision>;
   handoff: { task: Task; summary: string; text: string }[];
   open: number;
@@ -123,12 +124,17 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
         <p>A one-page summary of what was compared and what differed. No verdicts.</p>
         <button type="button" className="ledger-button" data-variant="line" onClick={onShare}>Share these findings</button>
       </section>}
+      {onExport && <section className="share-block">
+        <p className="kicker">Keep a record</p>
+        <p>Every decision with its evidence, and what Mellow said first. CSV or print.</p>
+        <button type="button" className="ledger-button" data-variant="line" onClick={onExport}>Export decision trail</button>
+      </section>}
       {notes.length > 0 && <section className="mellow-events" aria-labelledby="notes-title">
         <h2 id="notes-title" className="kicker">Mellow notes today · {notes.length}</h2>
         <p className="mellow-events-help">What Mellow said first, and what was dismissed. These are not decisions.</p>
         <ul>{notes.map((note) => <li key={note.id}>
           <time dateTime={note.at}>{new Date(note.at).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</time>
-          <span><span className="mellow-voice">{note.text}</span><small>{note.trigger}{note.dismissedAt ? ` · Dismissed ${new Date(note.dismissedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : " · Shown"}</small></span>
+          <span><span className="mellow-voice">{note.text}</span><small>{note.trigger}{note.feedback ? ` · Not useful: ${note.feedback}` : note.dismissedAt ? ` · Dismissed ${new Date(note.dismissedAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : " · Shown"}</small></span>
         </li>)}</ul>
       </section>}
       <section aria-labelledby="numbers-title">

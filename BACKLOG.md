@@ -34,6 +34,12 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
 - Sprint 5: inspection prep for Texas current law: checked controls, evidence on file, the binder.
 - Sprint 6: "What if" for the 2027 session bills, plus Expand.
 
+## From the v1.39 review
+
+- The trail says who decided once accounts exist. Until then, it says it can't (sprint 5).
+- The sprint 5 binder opens from the trail.
+- Rules entries need a named person to check them before real use.
+
 ## Open items
 
 - Real sessions with 3 to 5 receiving leads (Research). "Compared" comprehension comes first.

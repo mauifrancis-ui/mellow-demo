@@ -1,5 +1,6 @@
 import type { LotCheck } from "./comparison.ts";
 import type { Run } from "./monitoring.ts";
+import { checkedText, currentRules, effectiveText, rulesScope } from "./rules-tx.ts";
 
 // Ask Mellow, local edition. Matches everyday receiving language against the
 // sample workspace. No model is called: live AI stays off until approved.
@@ -8,6 +9,7 @@ export type Series = "matched" | "different" | "missing";
 export type AskAction =
   | { kind: "open"; id: string }
   | { kind: "tab"; tab: "Activity" | "Learn" }
+  | { kind: "rules" }
   | { kind: "compare" }
   | { kind: "series"; series: Series }
   | { kind: "delay" }
@@ -35,7 +37,7 @@ export type AskContext = {
 
 export type AskAnswer = {
   intent: "package" | "unknown-package" | "next" | "list" | "label" | "gaps" | "differences" | "matched" | "compare"
-    | "handoff" | "source" | "summary" | "learn" | "judgment" | "decision" | "self" | "capabilities" | "explain" | "order" | "fallback";
+    | "handoff" | "source" | "summary" | "learn" | "rule" | "bill" | "compliance" | "judgment" | "decision" | "self" | "capabilities" | "explain" | "order" | "fallback";
   title: string;
   body: string;
   items?: { label: string; detail: string; id?: string; title?: string; kind?: Issue["kind"] }[];
@@ -182,7 +184,17 @@ export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefin
   }
   if (answer.intent === "label" || answer.intent === "learn") {
     return { verified: false, label: "General guidance",
-      sources: ["Written guidance, not read from your records", "State rules aren’t loaded, so confirm with your regulator’s current materials"] };
+      sources: ["Written guidance, not read from your records", "Texas hemp rules are linked in Learn for reference. Mellow doesn’t check your records against them"] };
+  }
+  if (answer.intent === "rule") {
+    return { verified: false, label: "Linked rule, not interpreted",
+      sources: [...currentRules().map((rule) => `${rule.citation} · ${checkedText(rule)}`), rulesScope] };
+  }
+  if (answer.intent === "bill") {
+    return { verified: false, label: "Mellow doesn’t track bills", sources: ["Mellow doesn’t track bills or predict outcomes", "Bills aren’t law until enacted"] };
+  }
+  if (answer.intent === "compliance") {
+    return { verified: true, label: "Open records and decisions on this device", sources: ["Open records in To check", "Decisions saved on this device", rulesScope] };
   }
   if (!fromRecords.has(answer.intent)) return undefined;
   const inSet = (id: string) => sets.some(({ packageIds }) => packageIds.includes(id));
@@ -225,7 +237,7 @@ function answerFor(input: string, context: AskContext): AskAnswer {
         { label: "Can", title: "Find today’s gaps and differences", detail: "and put them in order" },
         { label: "Can", title: "Compare new files", detail: "before anything goes into To check" },
         { label: "Can’t", title: "Make decisions", detail: "only a person approves or dismisses a record" },
-        { label: "Can’t", title: "Judge the law or predict an audit", detail: "state rules aren’t loaded" },
+        { label: "Can’t", title: "Judge the law or predict an audit", detail: "I link Texas hemp rules, but I don’t check your records against them" },
         { label: "Can’t", title: "Read attachments or photos", detail: "add them as evidence for a person to review" },
       ],
       actions: [],
@@ -257,6 +269,45 @@ function answerFor(input: string, context: AskContext): AskAnswer {
     };
   }
 
+  // Bills, current rules and "am I compliant" come before the general judgment answer (MELLOW_EVALS.md, case R).
+  if (has(text, /\b(bills?|h\.?b\.? ?\d+|s\.?b\.? ?\d+|legislat\w*|lawmakers?|session|legaliz\w*|adult[- ]use|recreational)\b/)
+    || has(text, /\bwill (it|marijuana|cannabis|weed|thc|hemp) (be|become) (legal|law)\b/)) {
+    return {
+      intent: "bill",
+      title: "I don’t predict what lawmakers will do",
+      body: "A bill isn’t law until it’s enacted, and I don’t track bills or guess whether they’ll pass. The Texas Legislature’s site has each bill’s text and status. I can show the rules in effect now, as references.",
+      actions: [{ label: "Open Texas hemp rules", action: { kind: "rules" } }],
+    };
+  }
+
+  if (has(text, /\b(am i|are we|is (this|my|our) (store|shop|business|location))\b.*\b(complian\w*|legal|ready|good to go|ok(ay)?)\b/)) {
+    const decided = context.manager.length;
+    return {
+      intent: "compliance",
+      title: "I can’t tell you whether you comply",
+      body: [
+        "That’s a decision for a person who knows your license and the rules. Here’s what’s on file and what’s missing on this device.",
+        `${plural(context.queue.length, "record")} still open${decided ? `, and ${decided} waiting on a manager` : ""}.`,
+        "For a decision about your business, talk to a licensed attorney.",
+      ].join(" "),
+      items: orderQueue(context.queue, context.comparison).map(({ task, issue }) => ({ label: task.record, id: task.id, kind: issue.kind, title: issue.label, detail: compact(task, context.comparison) })),
+      actions: [{ label: "Open Texas hemp rules", action: { kind: "rules" } }, { label: "Get help", action: { kind: "tab", tab: "Learn" } }],
+    };
+  }
+
+  if (has(text, /\b(rules?|regulations?|statutes?|chapter|tac|health and safety code|law)\b/)
+    && has(text, /\b(what (does|do|is|are)|what's in|show|list|which|where (is|are|can i find)|link|read|texas|hemp|dshs|tabc|usda)\b/)
+    && !has(text, /\b(violat\w*|complian\w*|allowed|permitted|legal|illegal|fines?|penalt\w*|can (i|we))\b/)) {
+    const rules = currentRules();
+    return {
+      intent: "rule",
+      title: "Texas hemp rules, linked",
+      body: `${rulesScope} Here’s what each one is and where to read it. I don’t summarize what they require.`,
+      items: rules.map((rule) => ({ label: rule.jurisdiction, title: rule.citation, detail: `${rule.agency} · ${rule.status} · ${effectiveText(rule)}` })),
+      actions: [{ label: "Open Texas hemp rules", action: { kind: "rules" } }],
+    };
+  }
+
   if (has(text, /\b(violat\w*|complian\w*|non-?complian\w*|legal(ly)?|illegal|lawful|allowed|permitted|penalt\w*|fines?|fined|regulat\w*|laws?|rules?|required|requirements?|audits?|inspections?|inspector|citations?|ok(ay)? to (sell|ship|release|move|use)|safe to (sell|ship|release|move|use)|can (i|we) (sell|ship|release))\b/)) {
     const row = id ? context.comparison.find(({ packageId: rowId }) => rowId === id) : undefined;
     const queued = id ? [...context.queue, ...context.manager].find((task) => task.id === id) : undefined;
@@ -273,7 +324,7 @@ function answerFor(input: string, context: AskContext): AskAnswer {
       intent: "judgment",
       title: audit ? "I can’t predict an audit" : id ? `I can’t tell you whether ${id} is allowed` : "I can’t tell you whether that’s allowed",
       body: [
-        "I compare records. I don’t judge them against the law, and state rules aren’t loaded.",
+        "I compare records. I don’t judge them against the law. Texas hemp rules are linked for reference, not checked.",
         row ? `What the records show: ${describe(row)}` : "",
         audit ? `What I can say: ${plural(context.queue.length, "record")} ${context.queue.length === 1 ? "is" : "are"} open right now.` : "",
         "Confirm requirements with your regulator’s current materials or a manager.",
@@ -440,7 +491,7 @@ function answerFor(input: string, context: AskContext): AskAnswer {
     return {
       intent: "learn",
       title: "Here’s the short version",
-      body: "A lot or batch number traces a product to the group it came from. I compare the lot in inventory with the lot in receiving. State rules aren’t loaded yet, so confirm requirements with your regulator’s current materials.",
+      body: "A lot or batch number traces a product to the group it came from. I compare the lot in inventory with the lot in receiving. Texas hemp rules are linked in Learn for reference. Confirm requirements with the agency’s current materials.",
       actions: [{ label: "Open the field guide", action: { kind: "tab", tab: "Learn" } }],
     };
   }
@@ -472,6 +523,9 @@ export function followUps(answer: AskAnswer, context: AskContext): string[] {
     source: ["What needs me right now?"],
     summary: ["Show me today’s gaps", "What matched?"],
     learn: ["What counts as a gap?", ...all],
+    rule: ["What can you do?", "What needs me right now?"],
+    bill: ["Show me the Texas hemp rules", "What can you do?"],
+    compliance: [...all, "Show me the Texas hemp rules"],
     judgment: ["What do I check on the label?", "What needs me right now?"],
     decision: ["What needs me right now?", "What do I check on the label?"],
     self: ["What can you do?", "What needs me right now?"],

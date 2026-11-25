@@ -347,3 +347,19 @@ The order for sprints 4 to 6 is approved with the board's changes. Hemp is the f
 ## v1.38 released · 2026-11-25
 
 The founder approved the release (Step 6). main was fast-forwarded to 1ea7e6c. Checked on production: the sample bar, the app and /welcome/ all load.
+
+## v1.39 built · sprint 4 · 2026-11-25
+
+Built as approved (DESIGN_BOARD.md, sprint 4):
+- **Get started:** workspace name and setup checklist; remembered columns.
+- **Use:** evidence-first stamp; phone "Your next package".
+- **Get help:** "Not useful" with a reason; Help with Mellow's limits and the attorney referral.
+- **End use:** decision trail export; "Clear this device's data".
+- **Learn:** Texas hemp rules references.
+- **Ask:** new rule, bill and compliance answers.
+- **Retro follow-ups:**
+  - The single-file import limit drops from 2 MB to 500 KB to match the site and the compare path. This changes behavior; it's recorded here and pinned by a test.
+  - The dialog check is added to the release checklist.
+  - Review records name their reviewers.
+
+Rules entries were written from official pages retrieved 2026-11-25. Nobody has checked them, and each says so. 92 tests pass. Awaiting the founder's release decision.

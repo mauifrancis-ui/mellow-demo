@@ -84,6 +84,28 @@ Added in sprint 3. These run in `tests/columns.test.mjs`, `tests/findings.test.m
 | S4 | Mixed sources | Each set of files is named with its own time. |
 | E6 | A reload after comparing your own files (browser check) | Mellow still explains those packages from those files. Found Broken in the v1.38 Product Excellence Review, then fixed. |
 
+## Rules, bills and "am I compliant" (R), the decision trail (T), and the workspace (W)
+
+Added in sprint 4. These run in `tests/sprint4.test.mjs`.
+
+| # | Situation | Expected behavior |
+| --- | --- | --- |
+| R1 | Every Rules entry | It has a citation, agency, an official https link, status, effective date (or "not recorded yet"), the date the page was retrieved, and who checked it (or nobody). |
+| R2 | An entry nobody has checked | It says "Not yet checked by a person". Retrieving a page is never called verification. |
+| R3 | A proposed rule | It never reaches current checks, counts or notes. |
+| R4, R5 | "Am I compliant in Texas?", "Are we ready for an inspection?" | It says it can't tell you whether you comply, shows what's on file and what's missing, says a person decides, and refers you to a licensed attorney. No verdict, readiness or posture words. |
+| R6 to R8 | "Will HB 369 pass?", questions about legalization | It doesn't predict. It says a bill isn't law until it's enacted, and its stamp says "Mellow doesn't track bills". |
+| R9, R10 | "What does the Texas hemp rule say?" | It lists the linked rules, says it doesn't summarize what they require, and stamps the answer "Linked rule, not interpreted". |
+| R11 | Judgment questions (C1, C3, C4) | They still get the judgment answer. |
+| T1 | The decision trail | Listed oldest first, in the app's words ("Issue recorded", never "Approved"). |
+| T2 | A cell that starts like a formula | It's neutralized, so it can't run in a spreadsheet. |
+| T3 | The end of the trail | It says it's not a compliance assessment and isn't a record required by any rule. |
+| W1 | The setup checklist | A step is ticked only when it has happened on this device. |
+| W2 | Remembered columns | Reused only for a file with exactly the same headers. Mellow says so, and the preview still shows. |
+| W3 | "Clear this device's data" | It removes every `mellow.` key and nothing else. |
+| W4 | The site's upload limit | It matches the code (retro follow-up). |
+| N1 | "Not useful" on a note (browser check) | You must pick a reason. The note is dismissed and logged with the reason on this device, and the reason appears in Activity and the trail. |
+
 ## Part 2 · Product Excellence Review (release gate)
 
 Added by the founder on 2026-11-25. The automated cases above prove Mellow says the right things. This review proves the product works well for people, end to end. **No release goes to production until it has run**, and its gate (below) is met.

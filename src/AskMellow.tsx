@@ -30,12 +30,13 @@ export function Briefing({ brief, lastCheck, delayed, aside, note }: {
 type Attachment = { name: string; size: number };
 
 function BasisStamp({ basis }: { basis: Basis }) {
+  // Evidence first (sprint 4): what was looked at leads; the verb follows with the time.
   const word = basis.verified ? "Compared" : "Not from your records";
-  const time = basis.at ? ` · ${basis.atKind === "compared" ? "compared" : "check"} at ${clock(basis.at)}` : "";
+  const time = basis.at ? ` · ${basis.atKind === "compared" ? "compared" : "from the check at"} ${clock(basis.at)}` : "";
   return <details className="basis" data-verified={basis.verified || undefined}
     onKeyDown={(event) => { if (event.key === "Escape") (event.currentTarget as HTMLDetailsElement).open = false; }}>
-    <summary aria-label={`${word}: ${basis.label}${time}. Show what Mellow looked at.`}>
-      <span className="basis-word">{word}</span><span>{basis.label}{time}</span>
+    <summary aria-label={basis.verified ? `${basis.label}${time}. Show what Mellow compared.` : `${word}: ${basis.label}. Show what this is based on.`}>
+      {basis.verified ? <span>{basis.label}{time}</span> : <><span className="basis-word">{word}</span><span>{basis.label}</span></>}
     </summary>
     <div className="basis-sources">
       <p className="kicker">{basis.verified ? "What I compared" : "What this is based on"}</p>

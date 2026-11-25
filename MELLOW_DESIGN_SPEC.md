@@ -424,3 +424,14 @@ Brand direction under review on the design canvas, page "Ask Mellow · AI brand"
 - **Bring your files:** templates in the compare dialog; "Next: match columns" shows each file's package ID and lot selects, filled in by known names. Mellow asks in the margin when it can't tell, and previews the first rows as it will read them. "Compare 2 files" stays disabled in effect until all four columns are chosen. The body scrolls while the buttons stay in view.
 - **Your files in Mellow:** rows from your comparisons are saved on the device with the queue they create. Answers about those packages name your files and say "compared at".
 - **Share these findings:** from Activity and from the queue. A centred dialog holding a one-page sheet: what was compared (each set of files with its time), the packages that need a person (disagreements first), decisions so far in the app's own words, and "Not a compliance assessment" under the title and at the foot. Close, "Copy as text", "Print or save as PDF" (the print stylesheet prints the sheet alone).
+
+## Version 1.39 Trust on the floor, Texas groundwork, a clean way out
+
+- **Rules are references.** Learn lists Texas hemp rules with official links, citation, agency, status, effective date, retrieval date and who checked them. "Mellow links to these. It doesn't check your records against them yet." Statuses are words, never a dot or ring. "In litigation" is a word.
+- **Status vocabulary for later checks:** On file, Missing, Can't check from these files. Never met, compliant, ready, readiness or posture.
+- **Bills** get no prediction. "Proposed, not law" is reserved and can never feed a check, a count or a note.
+- **Help** lists what Mellow can't do and refers decisions to a licensed attorney: the State Bar of Texas LRIS and the DSHS hemp program contact. No firm is named or ranked.
+- **The stamp leads with the evidence:** "2 files · PKG-443 · compared 9:13". Answers not from your records still lead with "Not from your records".
+- **The decision trail** shares the findings sheet: CSV with formula-safe cells, and print. It's titled "Mellow decision trail", never "for an inspector".
+- **Clear this device's data** takes two steps, says what's stored, and moves focus to the confirm button.
+- **On a phone,** Today opens with "Your next package".

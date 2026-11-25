@@ -767,3 +767,42 @@ Reviewed by Compliance and Risk, Research, Product Lead, Product Designer, Conte
 ### Sprint 4 · founder decision (Step 3) · 2026-11-25
 
 The founder approved the revised sprint 4. He didn't answer the question about naming a checker, so every Rules entry defaults to **"Not yet checked by a person"** plus the date the official page was retrieved. Retrieval is not verification.
+
+### Sprint 4 · implementation and preview review · v1.39 (Steps 4 and 5)
+
+Reviewed by the Engineer, Accessibility, Compliance and Risk, Content and Voice, AI UX and the Product Designer. Lint, type check, build and 92 tests pass. Browser walkthroughs ran at 1440px and 390px with a keyboard and with reduced motion. There were no console errors and no sideways scroll.
+
+| Role | Finding | Status |
+| --- | --- | --- |
+| Engineer | The single-file import still allowed 2 MB while the site says 500 KB. Both paths now use one constant, pinned to the site by a test (W4). | Closed |
+| Content and Voice | The bill stamp read "Not from your records · Not from your records". It now reads "Mellow doesn't track bills". The compliance stamp had a stray "· compared". | Closed |
+| Compliance and Risk | The trail reused the findings line "a comparison of two files", which isn't what a trail is. It now has its own disclaimer, and test T3 checks for that. | Closed |
+| Accessibility | The trail table set decisions in mono on a phone, and the sheet header crowded the wordmark. Fixed for both the trail and the findings sheet. "Clear data" moves focus to confirm, and Cancel returns focus. All rule links are reachable by keyboard. | Closed |
+| Accessibility | "Not useful" uses native radios. The button stays disabled until a reason is chosen. | Closed |
+| Product Designer | The old Learn references showed a ring next to "Not yet verified", which misused the gap mark. Rules now use words only. | Closed |
+| AI UX | Routing order is honesty, then bills, compliance, rules, then judgment. C1 to C5 are unchanged (R11). | Closed |
+| Research | Remembered columns can only be told apart from a fresh guess on the second import with the same headers. That's working as designed; Mellow says when it's reusing columns. | Info |
+| Compliance and Risk | No Rules entry has been checked by a person. Each says so, which is acceptable for the prototype. A named reviewer is still needed before a real business relies on them (sprint 5 blocking condition). | Open · founder |
+
+### Product Excellence Review · v1.39 · synthetic
+
+Synthetic archetypes (weak evidence). The board lenses were in the room.
+
+| Stage | v1.38 | v1.39 | Evidence |
+| --- | --- | --- | --- |
+| Discover | Good | Good | Unchanged |
+| Learn | Good | **Good+** | Rules with status and dates. Priya: "Last checked is the first thing I'd look for." |
+| Try | Good | Good | Unchanged |
+| Buy | Good for a prototype | Good for a prototype | Unchanged; there's still no price, by founder decision |
+| Get started | Friction | **Good** | A name, a checklist ticked by real events, and remembered columns. Luis: the second import needed no column choices. |
+| Use | Friction | **Good** | The stamp leads with files, package and time. Dana's phone opens on PKG-443 first. |
+| Get help | Good | **Good+** | "Not useful" with a reason; Help lists the limits and the attorney referral |
+| Expand | Not served | Not served | Moved to sprint 6, accepted by the founder |
+| End use | Not served | **Good** | A decision trail as CSV and print; clearing the device in two steps, with what's stored listed |
+
+**Provocations:**
+- **Morris:** should the trail record *who* decided? There are no accounts, so it can't yet. Say so on the trail in sprint 5.
+- **Zhuo:** the binder in sprint 5 should open from the trail, not a new door.
+- **Norman:** Jo asked where Rules live. Learn works, but Today could link it when someone asks about the law.
+
+**Gate:** met for a prototype. No CUJ stage got worse, End use and Get started reached Good, and every eval passes.

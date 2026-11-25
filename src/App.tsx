@@ -8,6 +8,10 @@ import { LearnPage } from "./LearnPage";
 import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextPanel";
 import { NoteLine } from "./NoteLine";
 import { FindingsDialog } from "./FindingsDialog";
+import { TrailDialog } from "./TrailDialog";
+import { maxUploadBytes, maxUploadText } from "./limits";
+import { clearDevice } from "./device";
+import { defaultName, readSetup, setupKey, setupSteps, type Setup } from "./setup";
 import { notesFor, noteTrail, sampleChecks, type NewIssue, type Note, type SourceEvent } from "./notes";
 import { panelFor, queueView, sameView, type PanelView } from "./panel";
 import { addTurn, ask, type FileSet, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
@@ -46,7 +50,7 @@ function readImported(): Imported {
   } catch { return { rows: [], sets: [] }; }
 }
 
-type NoteEvent = { id: string; text: string; trigger: string; at: string; dismissedAt?: string };
+type NoteEvent = { id: string; text: string; trigger: string; at: string; dismissedAt?: string; feedback?: string };
 function readDismissed(): NoteEvent[] {
   try { return JSON.parse(localStorage.getItem(dismissedKey) ?? "[]") as NoteEvent[]; } catch { return []; }
 }
@@ -166,6 +170,9 @@ export default function App() {
   const importedRows = imported.rows;
   const fileSets = imported.sets;
   const [sharing, setSharing] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [setup, setSetup] = useState<Setup>(() => { try { return readSetup(localStorage); } catch { return { name: defaultName, shared: false }; } });
+  const workspaceName = setup.name;
   const [confirmReset, setConfirmReset] = useState(false);
   const [newIssues, setNewIssues] = useState<NewIssue[]>([]);
   const [opened, setOpened] = useState<string[]>([]);
@@ -203,6 +210,13 @@ export default function App() {
     waiting: handoff.map(({ task }) => ({ taskId: task.id, record: task.record,
       since: [...workspace.history].reverse().find((entry) => entry.task.id === task.id && entry.decision === "Manager review requested")?.at ?? new Date().toISOString() })) });
   const briefing = brief(askContext);
+  const ownIds = new Set(fileSets.flatMap(({ packageIds }) => packageIds));
+  const steps = setupSteps({ name: setup.name, comparedSets: fileSets.length, shared: setup.shared,
+    ownDecisions: workspace.history.filter((entry) => !entry.task.sample && ownIds.has(entry.task.record)).length });
+  const stepsDone = steps.filter(({ done }) => done).length;
+  const noteLog = [...trail.map(({ id, text, trigger, at }) => dismissedLog.find((event) => event.id === id) ?? { id, text, trigger, at }),
+    ...dismissedLog.filter((event) => !trail.some(({ id }) => id === event.id)
+      && new Date(event.dismissedAt ?? event.at).toDateString() === new Date().toDateString())];
   const doneToday = [...latest.entries()].filter(([, decision]) => decision === "Approved" || decision === "Dismissed")
     .map(([id, decision]) => ({ id, decision, entry: workspace.history.find((item) => item.task.id === id && item.decision === decision) }))
     .filter(({ entry }) => entry && new Date(entry.at).toDateString() === new Date().toDateString());
@@ -277,7 +291,7 @@ export default function App() {
   }
 
   async function importCsv(file: File) {
-    if (file.size > 2_000_000) throw new Error("Choose a CSV of 2 MB or less.");
+    if (file.size > maxUploadBytes) throw new Error(`Choose a CSV of ${maxUploadText} or less.`);
     const rows = parseCsv(await file.text());
     const batchId = crypto.randomUUID();
     const tasks = rows.flatMap((row, index): Task[] => {
@@ -407,8 +421,21 @@ export default function App() {
     smooth(() => setPanelCollapsed(next), "panel");
   }
 
-  function dismissNote(note: Note) {
-    const event: NoteEvent = { id: note.id, text: note.text, trigger: note.trigger, at: note.at, dismissedAt: new Date().toISOString() };
+  function updateSetup(change: Partial<Setup>) {
+    setSetup((current) => {
+      const next = { ...current, ...change };
+      try { localStorage.setItem(setupKey, JSON.stringify(next)); } catch { /* Kept for this visit. */ }
+      return next;
+    });
+  }
+
+  function markNotUseful(note: Note, reason: string) {
+    dismissNote(note, reason);
+    setStatus("Marked not useful. Saved on this device. Nothing was sent.");
+  }
+
+  function dismissNote(note: Note, feedback?: string) {
+    const event: NoteEvent = { id: note.id, text: note.text, trigger: note.trigger, at: note.at, dismissedAt: new Date().toISOString(), ...(feedback ? { feedback } : {}) };
     setDismissedLog((current) => {
       const next = [...current.filter(({ id }) => id !== note.id), event];
       try { localStorage.setItem(dismissedKey, JSON.stringify(next)); } catch { /* Keep it for this visit. */ }
@@ -458,7 +485,7 @@ export default function App() {
         {fresh.includes(task.id) && <span className="queue-new">New</span>}
         <span className="queue-time">{time}</span>
       </button>
-      {notes.rows.get(task.id) && <NoteLine note={notes.rows.get(task.id)!} onDismiss={dismissNote} compact />}
+      {notes.rows.get(task.id) && <NoteLine note={notes.rows.get(task.id)!} onDismiss={dismissNote} onNotUseful={markNotUseful} compact />}
     </li>;
   }
 
@@ -485,6 +512,14 @@ export default function App() {
       const task = [...queue, ...manager].find((item) => item.id === action.id);
       if (task) openTask(task);
     } else if (action.kind === "tab") goTo(action.tab);
+    else if (action.kind === "rules") {
+      goTo("Learn");
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const node = document.getElementById("rules-title");
+        node?.scrollIntoView({ block: "start" });
+        (node as HTMLElement | null)?.focus({ preventScroll: true });
+      }));
+    }
     else if (action.kind === "compare") {
       if (tab !== "Today") goTo("Today");
       requestAnimationFrame(() => setCompareRequest((count) => count + 1));
@@ -529,7 +564,7 @@ export default function App() {
           {pill && <span className="nav-pill" aria-hidden="true" style={{ width: pill.width, transform: `translate(${pill.x}px, ${pill.y + pill.height - 2}px)` }} />}
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => goTo(item)}>{item}</button>)}
         </nav>
-        <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · Sample workspace</p>
+        <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · {workspaceName}</p>
         <button ref={askButton} type="button" className="ask-trigger" onClick={openAsk} aria-keyshortcuts="/"
           aria-expanded={tab === "Today" ? undefined : askOpen} aria-controls={tab === "Today" ? "ask-input" : "ask-drawer"}
           data-open={tab !== "Today" && askOpen ? "" : undefined} title="Ask Mellow (/)">
@@ -546,6 +581,11 @@ export default function App() {
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="ledger">
           <div className="ledger-main">
+            {active && <a className="phone-next" href="#task-title" onClick={(event) => { event.preventDefault(); openTask(active); }}>
+              <span className="kicker">Your next package</span>
+              <span className="phone-next-id">{active.record}</span>
+              <span className="phone-next-issue">{activeIssue?.label}</span>
+            </a>}
             <section className="sample-bar" aria-label="Sample workspace controls">
               <p className="kicker">Sample workspace</p>
               <p className="sample-bar-text">Fictional records. Try what a shift feels like:</p>
@@ -561,9 +601,23 @@ export default function App() {
                     <button type="button" className="text-link" onClick={() => setConfirmReset(false)}>Cancel</button>
                   </p>
                 : <button type="button" className="text-link sample-bar-reset" onClick={() => setConfirmReset(true)}>Reset sample</button>}
+              <details className="setup">
+                <summary>Set up your workspace · {stepsDone} of {steps.length} done</summary>
+                <div className="setup-body">
+                  <label className="setup-name">Workspace name
+                    <input defaultValue={setup.name === defaultName ? "" : setup.name} placeholder="For example, Riverside store" maxLength={60}
+                      onBlur={(event) => updateSetup({ name: event.target.value.trim() || defaultName })}
+                      onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); }} />
+                  </label>
+                  <ol className="setup-steps">{steps.map((step) => <li key={step.id} data-done={step.done || undefined}>
+                    <span className="setup-state">{step.done ? "Done" : "To do"}</span><span>{step.label}</span>
+                  </li>)}</ol>
+                  <p className="setup-help">Mellow ticks a step only when it has happened on this device. Columns you choose are remembered for files with the same headers.</p>
+                </div>
+              </details>
             </section>
             <Briefing brief={briefing} lastCheck={posture.lastSuccessfulRun?.checkedAt} delayed={posture.receiving === "delayed"}
-              note={notes.briefing ? <NoteLine key={notes.briefing.id} note={notes.briefing} onDismiss={dismissNote} /> : undefined}
+              note={notes.briefing ? <NoteLine key={notes.briefing.id} note={notes.briefing} onDismiss={dismissNote} onNotUseful={markNotUseful} /> : undefined}
               aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
             <section className="primary ledger-record" aria-labelledby="task-title">
               <p className="record-marker" data-manager={pendingManager || undefined} aria-hidden="true">{active ? (pendingManager ? "With manager" : "Now") : ""}</p>
@@ -635,7 +689,7 @@ export default function App() {
                 <h2 id="queue-title" className="kicker">Needs you · <span className="count" key={queue.length}>{queue.length}</span></h2>
                 {queue.length > 1 && <span>Disagreements first</span>}
               </div>
-              {ordered.length > 0 && <button type="button" className="text-link share-link" onClick={() => setSharing(true)}>Share these findings</button>}
+              {ordered.length > 0 && <button type="button" className="text-link share-link" onClick={() => { setSharing(true); updateSetup({ shared: true }); }}>Share these findings</button>}
               {ordered.length ? <ul>{ordered.map(({ task, issue }, index) => queueRow(task, issue.kind, issue.label, index))}</ul>
                 : <p className="empty">Nothing needs you right now.</p>}
               {manager.length > 0 && <>
@@ -664,11 +718,10 @@ export default function App() {
         </div>}
         {tab === "Activity" && <ActivityPage history={workspace.history} latest={latest} handoff={handoff} open={queue.length}
           flaggedToday={posture.runs.reduce((sum, run) => sum + run.exceptions, 0)} handoffStatus={handoffStatus}
-          notes={[...trail.map(({ id, text, trigger, at }) => dismissedLog.find((event) => event.id === id) ?? { id, text, trigger, at }),
-            ...dismissedLog.filter((event) => !trail.some(({ id }) => id === event.id)
-              && new Date(event.dismissedAt ?? event.at).toDateString() === new Date().toDateString())]}
-          onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} onShare={() => setSharing(true)} />}
-        {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)} />}
+          notes={noteLog} onExport={() => { setExporting(true); updateSetup({ shared: true }); }}
+          onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} onShare={() => { setSharing(true); updateSetup({ shared: true }); }} />}
+        {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)}
+          onClearDevice={() => { try { clearDevice(localStorage); } catch { /* Nothing stored. */ } window.location.reload(); }} />}
       </main>
       <FindingsDialog open={sharing} onClose={() => setSharing(false)} input={{
         rows: comparison,
@@ -678,6 +731,7 @@ export default function App() {
         ],
         decisions: workspace.history.slice(-8).map(({ task, decision, at }) => ({ record: task.record, decision, at })),
       }} />
+      <TrailDialog open={exporting} history={workspace.history} notes={noteLog} workspaceName={workspaceName} onClose={() => setExporting(false)} />
       {tab !== "Today" && askOpen && <aside className="ask-drawer" id="ask-drawer" role="dialog" aria-label="Talk with Mellow"
         onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); closeAsk(); } }}>
         <div className="ask-drawer-bar">

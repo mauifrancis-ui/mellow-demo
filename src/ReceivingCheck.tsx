@@ -1,4 +1,10 @@
-import { columnQuestion, guessColumns, lotRecordsWith, previewRows, type ColumnGuess } from "./columns";
+import { maxUploadBytes, maxUploadText } from "./limits";
+import { columnQuestion, guessColumns, lotRecordsWith, previewRows, rememberColumns, rememberedChoice, type ColumnGuess, type SavedColumns } from "./columns";
+
+export const columnsKey = "mellow.columns";
+function readSaved(): SavedColumns[] {
+  try { const saved = JSON.parse(localStorage.getItem(columnsKey) ?? "[]"); return Array.isArray(saved) ? saved as SavedColumns[] : []; } catch { return []; }
+}
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { compareLots, type LotCheck } from "./comparison";
 
@@ -8,7 +14,7 @@ function displayValue(value: string | null) {
   return value === null ? "No matching record" : value || "No lot number";
 }
 
-type Side = { name: string; text: string; guess: ColumnGuess; choice: { package: string | null; lot: string | null } };
+type Side = { name: string; text: string; guess: ColumnGuess; choice: { package: string | null; lot: string | null }; remembered: boolean };
 type Pending = { inventory: Side; receiving: Side };
 
 export function ReceivingCheck({ onCompared, onImport, openRequest = 0 }: {
@@ -37,7 +43,7 @@ export function ReceivingCheck({ onCompared, onImport, openRequest = 0 }: {
   }
 
   function choose(side: "inventory" | "receiving", kind: "package" | "lot", header: string) {
-    setPending((current) => current && { ...current, [side]: { ...current[side], choice: { ...current[side].choice, [kind]: header || null } } });
+    setPending((current) => current && { ...current, [side]: { ...current[side], remembered: false, choice: { ...current[side].choice, [kind]: header || null } } });
   }
 
   function compareChosen() {
@@ -51,6 +57,11 @@ export function ReceivingCheck({ onCompared, onImport, openRequest = 0 }: {
       const rows = compareLots(
         lotRecordsWith(inventory.text, { package: inventory.choice.package, lot: inventory.choice.lot }),
         lotRecordsWith(receiving.text, { package: receiving.choice.package, lot: receiving.choice.lot }));
+      try {
+        let saved = readSaved();
+        for (const side of [inventory, receiving]) saved = rememberColumns(saved, side.guess.headers, { package: side.choice.package!, lot: side.choice.lot! });
+        localStorage.setItem(columnsKey, JSON.stringify(saved));
+      } catch { /* Remembered for this visit only. */ }
       setComparison({ rows, inventoryFile: inventory.name, receivingFile: receiving.name });
       setPending(undefined);
       setError("");
@@ -84,11 +95,13 @@ export function ReceivingCheck({ onCompared, onImport, openRequest = 0 }: {
         return;
       }
       if (!(receiving instanceof File) || !receiving.size) throw new Error("Choose a receiving CSV.");
-      if (inventory.size > 500_000 || receiving.size > 500_000) throw new Error("Choose CSV files of 500 KB or less.");
+      if (inventory.size > maxUploadBytes || receiving.size > maxUploadBytes) throw new Error(`Choose CSV files of ${maxUploadText} or less.`);
       const [left, right] = await Promise.all([inventory.text(), receiving.text()]);
+      const saved = readSaved();
       const side = (name: string, text: string) => {
         const guess = guessColumns(text);
-        return { name, text, guess, choice: { package: guess.package, lot: guess.lot } };
+        const remembered = rememberedChoice(guess.headers, saved);
+        return { name, text, guess, choice: remembered ?? { package: guess.package, lot: guess.lot }, remembered: Boolean(remembered) };
       };
       setPending({ inventory: side(inventory.name, left), receiving: side(receiving.name, right) });
       requestAnimationFrame(() => dialog.current?.querySelector<HTMLElement>(".columns-step h3")?.focus());
@@ -131,6 +144,7 @@ export function ReceivingCheck({ onCompared, onImport, openRequest = 0 }: {
                     </select>
                   </label>)}
                 </div>
+                {side.remembered && <p className="mellow-note-inline"><span className="kicker">Mellow</span><span className="mellow-voice">These are the columns you chose last time for a file with the same headers. Change them if they’re wrong.</span></p>}
                 {question && <p className="mellow-note-inline"><span className="kicker">Mellow</span><span className="mellow-voice">{question}</span></p>}
                 <table className="preview-table">
                   <caption>First rows, as I’ll read them</caption>
