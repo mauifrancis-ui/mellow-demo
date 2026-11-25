@@ -302,3 +302,7 @@ Released 1.37.1 to production 2026-11-25 (main at e1d2171). Verified live at 104
 ## Marketing site audited · 2026-11-25
 
 The founder shared `mellow-landing-FINAL.html` for an update. The team audit found four blockers (fabricated testimonials, a fake CSV analysis, readiness scores and verdicts, and invented regulatory claims) and recommended a rebuild in sprint 3. Recorded in DESIGN_BOARD.md and on the canvas page "Marketing site · audit". The founder's original file is unchanged.
+
+## Sprints 3 and 4 planned; sprint 3 proposal reviewed · 2026-11-25
+
+The founder set the goal for the next two sprints: serve every Universal Experiences stage honestly. Briefs and a journey coverage plan are in DESIGN_BOARD.md: sprint 3 is "From first look to yes" (Discover, Learn, Try, Buy), and sprint 4 is "Trust on the floor, and a clean way out" (Get started, Use, Get help, Expand, End use). The sprint 3 proposal (a marketing site rebuilt from the audit, plus the sample bar, bring your files, and share these findings) went through the team review, a synthetic walkthrough and the board. Awaiting the founder's decisions: the briefs, the proposal, where the site lives, and the pilot offer and contact.

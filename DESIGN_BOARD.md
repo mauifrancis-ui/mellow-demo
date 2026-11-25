@@ -448,3 +448,87 @@ The founder found the marketing page and asked for it to be brought up to the cu
 - **Timing:** fold it into sprint 3 with the Try → Buy work.
 
 **Open question for the founder:** is this page published anywhere? If it is, the blockers should come down now.
+
+## Sprints 3 and 4 · briefs · 2026-11-25
+
+**Founder goal for both sprints.** By the end of sprint 4, every one of the nine Universal Experiences stages is served honestly. The Product Lead split the work by where people are in the journey.
+
+**Journey coverage.** Ratings come from the v1.37 Product Excellence Review; targets are what each sprint must reach.
+
+| Stage | Now (v1.37) | After sprint 3 | After sprint 4 | Carried by |
+| --- | --- | --- | --- | --- |
+| Discover | Not served | **Good** | Good | Rebuilt marketing site |
+| Learn | Friction | **Good** | Good | The site's "does and doesn't" list; "What can you do?" in the app |
+| Try | Friction | **Good** | Good | Sample bar; own files in under 10 minutes; a template |
+| Buy | Not served | **Good for an early product** | Good | "Share these findings"; an honest pilot contact |
+| Get started | Not served (own data) | Friction (first value only) | **Good** | Guided import (sprint 3); workspace setup with saved column mappings (sprint 4) |
+| Use | Friction | Friction | **Good** | "Compared" leads with the evidence; phone leads with the next package |
+| Get help | Good | Good | **Good+** | "Not useful" on notes; a Help entry that explains Mellow's limits |
+| Expand | Not served | Not served | **Good for an early product** | A second store's files as a separate workspace |
+| End use | Not served | Not served | **Good** | Export the trail for inspectors; "Clear this device's data" with a plain account of what's kept |
+
+### Sprint 3 brief · "From first look to yes"
+
+- **Stages:** Discover, Learn, Try, Buy. Handoffs: Discover → Try, Try → Get started, Try → Buy.
+- **Problem:** there's no honest way in. The only marketing page fakes its demo, scores and testimonials. In the real demo, the controls are buried, your own files need exact column names, and a buyer leaves with nothing to show an approver.
+- **Scope:**
+  1. Rebuild the marketing site in Field Ledger, from the audited draft.
+  2. A sample bar on Today with the demo controls and "Use my files".
+  3. Bring your files: a template, column matching by common names, a 5-row preview, and a question whenever Mellow can't tell.
+  4. "Share these findings": a printable one-page summary with no verdicts.
+- **Success measures:**
+  - Every claim on the site is verified against the product (Compliance checklist, 100%).
+  - Own files to a first finding in under 10 minutes in a timed walkthrough.
+  - CUJ 3 has no Not served cell for Discover or Buy.
+  - The evaluation set gains cases for column matching and the summary text, and passes.
+- **Out of scope:** pricing and billing, accounts, a server, and live Metrc.
+
+### Sprint 4 brief · "Trust on the floor, and a clean way out"
+
+- **Stages:** Get started, Use, Get help, Expand, End use.
+- **Scope:**
+  1. Workspace setup: name it, save column mappings, and a first-day checklist.
+  2. "Compared" leads with the evidence ("2 files · row 2 · 9:13").
+  3. On a phone, Today leads with "Your next package".
+  4. "Not useful" on notes, with a reason, logged.
+  5. Export the decision and note trail for an inspector (CSV and print).
+  6. "Clear this device's data", with a plain account of what's stored and where.
+  7. A second store as a separate workspace (Expand).
+  8. A Help entry for Mellow's limits.
+- **Cut line (Product Lead):** if time runs short, #7 slips to sprint 5 and Expand stays Not served, accepted by the founder.
+- **Dependency:** real user sessions stay open debt. Sprint 4 measures "Compared" comprehension with synthetic sessions only, unless leads are recruited.
+
+## Sprint 3 · proposal review by role
+
+Proposal on the canvas page "Sprint 3 · From first look to yes": the marketing site draft at 1440px and 390px, and the Try → Buy flows (the sample bar, bring your files, share these findings).
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Compliance and Risk | Every site claim was checked against the code: no network calls, so comparisons run in the browser; `package_id` and `lot_number` are required; one row per package; 2 MB limit. No testimonials, photos, scores or verdicts. The footer says it isn't legal advice or a compliance assessment. | Info | Add a release-checklist line: "Your files stay in your browser" must be rewritten the day any server handles customer files. |
+| Compliance and Risk | "Pilot it with us" and the contact line promise things only the founder can confirm. | High | The founder confirms the offer, the contact address, and whether to say anything about price. |
+| Content and Voice | The phone section claims "what's new since the last check", but its screenshot shows only the count. The site mentions the findings summary, which only exists once sprint 3 ships. | Medium | Swap in a screenshot that shows "· 1 new". The site launches together with the sprint 3 build, never before it. |
+| Product Designer (systems and IA) | The site's navigation maps to the journey: What it does (Learn), How a shift goes (Use, previewed), Try it on your files (Try), Bring it to your team (Buy). New objects: **Workspace** (sample or your own) and **Findings summary** (derived from a Check; no new state). | Info | Add both to the system map. |
+| Product Designer (systems and IA) | **Where the site lives decides an entry point.** Today `/` is the demo, and AGENTS.md says to preserve established entry points. | High | The founder decides: site at `/` with the demo at `/demo`; site at `/welcome` with the demo staying at `/`; or a separate domain. |
+| Product Designer | On a phone, the hero screenshot is a scaled-down desktop page and can't be read. | High | Show the phone screenshot at small widths. |
+| AI UX Designer/Engineer | Column matching must be deterministic: a fixed list of known names, always a preview, a question when unsure, never a silent guess. | Info | Evaluation cases before build: a missing lot column, two candidate columns, duplicate IDs, blank lots, and summary text containing no verdict words. |
+| Accessibility | The site has a skip link, semantic headings, alt text, 48px CTAs and AA contrast, and no motion beyond smooth scrolling, which honors reduced motion. The mapping step must use native `select`s with labels. The summary needs a print stylesheet. | Medium | Build to those rules. |
+| Engineer | The site is a static page in the repo; the template is a CSV file. Column matching generalizes `lotRecords`. The summary is a printable view in the app. One sprint. | Info | None. |
+| Research and Insights | A synthetic walkthrough with the five archetypes (weak evidence). **Jo** (the owner) understood "does and doesn't" in one read and liked "no form, no list", but asked "What does it cost?", which the site doesn't answer. **Priya** (compliance) asked where files go in a real deployment, since the site only covers the demo. **Marcus** asked about several stores (Expand, sprint 4). **Luis** said the template "would save me." **Dana** couldn't read the hero screenshot on her phone. | Medium | The price question goes to the founder. "In a real deployment" data handling goes in sprint 4 (End use). |
+| Design Director | The first fully Field Ledger customer-facing surface, coherent with the product. | Info | Present for decision. |
+
+## Sprint 3 · board pass
+
+- **Morris:** strongly backs it. The "does and doesn't" list sets accurate expectations of an AI-like tool before anyone tries it.
+- **Rams, Maeda:** back it. Honesty is the design. Keep the page short: no feature grid, no stats band.
+- **Norman:** backs the column preview. It shows the system's status before anything is committed.
+- **Zhuo:** backs "Share these findings". A buyer leaves with an artifact an approver can act on.
+- **Eames:** backs a human pilot contact over a form.
+- **Vignelli, Kare:** back the type system carrying over intact. Keep vermilion for the "Doesn't" heading only.
+- **Wroblewski, Clark:** fix the phone hero. Test the import on a phone. (Can a lead pick files at the dock?)
+- **Ive:** product shots framed with a 1px ink rule and 4px corners, matching the app.
+
+**Board recommendation.**
+1. Approve both sprint briefs and the coverage targets.
+2. Approve the sprint 3 proposal with the review changes (the phone hero, the phone screenshot, a launch tied to the build).
+3. The founder decides where the site lives.
+4. The founder confirms the pilot offer, the contact address and any price line.
