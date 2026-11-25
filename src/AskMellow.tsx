@@ -31,11 +31,11 @@ type Attachment = { name: string; size: number };
 
 function BasisStamp({ basis }: { basis: Basis }) {
   const word = basis.verified ? "Compared" : "Not from your records";
-  const time = basis.at ? ` · check at ${clock(basis.at)}` : "";
+  const time = basis.at ? ` · ${basis.atKind === "compared" ? "compared" : "check"} at ${clock(basis.at)}` : "";
   return <details className="basis" data-verified={basis.verified || undefined}
     onKeyDown={(event) => { if (event.key === "Escape") (event.currentTarget as HTMLDetailsElement).open = false; }}>
     <summary aria-label={`${word}: ${basis.label}${time}. Show what Mellow looked at.`}>
-      <span className="basis-word">{word}</span><span>{basis.label}{basis.at ? ` · check at ${clock(basis.at)}` : ""}</span>
+      <span className="basis-word">{word}</span><span>{basis.label}{time}</span>
     </summary>
     <div className="basis-sources">
       <p className="kicker">{basis.verified ? "What I compared" : "What this is based on"}</p>

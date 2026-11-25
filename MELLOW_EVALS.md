@@ -65,6 +65,25 @@ P1 to P6 run in `tests/notes.test.mjs`, and E5 runs in `tests/evals.test.mjs`. T
 
 **Probe score, 2026-11-25:** 1 pass, 4 partial, 11 fail, and 1 not run, across 17 record-answer cases. The proactive cases have no automated test yet.
 
+## Bringing your own files (F) and sharing findings (S)
+
+Added in sprint 3. These run in `tests/columns.test.mjs`, `tests/findings.test.mjs` and `tests/evals.test.mjs`.
+
+| # | Situation | Expected behavior |
+| --- | --- | --- |
+| F1 | Template columns (`package_id`, `lot_number`) | Found without a question. |
+| F2 | Common export names ("Package Label", "Batch No") | Matched regardless of case and spacing. |
+| F3 | No lot column | A question naming the file. Never a guess. |
+| F4 | Two candidate columns | A question listing both. Mellow won't compare until a person chooses. |
+| F5 | Duplicate or blank package IDs | Refused, naming the ID or the row. |
+| F6 | Blank lots | Previewed as "(blank)", exactly as they'll be read. |
+| P-1 | A question about a package from your own files | The stamp names *those* files, their package count and "compared at" time, never the sample. |
+| S1 | The summary | Counts what was compared and lists disagreements first. |
+| S2 | Summary text | Never contains a verdict word. Internal decision names ("Approved") are shown as the app's words ("Issue recorded"). |
+| S3 | The end of the summary | Always says it isn't a compliance assessment (also under the title, so it survives a photocopy). |
+| S4 | Mixed sources | Each set of files is named with its own time. |
+| E6 | A reload after comparing your own files (browser check) | Mellow still explains those packages from those files. Found Broken in the v1.38 Product Excellence Review, then fixed. |
+
 ## Part 2 · Product Excellence Review (release gate)
 
 Added by the founder on 2026-11-25. The automated cases above prove Mellow says the right things. This review proves the product works well for people, end to end. **No release goes to production until it has run**, and its gate (below) is met.

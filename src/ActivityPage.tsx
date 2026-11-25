@@ -30,7 +30,8 @@ function dayLabel(iso: string) {
   return date.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" });
 }
 
-export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, notes = [], onReopen, onOpen, onCopy }: {
+export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare }: {
+  onShare?: () => void;
   history: Entry[];
   notes?: { id: string; text: string; trigger: string; at: string; dismissedAt?: string }[];
   latest: Map<string, Decision>;
@@ -117,6 +118,11 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
     </div>
 
     <aside className="ledger-side" aria-label="Today at a glance">
+      {onShare && <section className="share-block">
+        <p className="kicker">Take it to whoever signs off</p>
+        <p>A one-page summary of what was compared and what differed. No verdicts.</p>
+        <button type="button" className="ledger-button" data-variant="line" onClick={onShare}>Share these findings</button>
+      </section>}
       {notes.length > 0 && <section className="mellow-events" aria-labelledby="notes-title">
         <h2 id="notes-title" className="kicker">Mellow notes today · {notes.length}</h2>
         <p className="mellow-events-help">What Mellow said first, and what was dismissed. These are not decisions.</p>

@@ -7,9 +7,10 @@ import { ActivityPage } from "./ActivityPage";
 import { LearnPage } from "./LearnPage";
 import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextPanel";
 import { NoteLine } from "./NoteLine";
+import { FindingsDialog } from "./FindingsDialog";
 import { notesFor, noteTrail, sampleChecks, type NewIssue, type Note, type SourceEvent } from "./notes";
 import { panelFor, queueView, sameView, type PanelView } from "./panel";
-import { addTurn, ask, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
+import { addTurn, ask, type FileSet, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 import { monitorReceiving, sampleHistory } from "./monitoring";
@@ -35,6 +36,15 @@ function smooth(update: () => void, kind: "page" | "panel" = "page") {
 const tabs = ["Today", "Activity", "Learn"] as const;
 const panelKey = "mellow.panel";
 const dismissedKey = "mellow.notes.dismissed";
+/** Rows and files from the person's own comparisons, kept with the queue they created so Mellow can still explain them after a reload. */
+const importedKey = "mellow.imported";
+type Imported = { rows: LotCheck[]; sets: FileSet[] };
+function readImported(): Imported {
+  try {
+    const saved = JSON.parse(localStorage.getItem(importedKey) ?? "null") as Imported | null;
+    return saved && Array.isArray(saved.rows) && Array.isArray(saved.sets) ? saved : { rows: [], sets: [] };
+  } catch { return { rows: [], sets: [] }; }
+}
 
 type NoteEvent = { id: string; text: string; trigger: string; at: string; dismissedAt?: string };
 function readDismissed(): NoteEvent[] {
@@ -152,6 +162,11 @@ export default function App() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [askOpen, setAskOpen] = useState(false);
   const [extraRows, setExtraRows] = useState<LotCheck[]>([]);
+  const [imported, setImported] = useState<Imported>(readImported);
+  const importedRows = imported.rows;
+  const fileSets = imported.sets;
+  const [sharing, setSharing] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [newIssues, setNewIssues] = useState<NewIssue[]>([]);
   const [opened, setOpened] = useState<string[]>([]);
   const [restoredAt, setRestoredAt] = useState<string | null>(null);
@@ -171,9 +186,11 @@ export default function App() {
   const handoff = shiftHandoff(workspace);
   const manager = handoff.map(({ task }) => task);
   const queue = workQueue(workspace);
-  const comparison = extraRows.length ? [...sampleComparison, ...extraRows] : sampleComparison;
+  const comparison = extraRows.length || importedRows.length
+    ? [...sampleComparison, ...extraRows].filter(({ packageId }) => !importedRows.some((row) => row.packageId === packageId)).concat(importedRows)
+    : sampleComparison;
   const ordered = orderQueue(queue, comparison);
-  const askContext = { queue, manager, comparison, runs: posture.runs, receiving: posture.receiving };
+  const askContext = { queue, manager, comparison, runs: posture.runs, receiving: posture.receiving, fileSets };
   const notes = notesFor({
     checks: posture.runs.map((entry) => entry.checkedAt), newIssues, receiving: posture.receiving, restoredAt,
     lastGoodAt: posture.lastSuccessfulRun?.checkedAt,
@@ -233,6 +250,16 @@ export default function App() {
 
   function addComparison(rows: LotCheck[], inventoryFile: string, receivingFile: string) {
     const tasks = comparisonTasks(rows, inventoryFile, receivingFile);
+    const ids = rows.map(({ packageId }) => packageId);
+    setImported((current) => {
+      const next = {
+        rows: [...current.rows.filter(({ packageId }) => !ids.includes(packageId)), ...rows],
+        sets: [...current.sets.map((set) => ({ ...set, packageIds: set.packageIds.filter((id) => !ids.includes(id)) })).filter((set) => set.packageIds.length),
+          { files: [inventoryFile, receivingFile], packageIds: ids, at: new Date().toISOString() }],
+      };
+      try { localStorage.setItem(importedKey, JSON.stringify(next)); } catch { /* Kept for this visit only. */ }
+      return next;
+    });
     let first: Task | undefined;
     let added = 0;
     const saved = save((current) => {
@@ -389,6 +416,15 @@ export default function App() {
     });
   }
 
+  function resetSample() {
+    try {
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(dismissedKey);
+      localStorage.removeItem(importedKey);
+    } catch { /* Nothing stored to clear. */ }
+    window.location.reload();
+  }
+
   function simulateCheck() {
     const index = Math.min(newIssues.length ? 1 : 0, sampleChecks.length - 1);
     const rows: LotCheck[] = sampleChecks[index].map((row) => ({ ...row, state: row.receiving === null ? "missing" : "different" }));
@@ -510,6 +546,22 @@ export default function App() {
         {tab !== "Today" && error && <p className="error" role="alert">{error}</p>}
         {tab === "Today" && <div className="ledger">
           <div className="ledger-main">
+            <section className="sample-bar" aria-label="Sample workspace controls">
+              <p className="kicker">Sample workspace</p>
+              <p className="sample-bar-text">Fictional records. Try what a shift feels like:</p>
+              <div className="sample-bar-actions">
+                <button type="button" className="ledger-button" data-variant="line" onClick={simulateCheck} disabled={posture.receiving === "delayed"}>Simulate a new check</button>
+                <button type="button" className="ledger-button" data-variant="line" onClick={toggleDelay}>{posture.receiving === "delayed" ? "Restore the source" : "Simulate a delay"}</button>
+                <button type="button" className="ledger-button" onClick={() => setCompareRequest((count) => count + 1)}>Use my files</button>
+              </div>
+              {confirmReset
+                ? <p className="sample-bar-reset" role="group" aria-label="Confirm reset">
+                    <span>Clear this device’s decisions and start over?</span>
+                    <button type="button" className="text-link" onClick={resetSample}>Reset</button>
+                    <button type="button" className="text-link" onClick={() => setConfirmReset(false)}>Cancel</button>
+                  </p>
+                : <button type="button" className="text-link sample-bar-reset" onClick={() => setConfirmReset(true)}>Reset sample</button>}
+            </section>
             <Briefing brief={briefing} lastCheck={posture.lastSuccessfulRun?.checkedAt} delayed={posture.receiving === "delayed"}
               note={notes.briefing ? <NoteLine key={notes.briefing.id} note={notes.briefing} onDismiss={dismissNote} /> : undefined}
               aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
@@ -577,12 +629,13 @@ export default function App() {
           <ContextPanel view={panelView} collapsed={panelCollapsed} needYou={queue.length} fresh={fresh.length} lastCheck={posture.lastSuccessfulRun?.checkedAt}
             onBack={backToQueue} onToggle={togglePanel}>
             {panelView.kind === "queue" && <>
-            <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} onSimulateCheck={simulateCheck} />
+            <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} />
             <section className="ledger-queue" id="work-queue" tabIndex={-1} aria-labelledby="queue-title">
               <div className="queue-head">
                 <h2 id="queue-title" className="kicker">Needs you · <span className="count" key={queue.length}>{queue.length}</span></h2>
                 {queue.length > 1 && <span>Disagreements first</span>}
               </div>
+              {ordered.length > 0 && <button type="button" className="text-link share-link" onClick={() => setSharing(true)}>Share these findings</button>}
               {ordered.length ? <ul>{ordered.map(({ task, issue }, index) => queueRow(task, issue.kind, issue.label, index))}</ul>
                 : <p className="empty">Nothing needs you right now.</p>}
               {manager.length > 0 && <>
@@ -601,11 +654,11 @@ export default function App() {
               decision={latest.get(panelView.id)} entries={workspace.history.filter((entry) => entry.task.id === panelView.id)}
               lastCheck={posture.lastSuccessfulRun?.checkedAt} isActive={active?.id === panelView.id} onOpen={openTask} />}
             {panelView.kind === "series" && <>
-              <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} onSimulateCheck={simulateCheck} />
+              <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} />
               <SeriesList series={panelView.series} rows={comparison} open={[...queue, ...manager]} latest={latest}
                 matched={posture.runs.reduce((sum, run) => sum + run.matched, 0)} activeId={active?.id} onOpen={openTask} />
             </>}
-            {panelView.kind === "summary" && <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} onToggleDelay={toggleDelay} onSimulateCheck={simulateCheck} />}
+            {panelView.kind === "summary" && <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} />}
             {panelView.kind === "handoff" && <HandoffPanel handoff={handoff} status={handoffStatus} onCopy={() => void copyHandoff()} onOpen={openTask} />}
           </ContextPanel>
         </div>}
@@ -614,9 +667,17 @@ export default function App() {
           notes={[...trail.map(({ id, text, trigger, at }) => dismissedLog.find((event) => event.id === id) ?? { id, text, trigger, at }),
             ...dismissedLog.filter((event) => !trail.some(({ id }) => id === event.id)
               && new Date(event.dismissedAt ?? event.at).toDateString() === new Date().toDateString())]}
-          onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} />}
+          onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} onShare={() => setSharing(true)} />}
         {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)} />}
       </main>
+      <FindingsDialog open={sharing} onClose={() => setSharing(false)} input={{
+        rows: comparison,
+        sources: [
+          ...(importedRows.length < comparison.length ? [{ files: ["Sample inventory export", "Sample receiving log"], at: posture.lastSuccessfulRun?.checkedAt, kind: "check" as const }] : []),
+          ...fileSets.map(({ files, at }) => ({ files, at, kind: "compared" as const })),
+        ],
+        decisions: workspace.history.slice(-8).map(({ task, decision, at }) => ({ record: task.record, decision, at })),
+      }} />
       {tab !== "Today" && askOpen && <aside className="ask-drawer" id="ask-drawer" role="dialog" aria-label="Talk with Mellow"
         onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); closeAsk(); } }}>
         <div className="ask-drawer-bar">

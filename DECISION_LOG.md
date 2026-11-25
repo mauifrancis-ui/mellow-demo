@@ -306,3 +306,21 @@ The founder shared `mellow-landing-FINAL.html` for an update. The team audit fou
 ## Sprints 3 and 4 planned; sprint 3 proposal reviewed · 2026-11-25
 
 The founder set the goal for the next two sprints: serve every Universal Experiences stage honestly. Briefs and a journey coverage plan are in DESIGN_BOARD.md: sprint 3 is "From first look to yes" (Discover, Learn, Try, Buy), and sprint 4 is "Trust on the floor, and a clean way out" (Get started, Use, Get help, Expand, End use). The sprint 3 proposal (a marketing site rebuilt from the audit, plus the sample bar, bring your files, and share these findings) went through the team review, a synthetic walkthrough and the board. Awaiting the founder's decisions: the briefs, the proposal, where the site lives, and the pilot offer and contact.
+
+## Version 1.38 From first look to yes · built and reviewed · 2026-11-25
+
+The founder approved sprints 3 and 4 and the sprint 3 proposal: no pilot or price (an end-to-end prototype), the founder's email as the contact, and the site at `/welcome/` (the team's default, preserving the entry point). Built:
+- the marketing site
+- the sample bar
+- bring your files (templates, column matching, preview)
+- share these findings
+- your own compared rows saved with the queue
+
+Verification: lint, type check, build and 74 tests pass; browser checks at 390px, 1024px and 1440px with keyboard and reduced motion; no third-party requests on the site. Found and fixed before release:
+- a 2 MB claim that should be 500 KB
+- provenance naming the sample for your own files
+- "Approved" leaking into the summary
+- two dialog layout bugs
+- a Broken reload contradiction found in the Product Excellence Review
+
+The gate is met (synthetic). Awaiting the founder's release decision.

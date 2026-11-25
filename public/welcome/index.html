@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mellow · Your records, compared</title>
+<meta name="description" content="Mellow compares your inventory and receiving records package by package, puts the disagreements first, and shows exactly what it compared. You decide what happens next.">
+<link rel="preload" href="fonts/newsreader-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+/* Fonts are self-hosted, like the app, so the page makes no third-party requests. */
+@font-face{font-family:'Newsreader';font-style:normal;font-weight:200 800;font-display:swap;src:url(fonts/newsreader-latin-opsz-normal.woff2) format('woff2')}
+@font-face{font-family:'Newsreader';font-style:italic;font-weight:200 800;font-display:swap;src:url(fonts/newsreader-latin-opsz-italic.woff2) format('woff2')}
+@font-face{font-family:'Instrument Sans';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/instrument-sans-latin-wght-normal.woff2) format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'IBM Plex Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/ibm-plex-mono-latin-500-normal.woff2) format('woff2')}
+:root{--paper:#F7F3EA;--ink:#1C1B19;--graphite:#5A5650;--rule:#DDD5C4;--rule-strong:#CFC6B3;--tint:#EFE8DA;--tint-soft:#F1EBDF;--vermilion:#C73E22;--vermilion-dark:#A93319;
+--serif:'Newsreader',Georgia,serif;--sans:'Instrument Sans',system-ui,sans-serif;--mono:'IBM Plex Mono',ui-monospace,monospace;--ease:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.skip{position:absolute;left:-999px;top:8px;background:var(--ink);color:var(--paper);padding:10px 14px;border-radius:4px;z-index:10}
+.skip:focus{left:16px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 40px}
+.kicker{font:500 12px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--graphite);margin:0}
+.mono{font-family:var(--mono)}
+.voice{font:italic 400 22px/1.4 var(--serif)}
+/* Masthead */
+header.top{position:sticky;top:0;z-index:5;background:var(--paper)}
+.top .wrap{display:flex;align-items:center;gap:32px;min-height:72px}
+.wordmark{font:italic 400 30px/1 var(--serif);letter-spacing:-.02em;text-decoration:none}
+.wordmark span{color:var(--vermilion);font-style:normal}
+.top nav{display:flex;gap:28px;margin-left:auto;align-items:center}
+.top nav a{font:500 15px var(--sans);color:var(--graphite);text-decoration:none;padding:12px 0}
+.top nav a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 20px;border:1px solid var(--ink);border-radius:4px;font:500 16px var(--sans);text-decoration:none;transition:background-color .16s var(--ease),color .16s var(--ease)}
+.btn.ink{background:var(--ink);color:var(--paper)}
+.btn.ink:hover{background:#000}
+.btn.line{background:transparent;color:var(--ink)}
+.btn.line:hover{background:var(--tint-soft)}
+.top nav .btn{color:var(--paper);padding:0 16px;min-height:44px;font-size:15px}
+.link{font:500 16px var(--sans);text-underline-offset:4px}
+/* Hero */
+.hero{padding:72px 0 40px}
+.hero h1{font:400 clamp(44px,6.2vw,84px)/1.02 var(--serif);letter-spacing:-.025em;margin:18px 0 0;max-width:15ch}
+.hero .lede{max-width:46ch;font-size:20px;color:var(--ink);margin:28px 0 0}
+.hero .actions{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;margin-top:32px}
+.margin-note{display:grid;grid-template-columns:72px minmax(0,1fr);gap:16px;margin-top:44px;padding-top:16px;border-top:1px solid var(--ink);max-width:760px}
+.margin-note .kicker{padding-top:6px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 22px;margin:18px 0 0 88px;font:12px var(--mono);letter-spacing:.04em;color:var(--graphite)}
+/* Product shot */
+figure{margin:0}
+.shot img{display:block;width:100%;height:auto;border:1px solid var(--ink);border-radius:4px}
+.shot figcaption{margin-top:10px;font:12px var(--mono);color:var(--graphite)}
+.hero-shot{margin-top:56px}
+/* Sections */
+section.block{padding:96px 0 0}
+.block h2{font:400 clamp(32px,4vw,52px)/1.08 var(--serif);letter-spacing:-.02em;margin:14px 0 0;max-width:20ch}
+.block .intro{max-width:52ch;color:var(--graphite);margin:18px 0 0}
+.ledger2{display:grid;grid-template-columns:1fr 1fr;gap:0 48px;margin-top:40px;border-top:1px solid var(--ink)}
+.ledger2 h3{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;margin:18px 0 6px}
+.ledger2 h3.not{color:var(--vermilion-dark)}
+.ledger2 ul{list-style:none;margin:0;padding:0}
+.ledger2 li{padding:14px 0;border-bottom:1px solid var(--rule)}
+.ledger2 li b{font-weight:600}
+.steps{list-style:none;margin:40px 0 0;padding:0;border-top:1px solid var(--ink)}
+.steps li{display:grid;grid-template-columns:72px minmax(0,18ch) minmax(0,1fr);gap:16px 24px;padding:20px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.steps .n{font:500 13px var(--mono);color:var(--graphite)}
+.steps .t{font:400 24px/1.2 var(--serif)}
+.steps .d{color:var(--graphite)}
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:56px;align-items:start;margin-top:40px}
+.split ul{list-style:none;margin:20px 0 0;padding:0;border-top:1px solid var(--ink)}
+.split li{display:grid;grid-template-columns:150px minmax(0,1fr);gap:16px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.split li .mono{font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding-top:4px}
+.req{width:100%;border-collapse:collapse;margin-top:24px;border-top:1px solid var(--ink)}
+.req th,.req td{text-align:left;padding:14px 12px 14px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+.req th{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--graphite);width:180px}
+.req code{font:14px var(--mono);background:var(--tint-soft);padding:2px 6px;border-radius:3px}
+.note-line{display:grid;grid-template-columns:72px minmax(0,1fr);gap:16px;margin-top:24px}
+.note-line .voice{font-size:18px}
+.phone{max-width:300px}
+.contact{margin-top:40px;padding:32px 0 0;border-top:1px solid var(--ink);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center}
+footer{margin-top:120px;padding:32px 0 48px;border-top:1px solid var(--rule)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:16px 40px;align-items:baseline}
+footer p{margin:0;font:13px var(--mono);color:var(--graphite);max-width:70ch}
+@media (max-width:860px){
+  .wrap{padding:0 20px}
+  .top nav a:not(.btn){display:none}
+  .hero{padding-top:40px}
+  .hero .lede{font-size:18px}
+  .margin-note,.note-line{grid-template-columns:minmax(0,1fr);gap:6px}
+  .facts{margin-left:0}
+  .ledger2,.split{grid-template-columns:minmax(0,1fr)}
+  .steps li{grid-template-columns:40px minmax(0,1fr)}
+  .steps .d{grid-column:2}
+  .split li{grid-template-columns:minmax(0,1fr);gap:4px}
+  .req th{width:auto;display:block;padding-bottom:0;border-bottom:0}
+  .req td{display:block}
+  .contact{grid-template-columns:minmax(0,1fr)}
+  section.block{padding-top:72px}
+  .phone{max-width:260px}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="wrap">
+  <a class="wordmark" href="/welcome/" aria-label="Mellow home">mellow<span aria-hidden="true">.</span></a>
+  <nav aria-label="Main">
+    <a href="#what">What it does</a>
+    <a href="#shift">How a shift goes</a>
+    <a href="#try">Try it on your files</a>
+    <a class="btn ink" href="/">Open the demo</a>
+  </nav>
+</div></header>
+
+<main id="main">
+<section class="hero"><div class="wrap">
+  <p class="kicker">For receiving and compliance teams</p>
+  <h1>Your records, compared. Where they disagree, said plainly.</h1>
+  <p class="lede">Mellow compares your inventory and receiving records package by package, puts the disagreements first, and shows exactly what it compared. You decide what happens next.</p>
+  <div class="actions">
+    <a class="btn ink" href="/">Open the demo <span aria-hidden="true">→</span></a>
+    <a class="link" href="#try">Try it on your own files</a>
+  </div>
+  <div class="margin-note"><span class="kicker">Mellow</span><p class="voice" style="margin:0">I compare records. I don’t judge them against the law, and I don’t guess.</p></div>
+  <p class="facts"><span>Sample data</span><span>No account</span><span>Your files stay in your browser</span></p>
+  <figure class="shot hero-shot"><picture><source media="(max-width: 860px)" srcset="phone.jpg" width="780" height="1688"><img src="today.jpg" width="1600" height="1000" alt="Mellow’s Today page: a briefing that names the first package to check, a note that a new check found one difference, the current record with both sources side by side, and the queue."></picture><figcaption>The demo’s Today page, after a new check. Sample data.</figcaption></figure>
+</div></section>
+
+<section class="block" id="what" aria-labelledby="what-title"><div class="wrap">
+  <p class="kicker">What it does</p>
+  <h2 id="what-title">What Mellow does, and what it doesn’t.</h2>
+  <div class="ledger2">
+    <div><h3>Does</h3><ul>
+      <li>Compares lot numbers between your inventory export and your receiving log, <b>one package at a time</b>.</li>
+      <li>Puts the packages where the records <b>disagree</b> first, then the ones missing a detail.</li>
+      <li>Shows <b>what it compared and when</b>, on every answer.</li>
+      <li>Speaks first only when a check finds <b>something new</b>.</li>
+      <li>Keeps the day’s <b>trail</b> of decisions and notes.</li>
+    </ul></div>
+    <div><h3 class="not">Doesn’t</h3><ul>
+      <li><b>Decide for you.</b> A person records the issue, marks it not an issue, or leaves it for a manager.</li>
+      <li><b>Judge your records against the law.</b> State rules aren’t loaded.</li>
+      <li><b>Score your readiness</b> or predict an inspection.</li>
+      <li><b>Read photos or attachments</b> yet.</li>
+      <li><b>Send your files anywhere.</b> In the demo, they stay in your browser.</li>
+    </ul></div>
+  </div>
+</div></section>
+
+<section class="block" id="shift" aria-labelledby="shift-title"><div class="wrap">
+  <p class="kicker">How a shift goes</p>
+  <h2 id="shift-title">Four steps, the same every time.</h2>
+  <ol class="steps">
+    <li><span class="n">01</span><span class="t">Compare two exports</span><span class="d">Your inventory export and your receiving log, as CSV files.</span></li>
+    <li><span class="n">02</span><span class="t">Start with what disagrees</span><span class="d">The briefing names the first package and says why it goes first.</span></li>
+    <li><span class="n">03</span><span class="t">Check the label, then decide</span><span class="d">Record the issue, mark it not an issue, or leave it for a manager. Your evidence goes with it.</span></li>
+    <li><span class="n">04</span><span class="t">Hand off the shift</span><span class="d">Activity keeps what was decided and what’s still waiting, ready for the next person.</span></li>
+  </ol>
+</div></section>
+
+<section class="block" id="checked" aria-labelledby="checked-title"><div class="wrap">
+  <p class="kicker">Built to be checked</p>
+  <h2 id="checked-title">Every answer shows its work.</h2>
+  <div class="split">
+    <div>
+      <p class="intro" style="margin-top:0">Ask Mellow about a package and the answer ends with what it compared: which files, which rows, and when. Tap it to see them. If Mellow can’t trace something to your records, it says so.</p>
+      <ul>
+        <li><span class="mono">Compared</span><span>On every answer drawn from your records.</span></li>
+        <li><span class="mono">Why this?</span><span>On every note Mellow raises first: the trigger, and what it looked at.</span></li>
+        <li><span class="mono">Activity</span><span>The day’s decisions and notes, including the ones that were dismissed.</span></li>
+      </ul>
+    </div>
+    <figure class="shot"><img src="answer.jpg" width="1264" height="1042" alt="An answer about PKG-443: inventory has no lot number, receiving has SAMPLE-6, the sources disagree. Below it, a Compared stamp naming the two files, the package count and the check time, opened to list what was compared."><figcaption>An answer with its Compared stamp open. Sample data.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="block" id="floor" aria-labelledby="floor-title"><div class="wrap">
+  <div class="split" style="margin-top:0;align-items:center">
+    <div>
+      <p class="kicker">On the floor</p>
+      <h2 id="floor-title">Works at the back door, on a phone.</h2>
+      <p class="intro">The bar at the bottom always says how many packages need you. After a check finds something, it says what’s new.</p>
+    </div>
+    <figure class="shot phone"><img src="phone.jpg" width="780" height="1688" alt="Mellow on a phone: the briefing, and a bar at the bottom reading 4 need you, 1 new, with the time of the last check."><figcaption>The demo at phone width.</figcaption></figure>
+  </div>
+</div></section>
+
+<section class="block" id="try" aria-labelledby="try-title"><div class="wrap">
+  <p class="kicker">Try it on your files</p>
+  <h2 id="try-title">Two CSV files, two columns.</h2>
+  <p class="intro">Comparisons run in your browser. Nothing is uploaded.</p>
+  <table class="req">
+    <tbody>
+      <tr><th scope="row">Files</th><td>An inventory export and a receiving log.</td></tr>
+      <tr><th scope="row">Columns</th><td>A package ID and a lot column in each file. The templates use <code>package_id</code> and <code>lot_number</code>; other common names like “Package Label” or “Batch No” work too.</td></tr>
+      <tr><th scope="row">Rows</th><td>One row per package. Up to 500 KB per file.</td></tr>
+      <tr><th scope="row">Privacy</th><td>Remove names and anything you wouldn’t share. Mellow only needs the two columns.</td></tr>
+    </tbody>
+  </table>
+  <div class="actions" style="display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;margin-top:28px">
+    <a class="btn line" href="/templates/inventory-template.csv" download>Inventory template</a>
+    <a class="btn line" href="/templates/receiving-template.csv" download>Receiving template</a>
+    <a class="btn ink" href="/">Open the demo <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="note-line"><span class="kicker" style="padding-top:5px">Mellow</span><p class="voice" style="margin:0">If a column is missing, I’ll say which one before I compare anything.</p></div>
+</div></section>
+
+<section class="block" id="team" aria-labelledby="team-title"><div class="wrap">
+  <p class="kicker">Take it to whoever signs off</p>
+  <h2 id="team-title">Share what you found, not a verdict.</h2>
+  <p class="intro">“Share these findings” makes a one-page summary: what was compared, which packages differ, and the decisions so far. Print it or save it as a PDF. It says plainly that it isn’t a compliance assessment.</p>
+  <div class="contact">
+    <p style="margin:0">Mellow is an end-to-end prototype. Questions or feedback? Write to <a href="mailto:maui.francis@gmail.com">maui.francis@gmail.com</a>.</p>
+    <a class="btn ink" href="mailto:maui.francis@gmail.com?subject=Mellow">Email us</a>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <a class="wordmark" href="/welcome/" style="font-size:24px">mellow<span aria-hidden="true">.</span></a>
+  <p>Mellow is a prototype. It doesn’t give legal advice or assess compliance. The demo uses fictional sample data.</p>
+</div></footer>
+</body>
+</html>

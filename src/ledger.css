@@ -591,3 +591,93 @@
 .ledger-queue li:has(.note-why[open]), .briefing-note:has(.note-why[open]) { position: relative; z-index: 40; }
 /* Rows fill their column edge to edge, so their focus ring is drawn just inside them. */
 .shell[data-palette="ledger"] .ledger-queue .queue-row:focus-visible { outline-offset: -3px; }
+
+/* Sprint 3 · Try: the sample bar. Demo controls in plain sight, only in the sample workspace. */
+.sample-bar {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 8px 16px; align-items: center;
+  padding: 10px 14px; background: var(--tint-soft); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule);
+}
+.sample-bar .kicker { margin: 0; }
+.sample-bar-text { margin: 0; font-size: 14px; color: var(--graphite); }
+.sample-bar-actions { display: flex; flex-wrap: wrap; gap: 8px; grid-column: 1 / -1; }
+.sample-bar-actions .ledger-button { min-height: 44px; }
+.sample-bar-reset { grid-column: 3; grid-row: 1; justify-self: end; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; font-size: 14px; }
+@media (width < 600px) {
+  .sample-bar { grid-template-columns: minmax(0, 1fr) auto; }
+  .sample-bar-text { grid-column: 1 / -1; }
+  .sample-bar-reset { grid-column: 2; }
+}
+
+/* Sprint 3 · Try → Get started: match columns, preview, then compare */
+.template-links { margin: 8px 0 0; font-size: 14px; color: var(--graphite); }
+.template-links a { color: var(--ink); text-underline-offset: 3px; }
+.columns-step { display: grid; gap: 18px; margin-top: 8px; }
+.columns-step h3 { margin: 0; font: 400 24px/1.2 var(--serif); }
+.columns-step h3:focus { outline: none; }
+.columns-file { display: grid; gap: 10px; padding-top: 12px; border-top: 1px solid var(--ink); }
+.columns-file .kicker { margin: 0; }
+.columns-pickers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.columns-pickers label { display: grid; gap: 4px; font-size: 14px; font-weight: 500; }
+.columns-pickers select {
+  min-height: 44px; padding: 0 10px; border: 1px solid var(--rule-strong); border-radius: 4px; background: var(--paper);
+  font: 14px var(--mono); color: var(--ink);
+}
+.columns-pickers select[aria-invalid] { border-color: var(--vermilion-dark); }
+.mellow-note-inline { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 10px; margin: 0; }
+.mellow-note-inline .kicker { padding-top: 3px; }
+.mellow-note-inline .mellow-voice { font-size: 16px; }
+.preview-table { width: 100%; border-collapse: collapse; font: 13px var(--mono); }
+.preview-table caption { text-align: left; font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--graphite); padding-bottom: 4px; }
+.preview-table th { text-align: left; font-weight: 500; color: var(--graphite); padding: 4px 0; border-bottom: 1px solid var(--rule); }
+.preview-table td { padding: 4px 0; border-bottom: 1px solid var(--rule); background: var(--tint-soft); }
+.columns-privacy { margin: 0; font-size: 13px; color: var(--graphite); }
+@media (width < 600px) { .columns-pickers { grid-template-columns: 1fr; } }
+
+/* Sprint 3 · Buy: share these findings */
+.share-link { margin-top: 10px; }
+.share-block { display: grid; gap: 8px; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
+.share-block .kicker, .share-block p { margin: 0; }
+.share-block p:not(.kicker) { font-size: 14px; color: var(--graphite); }
+.share-block .ledger-button { justify-self: start; }
+.findings-dialog {
+  width: min(760px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 1px solid var(--ink); border-radius: 4px;
+  background: var(--paper); color: var(--ink); box-shadow: 0 18px 40px rgb(28 27 25 / 18%);
+}
+.findings-dialog::backdrop { background: rgb(28 27 25 / 35%); }
+.findings-sheet { padding: 32px 36px 20px; display: grid; gap: 10px; background: #fff; }
+.findings-sheet .kicker { margin: 8px 0 0; }
+.findings-sheet p { margin: 0; }
+.findings-head { display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 12px; border-bottom: 1px solid var(--ink); }
+.findings-head .kicker { margin: 0; }
+.findings-head .wordmark { font: italic 400 24px var(--serif); }
+.findings-head .wordmark span { color: var(--vermilion); font-style: normal; }
+.findings-sheet h2 { margin: 8px 0 0; font: 400 32px/1.1 var(--serif); }
+.findings-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 14px; border-top: 1px solid var(--ink); }
+.findings-table th, .findings-table td { text-align: left; padding: 8px 10px 8px 0; border-bottom: 1px solid var(--rule); }
+.findings-table thead th { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--graphite); }
+.findings-table tbody th, .findings-table td:nth-child(2), .findings-table td:nth-child(3) { font: 13px var(--mono); }
+.findings-decisions { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; }
+.findings-decisions .mono { font: 13px var(--mono); margin-right: 8px; }
+.findings-disclaimer { margin-top: 14px !important; padding-top: 10px; border-top: 1px solid var(--rule); font-size: 13px; color: var(--graphite); }
+.findings-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: flex-end; padding: 14px 36px 20px; border-top: 1px solid var(--rule); }
+.findings-status { margin: 0 auto 0 0; font-size: 13px; color: var(--graphite); }
+@media (width < 600px) { .findings-sheet { padding: 24px 18px 16px; } .findings-actions { padding: 12px 18px 16px; } }
+@media print {
+  body:has(.findings-dialog[open]) .shell > :not(.findings-dialog) { display: none !important; }
+  body:has(.findings-dialog[open]) { background: #fff; }
+  .findings-dialog[open] { position: static; display: block; width: auto; max-height: none; border: 0; box-shadow: none; }
+  .findings-dialog::backdrop { display: none; }
+  .findings-actions { display: none; }
+  .findings-sheet { padding: 0; }
+}
+.findings-scope { font: 500 12px var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--ink); }
+
+/* Dialogs: the body scrolls, the buttons stay in view; the summary sits centred like every dialog. */
+.compare-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.compare-dialog[open] > form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+.compare-dialog .compare-body { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+.compare-dialog .compare-footer { flex: none; background: var(--paper); }
+.findings-dialog { position: fixed; inset: 0; margin: auto; height: fit-content; }
+.findings-dialog[open] { display: flex; flex-direction: column; overflow: hidden; }
+.findings-dialog .findings-sheet { overflow-y: auto; min-height: 0; }
+.findings-dialog .findings-actions { flex: none; }

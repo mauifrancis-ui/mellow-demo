@@ -532,3 +532,68 @@ Proposal on the canvas page "Sprint 3 · From first look to yes": the marketing 
 2. Approve the sprint 3 proposal with the review changes (the phone hero, the phone screenshot, a launch tied to the build).
 3. The founder decides where the site lives.
 4. The founder confirms the pilot offer, the contact address and any price line.
+
+
+## Sprint 3 · founder decision, implementation, preview and Product Excellence Review · v1.38
+
+**Founder decision (2026-11-25).** Approved the sprint 3 and 4 briefs and the sprint 3 proposal. Contact email: the founder's own. **No pilot and nothing about price**, because Mellow is an end-to-end prototype and that strategy comes later. Where the site lives wasn't answered, so the team took the option that preserves the established entry point: `/welcome/`, with the demo staying at `/` (reversible).
+
+### Implementation and preview review
+
+| Role | Finding | Status |
+| --- | --- | --- |
+| Compliance and Risk | **Caught in our own draft:** the site said "up to 2 MB per file", but comparing two files is limited to 500 KB each (2 MB is the single-file import). Corrected. | Closed |
+| AI UX Designer/Engineer | **Caught in build (honesty):** answers about packages from your own files were stamped "Compared · 2 files" and listed the *sample* files, with an all-packages count. Provenance now comes from the file set each package came from, with its own count and a "compared at" time. Added test P-1. | Closed |
+| Content and Voice | **Caught in build:** the summary would have printed the internal decision name "Approved", which reads as a sign-off. It now uses the app's words ("Issue recorded"). Added test S2b. | Closed |
+| Compliance and Risk | A disclaimer only at the foot, in small grey type, may not survive a photocopy. Added a mono line under the title: "A comparison of two files. Not a compliance assessment." | Closed |
+| Product Designer | **Caught in build:** the share dialog opened pinned to the top-left, and the column step pushed "Compare 2 files" below the screen. Both dialogs now centre, scroll their body and keep their buttons in view at 1440px and 390px. | Closed |
+| Product Designer (systems and IA) | Two doors now open the same dialog: "Compare files" in the briefing and "Use my files" in the sample bar. | Medium, sprint 4: one door. |
+| Engineer | Lint, type check, build and 74 tests pass. No horizontal overflow on Today, Activity or Learn at 390px, 1024px and 1440px. No console errors. The site makes no third-party requests, all its links resolve, and its fonts load locally. | Closed |
+| Accessibility | The Tab order follows the page. The skip link is first on the site. Native `select`s have labels, and an unchosen column is marked invalid. With reduced motion, nothing animates. Dialogs close with Escape. | Closed |
+
+### Product Excellence Review · v1.38 · synthetic
+
+The users were the five fictional archetypes, with the team and the board in the room. **Evidence grade: Synthetic.**
+
+**Found Broken during the walk, fixed before scoring.** Luis compared his files, the page reloaded, and Mellow said "I don't see PKG-1002 in today's records" while PKG-1002 sat in his queue, stamped against the sample. Mellow contradicted its own queue. Rows from your comparisons are now saved with the queue, and reset clears them (evaluation case E6).
+
+| CUJ | Discover | Learn | Try | Buy | Get started | Use | Get help | Expand | End use |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 · Resolve a mismatch | – | – | – | – | G | **F** (phone: the queue sits behind Show) | G | – | – |
+| 2 · Ask and trust | – | G | – | – | G | **F** ("Compared" may still read as "approved") | G (it names your own files now) | – | – |
+| 3 · Try on our own files | **G** (the site, with an honest "does and doesn't") | **G** | **G** (sample bar, templates, column matching, preview) | **G for a prototype** (share findings; pricing and approval out of scope by founder) | **F** (a one-off import; column choices aren't remembered) | G | G | **NS** (sprint 4) | **NS** (sprint 4; "Reset sample" is a partial) |
+
+**Handoffs.** Discover → Try: Good ("Open the demo"). Try → Buy: **Good** (was Not served). Try → Get started: Friction.
+
+**Movement since v1.37.** Discover went from Not served to Good, Learn from Friction to Good, Try from Friction to Good, Buy from Not served to Good for a prototype, and Try → Buy from Not served to Good.
+
+**Provocations (recorded verbatim).**
+- Product Lead: "A lead opens the site on a phone at the dock. Can they even get their export files onto a phone?"
+- Research: "In a one-store shop, who is 'whoever signs off'?"
+- AI UX: "Should Mellow remember a file's column choices next time?"
+- Product Designer: "Two doors to the same dialog. Which one survives?"
+- Content: "Is 'Fictional records' the clearest way to say sample?"
+- Compliance: "Does the summary say who made each decision?"
+- Accessibility: "Has anyone read the printed PDF with a screen reader?"
+- Engineer: "What does a 500 KB, 10,000-row file feel like on a cheap phone?"
+- Design Director: "Is the site's first screen memorable, or merely correct?"
+- Norman: "Does a person know their files were added to the queue, not swapped in for it?"
+- Rams: "Could the sample bar step aside once someone uses their own files?"
+
+**How might we, plus a bold idea.**
+
+| # | How might we… | Bold idea |
+| --- | --- | --- |
+| 1 | …make the second import effortless? | Remember column choices by file name pattern, then go straight to the preview. |
+| 2 | …try from a phone when exports live on a desktop? | "Send this to my computer": a plain link to copy, with no account. |
+| 3 | …show that files were *added*? | A margin note with a deterministic trigger: "Added 2 from your files: PKG-1002, PKG-1003." |
+| 4 | …give the summary a human signature? | A name field on the summary, typed by the person and never inferred. |
+| 5 | …make the first screen unforgettable? | Lead with one live comparison: two lot numbers side by side, disagreeing, in big type. |
+
+**Gate check.**
+- No Broken cells: **met** (one found and fixed before scoring).
+- Every Friction cell has an owner and a sprint 4 slot: CUJ 1 Use (phone next package), CUJ 2 Use ("Compared" clarity), CUJ 3 Get started (workspace setup, remembered columns).
+- Not served: Expand and End use, the sprint 4 targets, which the founder accepted as part of the plan.
+- The evaluation set passes, 74 of 74.
+
+**The gate is met. Awaiting the founder's release decision.**

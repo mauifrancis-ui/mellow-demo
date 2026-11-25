@@ -27,6 +27,8 @@ export type AskContext = {
   comparison: LotCheck[];
   runs: Run[];
   receiving: "current" | "delayed";
+  /** Files the person compared, so provenance names the right sources for each package. */
+  fileSets?: FileSet[];
   /** Mellow's previous answer in this conversation, so "how do you know?" can explain it. */
   previous?: AskAnswer;
 };
@@ -44,7 +46,9 @@ export type AskAnswer = {
 };
 
 /** How Mellow knows what it said. Verified only when the answer comes straight from compared records. */
-export type Basis = { verified: boolean; label: string; sources: string[]; at?: string };
+export type FileSet = { files: string[]; packageIds: string[]; at: string };
+
+export type Basis = { verified: boolean; label: string; sources: string[]; at?: string; atKind?: "check" | "compared" };
 
 export const suggestions = [
   "What needs me right now?",
@@ -161,10 +165,17 @@ const fromRecords = new Set<AskAnswer["intent"]>(["package", "unknown-package", 
 
 export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefined {
   const last = context.runs.at(-1);
-  const files = ["Inventory export (sample)", "Receiving log (sample)"];
+  const sample = ["Inventory export (sample)", "Receiving log (sample)"];
+  const sets = context.fileSets ?? [];
+  const setFor = (id?: string) => (id ? sets.find(({ packageIds }) => packageIds.includes(id)) : undefined);
+  const usesSample = context.comparison.some(({ packageId }) => !setFor(packageId));
+  const allFiles = [...new Set([...(usesSample ? sample : []), ...sets.flatMap(({ files }) => files)])];
+  const focusSet = setFor(answer.focusId);
+  const files = answer.focusId ? focusSet?.files ?? sample : allFiles;
+  const at = focusSet ? focusSet.at : last?.checkedAt;
   if (answer.intent === "explain") return context.previous?.basis;
   if (answer.intent === "judgment") {
-    return answer.focusId ? { verified: true, label: `2 files · ${answer.focusId}`, sources: [`${answer.focusId} in both files`, ...files], at: last?.checkedAt } : undefined;
+    return answer.focusId ? { verified: true, label: `${files.length} files · ${answer.focusId}`, sources: [`${answer.focusId} in both files`, ...files], at, atKind: focusSet ? "compared" : "check" } : undefined;
   }
   if (answer.intent === "handoff") {
     return { verified: true, label: "Your decisions on this device", sources: ["Decisions saved in Activity on this device", "Nothing was sent anywhere"] };
@@ -174,13 +185,18 @@ export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefin
       sources: ["Written guidance, not read from your records", "State rules aren’t loaded, so confirm with your regulator’s current materials"] };
   }
   if (!fromRecords.has(answer.intent)) return undefined;
-  const rows = `${context.comparison.length} packages compared`;
+  const inSet = (id: string) => sets.some(({ packageIds }) => packageIds.includes(id));
+  const count = focusSet ? focusSet.packageIds.length
+    : answer.focusId ? context.comparison.filter(({ packageId }) => !inSet(packageId)).length : context.comparison.length;
+  const rows = `${plural(count, "package")} compared`;
   const sources = answer.intent === "summary"
     ? [`${plural(context.runs.length, "check")} today, earlier ones are sample data`, ...files]
     : answer.intent === "source"
       ? ["Receiving source status at the last check", ...files]
       : answer.focusId ? [`${answer.focusId} in both files`, ...files, rows] : [...files, rows];
-  return { verified: true, label: answer.intent === "summary" ? `${plural(context.runs.length, "check")} · ${plural(last?.checked ?? 0, "package")} last` : `2 files · ${context.comparison.length} packages`, sources, at: last?.checkedAt };
+  const label = answer.intent === "summary" ? `${plural(context.runs.length, "check")} · ${plural(last?.checked ?? 0, "package")} last`
+    : answer.focusId ? `${files.length} files · ${answer.focusId}` : `${files.length} files · ${context.comparison.length} packages`;
+  return { verified: true, label, sources, at: answer.intent === "summary" ? last?.checkedAt : at, atKind: focusSet && answer.intent !== "summary" ? "compared" : "check" };
 }
 
 function answerFor(input: string, context: AskContext): AskAnswer {

@@ -410,3 +410,17 @@ Brand direction under review on the design canvas, page "Ask Mellow · AI brand"
 - **Activity · Mellow notes today:** every note Mellow said first, in order, marked Shown or Dismissed with its time. These are never decisions. The trail comes from the events that create notes, so a note replaced by a later one still appears.
 - **Demo:** "Simulate a new check" in "What I checked". The first adds PKG-610; the second adds three (batched).
 - **Small vermilion text:** always vermilion-dark `#A93319` (5.97:1 on paper).
+
+
+## Version 1.38 From first look to yes
+
+- **Marketing site** at `/welcome/`; the demo stays at `/`. Field Ledger throughout:
+  - self-hosted fonts and no third-party requests
+  - a "does and doesn't" ledger
+  - real screenshots of the demo, with the phone screenshot as the hero below 860px
+  - a "Take it to whoever signs off" section
+  - a contact email; no pilot or price, by founder decision: this is an end-to-end prototype
+- **Sample bar** at the top of Today: "Simulate a new check", "Simulate a delay" or "Restore the source", "Use my files", and "Reset sample" (a two-step confirmation that clears this device's decisions, notes and your compared files).
+- **Bring your files:** templates in the compare dialog; "Next: match columns" shows each file's package ID and lot selects, filled in by known names. Mellow asks in the margin when it can't tell, and previews the first rows as it will read them. "Compare 2 files" stays disabled in effect until all four columns are chosen. The body scrolls while the buttons stay in view.
+- **Your files in Mellow:** rows from your comparisons are saved on the device with the queue they create. Answers about those packages name your files and say "compared at".
+- **Share these findings:** from Activity and from the queue. A centred dialog holding a one-page sheet: what was compared (each set of files with its time), the packages that need a person (disagreements first), decisions so far in the app's own words, and "Not a compliance assessment" under the title and at the foot. Close, "Copy as text", "Print or save as PDF" (the print stylesheet prints the sheet alone).

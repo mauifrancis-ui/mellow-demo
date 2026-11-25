@@ -10,7 +10,7 @@ export function ReceivingMonitor({ posture, open, onToggleDelay, onSimulateCheck
   onSimulateCheck?: () => void;
   focusSeries?: Series | null;
   onFocusSeries?: (series: Series | null) => void;
-  onToggleDelay: () => void;
+  onToggleDelay?: () => void;
 }) {
   const delayed = posture.receiving === "delayed";
   const run = posture.lastSuccessfulRun;
@@ -36,10 +36,10 @@ export function ReceivingMonitor({ posture, open, onToggleDelay, onSimulateCheck
           </tbody>
         </table>}
         <p>Earlier checks are fictional sample data. These records can show a difference. A person verifies the physical package.</p>
-        <div className="monitor-actions">
+        {(onSimulateCheck || onToggleDelay) && <div className="monitor-actions">
           {onSimulateCheck && <button className="ledger-button" data-variant="line" onClick={onSimulateCheck} disabled={delayed}>Simulate a new check</button>}
-          <button className="ledger-button" data-variant="line" onClick={onToggleDelay}>{delayed ? "Restore sample source" : "Simulate a source delay"}</button>
-        </div>
+          {onToggleDelay && <button className="ledger-button" data-variant="line" onClick={onToggleDelay}>{delayed ? "Restore sample source" : "Simulate a source delay"}</button>}
+        </div>}
       </div>
     </details>
   </section>;

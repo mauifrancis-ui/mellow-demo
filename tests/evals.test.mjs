@@ -146,3 +146,16 @@ test("E5 · What evidence is required? says it can't say what the law requires, 
   assert.match(answer.body, /^I can’t say what the law requires\./);
   assert.equal(answer.basis.verified, false);
 });
+
+test("P-1 · provenance names the files a package actually came from", () => {
+  const rows = [{ packageId: "PKG-1002", inventory: "LOT-0912", receiving: "LOT-0915", state: "different" }];
+  const own = { ...context, comparison: [...context.comparison, ...rows], fileSets: [{ files: ["inventory_nov25.csv", "receiving_log.csv"], packageIds: ["PKG-1002"], at: "2026-11-25T20:27:00Z" }] };
+  const mine = ask("Anything wrong with PKG-1002?", own);
+  assert.deepEqual(mine.basis.sources, ["PKG-1002 in both files", "inventory_nov25.csv", "receiving_log.csv", "1 package compared"]);
+  assert.equal(mine.basis.at, "2026-11-25T20:27:00Z");
+  assert.equal(mine.basis.atKind, "compared", "a file comparison isn't a check");
+  const sample = ask("Anything wrong with 443?", own);
+  assert.ok(sample.basis.sources.includes("Inventory export (sample)"));
+  assert.ok(sample.basis.sources.includes("8 packages compared"), "the sample count excludes your files");
+  assert.match(ask("Show me today's gaps", own).basis.label, /^4 files/);
+});

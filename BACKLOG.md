@@ -9,7 +9,12 @@ Small bugs bypass the full review (see AGENTS.md). Each one is fixed, checked an
 | 1 | The expanded right panel scrolls sideways 8px, cutting off the end of queue rows ("Import" or the time) | Founder, 2026-11-25 | Inner room for the row hover band; columns never scroll sideways; focus ring drawn inside the row (v1.37.1) | Shipped |
 | 2 | On phones, the chat panel bleeds 4px past the screen, so the page can shift sideways | Team, while fixing #1 | The panel bleeds exactly to the 16px page margin (v1.37.1) | Shipped |
 
-## Sprint 3 candidates
+## Sprint 4 additions from the v1.38 Product Excellence Review
+
+- One door to the compare dialog ("Compare files" vs "Use my files").
+- Remember column choices; a note when files are added; a typed name on the summary; "Send this to my computer".
+
+## Sprint 3 candidates (done in v1.38 unless noted)
 
 0. **Rebuild the marketing site** (audit in DESIGN_BOARD.md, 2026-11-25): Field Ledger, honest claims, a real demo handoff, no fabricated testimonials or scores.
 
