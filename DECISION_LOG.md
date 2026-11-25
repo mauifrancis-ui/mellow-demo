@@ -324,3 +324,15 @@ Verification: lint, type check, build and 74 tests pass; browser checks at 390px
 - a Broken reload contradiction found in the Product Excellence Review
 
 The gate is met (synthetic). Awaiting the founder's release decision.
+
+## Texas regulatory direction · 2026-11-25
+
+The founder asked for state, local and federal law as linked references, with control posture and audit readiness, starting with Texas, plus the anticipated 2027 bills. The founder kept the principles unchanged: no verdicts, no untraceable scores, no predictions. The team placed the work across sprints 4 to 6 (DESIGN_BOARD.md). The founder framed the bills as a hypothetical "turned blue" scenario; reporting shows the Texas House flipped in the November 2026 midterms and that adult-use bills are pre-filed for the session that convenes 2027-01-12. Sources the team used:
+- Texas DPS on HB 46 and the TCUP expansion
+- DSHS Consumable Hemp Program and Texas Register adopted rules (March 2026)
+- Clark Hill (2026-08-04) on delta-8 scheduling
+- ABA and Gibson Dunn on federal rescheduling (April 2026)
+- Morgan Lewis (2026-09-24) on the post-hearing status
+- NORML, Cannabis Business Times and the Texas Tribune (November 2026) on the pre-filed bills
+
+These are research inputs, not legal advice. Every regulatory reference will be verified by a person before it ships.

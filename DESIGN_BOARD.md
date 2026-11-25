@@ -597,3 +597,37 @@ The users were the five fictional archetypes, with the team and the board in the
 - The evaluation set passes, 74 of 74.
 
 **The gate is met. Awaiting the founder's release decision.**
+
+## Team decision: where Texas law, control posture and the 2027 bills fit · 2026-11-25
+
+**The founder's request.** Load state, local and federal law as linked references, and help teams see control posture and audit readiness, starting with Texas. Also consider the anticipated bills. The founder kept Mellow's principles unchanged: no verdicts, no scores that don't trace to a cited control, no predictions.
+
+**What Research and Compliance found (sources in DECISION_LOG.md).**
+- **Two regulated segments in Texas fit Mellow's receiving work.**
+  - **TCUP dispensing organizations**, licensed and physically inspected by DPS. HB 46 (effective 2025-09-01) takes the program from 3 to 15 licenses, and new licensees must be operational within 24 months.
+  - **Consumable hemp manufacturers and retailers**, under DSHS rules effective 2026-03-31: testing, packaging, labeling and recordkeeping, with TABC assisting inspections. Delta-8 and related isomers became Schedule I under Texas law on 2026-07-31, and litigation over the rules is ongoing.
+- **Federal status is split.** State-licensed medical marijuana and FDA-approved products are Schedule III (effective 2026-04-28). Adult-use remains Schedule I, and broader rescheduling is unresolved. The federal hemp definition changes in November 2026.
+- **The 2027 session (convenes 2027-01-12):** pre-filed bills include HB 369 and HB 362 (adult use), SB 237 (adult use) and HB 330 (TCUP expansion). After the November 2026 midterms, Democrats control the Texas House and Republicans keep the Senate. **The team takes no view on passage.**
+- **Law here moves monthly.** Every reference needs its source, its effective date, its status (in effect, under litigation, proposed) and a "last verified by a person" date.
+
+**Team decision on sequencing.** The Product Lead was accountable; every role was consulted.
+
+| Sprint | Name | What it carries | Why here |
+| --- | --- | --- | --- |
+| **4** | Trust on the floor + Texas groundwork | As briefed, **minus the second store (Expand)**, **plus** a **regulation source registry**. It holds the official links, citation, agency, effective date, status (in effect, litigated or proposed) and "last verified" date for the Texas, federal and local sources above. It's shown in Learn as references only: no checks and no interpretation. The inspector export becomes the skeleton of the binder. | The registry needs no expert sign-off, because it quotes and links. Building it first means sprint 5 starts with verified sources. The inspector export was already in sprint 4. |
+| **5** | Inspection prep · Texas, current law | **Controls checked from your records**, each tied to a cited rule: met, gap, or "can't check from these files", reported as counts and never as a score. **Evidence on file per control** (what an inspector will ask to see). The **inspection prep binder** export. One segment first. | Controls must be chosen and verified by a regulatory expert. That review starts during sprint 4 so sprint 5 isn't blocked. |
+| **6** | What if · the 2027 session | **Scenario view for pre-filed bills.** For each bill: its status, a link to its text, and which of today's checks it would add, change or remove, all labeled "Proposed, not law" and updated as bills move. Plus **Expand** (the second store). | A bill can only be compared against verified current-law controls, which come from sprint 5. Bills change heavily in session, which opens 2027-01-12, so sprint 6 lands as they start moving. |
+
+**Guardrails the team set.**
+- **Proposed is never law.** Scenario content can never feed a current check, a count or a note.
+- **Neutral.** Bills are described by their text and status only. No advocacy, no likelihood of passage.
+- **Litigated rules** are flagged as such, with the date the status was last checked.
+- **Expert verification** happens before any control ships (sprint 5). Counsel reviews the disclaimers.
+- **New evaluation cases** for these features: no "compliant" or "will pass"; every count traces to its controls; scenario answers always say "proposed".
+
+**Effect on the journey plan.** Expand moves from sprint 4 to sprint 6, so it stays Not served one sprint longer. The founder needs to accept that.
+
+**Founder decisions needed.**
+1. The sequence above.
+2. Which segment goes first in sprint 5: TCUP dispensing organizations or consumable hemp.
+3. Who the regulatory expert is, and when they start (it should be during sprint 4).

@@ -28,6 +28,12 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
 6. "Watch a shift": a guided Try mode that plays a scripted day.
 7. Export the decision and note trail for inspectors (PDF or CSV).
 
+## Texas roadmap (team decision 2026-11-25)
+
+- Sprint 4: the regulation source registry (references only), plus the binder skeleton.
+- Sprint 5: inspection prep for Texas current law: checked controls, evidence on file, the binder.
+- Sprint 6: "What if" for the 2027 session bills, plus Expand.
+
 ## Open items
 
 - Real sessions with 3 to 5 receiving leads (Research). "Compared" comprehension comes first.
