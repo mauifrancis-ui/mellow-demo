@@ -336,3 +336,10 @@ The founder asked for state, local and federal law as linked references, with co
 - NORML, Cannabis Business Times and the Texas Tribune (November 2026) on the pre-filed bills
 
 These are research inputs, not legal advice. Every regulatory reference will be verified by a person before it ships.
+
+## Texas plan approved · 2026-11-25
+
+The order for sprints 4 to 6 is approved with the board's changes. Hemp is the first segment (the default). There is no regulatory expert yet:
+- Controls are labeled "not reviewed by a regulatory expert" until one signs off.
+- Expert review blocks real-business use, not the prototype.
+- The product refers people to the State Bar of Texas Lawyer Referral & Information Service and the DSHS hemp program contact, and never to a specific firm.

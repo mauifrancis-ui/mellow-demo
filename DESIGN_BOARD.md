@@ -665,3 +665,21 @@ The users were the five fictional archetypes, with the team and the board in the
    - Make "What if" opt-in, off by default, in its own view.
 3. Prefer hemp for the first segment (Research), with the founder deciding.
 4. Blocking condition: a named regulatory expert before the sprint 5 build.
+
+### Texas · founder decision (Step 3) · 2026-11-25
+
+**Approved:** the sprint 4 to 6 order with the board's changes:
+- the registry is narrowed to the sources sprint 5 cites;
+- "What if" is opt-in, off by default, in its own view;
+- the statuses are On file, Missing, and Can't check from these files.
+
+**First segment:** consumable hemp, on Research's recommendation. The founder didn't object; this is recorded as the default and is open to change.
+
+**Regulatory expert.** The founder has no expert. Compliance and Risk revised the blocking condition:
+- **In the prototype:** sprint 5 can build controls, each labeled *"Drafted from the rule text · not reviewed by a regulatory expert"* and linked to the exact rule. No control may drop that label until a named expert signs off.
+- **Before any real business relies on it:** expert review blocks release. This replaces "blocks the sprint 5 build".
+- **In the product, refer; don't recommend:**
+  - The "Get help" pointer says: *"For a decision about your business, talk to a licensed attorney."*
+  - It links the State Bar of Texas Lawyer Referral & Information Service, a certified referral service, and, for hemp rules, the DSHS Consumable Hemp Program's contact.
+  - Mellow never names or ranks a firm, because that would be an endorsement.
+- **For the team:** the founder may contact a Texas cannabis or hemp attorney later. Mellow drafts the outreach and never sends it.
