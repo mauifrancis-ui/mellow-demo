@@ -269,3 +269,7 @@ The founder directed the team to use IBM's Universal Experiences journey (Discov
 
 The founder approved the board's six recommendations and the release. This was built through the full cadence (sprint brief, review by role, board pass, founder decision, implementation review, preview review). Mellow now answers questions about itself, explains how it knows (from the previous answer's basis), refuses decision commands and compliance verdicts, and shows a "Compared · files · check time" stamp on factual answers. The evaluation set (MELLOW_EVALS.md) runs as `tests/evals.test.mjs` and gates release: 51 of 51 tests pass. Open items: the evidence-question over-match (AI UX), user sessions (Research), counsel on AI disclosure before live AI (Compliance), the system map (Product Designer), and the sprint 2 proactive margin note.
 Released to production 2026-11-25 (main at 528655d). Verified live: the violation, package, "how do you know", approve, "are you an AI" and off-topic questions all answered as specified, with the Compared stamp on factual answers only.
+
+## Sprint 1 retro · 2026-11-25
+
+Recorded in DESIGN_BOARD.md. The evaluation set went from 1 pass, 4 partial and 11 fail to every case passing. Comprehension wasn't measured because there have been no user sessions. Six follow-ups were assigned to owners, including a retro board pass on 1.31 to 1.34, which shipped without review.

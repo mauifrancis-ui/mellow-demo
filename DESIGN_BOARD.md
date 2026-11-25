@@ -214,3 +214,45 @@ The founder adopted the Universal Experiences journey on 2026-11-25, while this 
 | Research | No user sessions yet. Provenance comprehension stays a hypothesis for the sprint 2 sessions. | Open, owner Research |
 
 **Preview review result.** No blockers or open highs. Ready for release under the founder's go-ahead.
+
+## Sprint 1 retro · v1.36 · 2026-11-25
+
+The Product Lead was accountable; Research and AI UX were responsible; all other roles were consulted.
+
+### Outcomes against the sprint brief
+
+| Measure | Target | Result |
+| --- | --- | --- |
+| Evaluation set | 100% pass | Production went from 1 pass, 4 partial and 11 fail to every case passing. 51 of 51 tests now gate release. |
+| Factual answers show what was compared | All | Yes, for every record intent (checked by test). |
+| No compliance verdicts, risk scores or predictions | None | None (checked by test). |
+| User comprehension of the stamp | Unknown | **Not measured.** There have been no user sessions, so we don't know if leads notice or understand it. |
+
+### What worked
+
+- **Testing against production first.** AI UX ran real questions against the live app before designing. That turned "brand options" into a live blocker and re-ordered the sprint around it.
+- **Role-named findings.** The Product Designer's systems note (Mellow already speaks first with one pattern) replaced an invented dot with an existing pattern. It also caught the ring-means-gap collision again during the build.
+- **The evaluation set as a gate.** It turned "be honest" into 51 tests that fail loudly.
+- **Journey lens.** Universal Experiences exposed the Try-to-Buy risk that raised the hotfix's priority.
+
+### What didn't
+
+- **Process slipped before it was written down.** Versions 1.31 to 1.34 shipped with no team or board review. A prototype was started before any review. The first "Team take" note was Claude's own view, labeled as the team's.
+- **The charter changed mid-sprint.** The review ran three times as the team was defined (the first pass, the charter rerun, the journey addendum). The decisions were better for it, but it cost time.
+- **A risky command reached the safety check.** A hard reset plus a direct push to production was blocked, correctly. Releases now only fast-forward `main` after the founder's go-ahead.
+- **No users in the loop.** Research has no way to reach receiving leads, so every user-facing claim is still a hypothesis.
+
+### Follow-ups
+
+| # | Item | Owner |
+| --- | --- | --- |
+| 1 | Retro board pass on 1.31 to 1.34, which shipped without review | Design Director |
+| 2 | Evidence-question over-match ("What evidence is required for…"): decide the expected behavior, add the evaluation case, fix | AI UX |
+| 3 | System map of objects, states, surfaces and journey stages | Product Designer |
+| 4 | A way to reach 3 to 5 receiving leads, or an agreed proxy | Founder, with Research |
+| 5 | Counsel review of AI disclosure before live AI | Founder, with Compliance |
+| 6 | Measure time to first finding in Try (journey target under 10 minutes) | Product Lead, Engineer |
+
+### What sprint 2 should measure
+
+Whether people understand what Mellow compared (the stamp) and whether a proactive note helps or interrupts. Both need users or an agreed proxy.
