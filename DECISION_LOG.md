@@ -373,3 +373,7 @@ The founder approved the release (Step 6): "Let's deploy the best most up to dat
   - the phone section says Today opens on your next package;
   - all three screenshots were retaken from v1.39, with matching alt text.
 - **Still not vetted by people:** real users, a named checker for the rules, and attorney review of the referral and disclaimers.
+
+## Activity marks and type released · 2026-11-25
+
+The founder approved the release ("ok re-deploy"). Activity has no marks; decision words are 14px.
