@@ -427,48 +427,7 @@ nav[data-pill] button { position: relative; z-index: 1; }
 .shell[data-palette] .masthead nav[data-pill] button[aria-current],
 .shell[data-palette] .masthead nav[data-pill] button[aria-current]:hover { background: transparent; }
 
-/* Motion system. Every movement answers an action or a state change.
-   Reduced motion keeps the same end states with no timed movement. */
-@media (prefers-reduced-motion: no-preference) {
-  /* Press and hover: 120ms */
-  :where(button, .upload, .queue-row, .queue-link, .next-record, summary) {
-    transition: background-color var(--motion-press) var(--ease), color var(--motion-press) var(--ease),
-      border-color var(--motion-press) var(--ease), transform var(--motion-press) var(--ease);
-  }
-  :where(button:not(.queue-row), .upload, .review-options summary):active { transform: translateY(1px); }
-  .queue-row .chevron { transition: transform var(--motion-press) var(--ease); }
-  .queue-row[aria-current] .chevron { transform: translateX(2px); }
-  .chart-tip { animation: arrive var(--motion-press) var(--ease) both; }
-
-  /* Arrival: 180ms */
-  .page { animation: arrive var(--motion-arrive) var(--ease) both; }
-  .feedback:not(:empty) { animation: arrive var(--motion-arrive) var(--ease) both; }
-  .compare-dialog[open]::backdrop { animation: fade var(--motion-arrive) var(--ease) both; }
-
-  /* Change and disclosure: 200ms */
-  .nav-pill { transition: transform var(--motion-change) var(--ease), width var(--motion-change) var(--ease); }
-  .queue-row { transition: background-color var(--motion-change) var(--ease), box-shadow var(--motion-change) var(--ease); }
-  .record-identity, .monitor-message, .compare-dialog[open] { animation: reveal var(--motion-change) var(--ease) both; }
-  .evidence, .review-options[open] .review-options-body, .monitor-details[open] .monitor-detail-body,
-  .note[open] textarea { animation: reveal var(--motion-change) var(--ease) both; }
-  :is(.review-options, .monitor-details, .note) > summary::after { transition: transform var(--motion-change) var(--ease); }
-  .count { display: inline-block; animation: tick var(--motion-change) var(--ease) both; }
-  .chart-column { animation: grow var(--motion-change) var(--ease) both; animation-delay: calc(var(--i, 0) * 28ms); }
-  .chart-column { transition: opacity var(--motion-press) var(--ease), translate var(--motion-press) var(--ease); }
-  .chart-slot[data-current] .chart-column { translate: 0 -2px; }
-  .chart-column [data-series] { transition: opacity var(--motion-change) var(--ease); }
-  .answer { animation: reveal var(--motion-change) var(--ease) both; }
-  .quick-card { transition: background-color var(--motion-press) var(--ease), border-color var(--motion-press) var(--ease), translate var(--motion-press) var(--ease), box-shadow var(--motion-press) var(--ease); }
-  .quick-card:hover { translate: 0 -1px; }
-  .composer { transition: border-color var(--motion-press) var(--ease), box-shadow var(--motion-press) var(--ease); }
-  .chart-delayed { animation: fade var(--motion-change) var(--ease) both; }
-
-  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-  @keyframes arrive { from { opacity: .78; } to { opacity: 1; } }
-  @keyframes reveal { from { opacity: .72; transform: translateY(var(--motion-travel)); } to { opacity: 1; transform: none; } }
-  @keyframes tick { from { opacity: .4; transform: translateY(calc(var(--motion-travel) * -1)); } to { opacity: 1; transform: none; } }
-  @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-}
+/* Motion lives in motion.css (sprint 5, E1). */
 
 /* Chart head, totals and focus legend */
 .chart-head { display: grid; gap: 2px; }

@@ -178,18 +178,6 @@
   .shell[data-palette="ledger"] .chart-legend button:hover { border-color: var(--ink); }
   .shell[data-palette="ledger"] .compare-trigger:hover { background: var(--tint); }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .chip, .tool, .ledger-button, .text-link, .composer textarea, .shell[data-palette="ledger"] .ledger-queue .queue-row {
-    transition: background-color var(--motion-press) var(--ease), border-color var(--motion-press) var(--ease),
-      color var(--motion-press) var(--ease), box-shadow var(--motion-press) var(--ease), transform var(--motion-press) var(--ease);
-  }
-  .ledger-button svg { transition: transform var(--motion-press) var(--ease); }
-  .ledger-button.send:hover svg { transform: translateX(3px); }
-  .chip:active, .tool:active, .ledger-button:active { transform: translateY(1px); }
-  .mellow-voice { animation: settle var(--motion-change) var(--ease) both; }
-  .ledger-record-body { animation: reveal var(--motion-change) var(--ease) both; }
-  @keyframes settle { from { opacity: 0; } to { opacity: 1; } }
-}
 
 /* Narrow screens: one column, side panel follows the record */
 @media (width < 900px) {
@@ -329,11 +317,6 @@
   .answer-row:is(button):hover .answer-open { text-decoration: underline; text-underline-offset: 3px; }
   .evidence-toggle:hover, .log-tools .text-link:hover { color: var(--ink); }
 }
-@media (prefers-reduced-motion: no-preference) {
-  .turn-pair[data-latest] { animation: settle var(--motion-change) var(--ease) both; }
-  .evidence-detail { animation: reveal var(--motion-change) var(--ease) both; }
-  .answer-row, .references a { transition: background-color var(--motion-press) var(--ease), box-shadow var(--motion-press) var(--ease); }
-}
 @media (width < 600px) {
   .turn, .margin-note, .term { grid-template-columns: minmax(0, 1fr); gap: 6px; }
   .decision-row { grid-template-columns: 76px minmax(0, 1fr) auto; row-gap: 2px; padding: 8px 0; }
@@ -360,7 +343,6 @@
 .shell[data-palette="ledger"] .dropdown .review-options-body .note summary { padding-inline: 8px; font-weight: 500; }
 
 /* Context panel: follows the conversation, collapses to a strip */
-.ledger:has(> .context-panel) { transition: grid-template-columns var(--motion-change) var(--ease); }
 .ledger:has(> .context-panel[data-collapsed]) { grid-template-columns: minmax(0, 1fr) 112px; }
 .ledger:has(> .context-panel[data-collapsed]) > .ledger-main { max-width: 860px; }
 .context-panel { align-content: start; gap: 20px; }
@@ -404,12 +386,6 @@
 .trail small { display: block; margin-top: 2px; font: 12px var(--mono); color: var(--graphite); }
 .trail-note { margin: 0; font: italic 17px/1.45 var(--serif); color: var(--voice); }
 
-@media (prefers-reduced-motion: no-preference) {
-  .panel-body { animation: settle var(--motion-change) var(--ease) both; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ledger:has(> .context-panel) { transition: none; }
-}
 
 /* Phones and narrow screens: the panel becomes a bottom sheet over the page */
 @media (width < 900px) {
@@ -490,10 +466,6 @@
 .shell[data-palette="ledger"] .ask-drawer .conversation-log .answer .mellow-voice { font-size: 17px; }
 .ask-drawer .ask-note { margin-bottom: 0; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .ask-drawer { transform-origin: top right; animation: drawer-in var(--motion-change) var(--spring) both; }
-  @keyframes drawer-in { from { opacity: 0; transform: translateY(-8px) scale(.985); filter: blur(1.5px); } }
-}
 
 @media (width < 600px) {
   .shell[data-palette="ledger"] .ask-trigger { padding: 0 10px; }
@@ -506,10 +478,6 @@
 }
 @media (width < 900px) {
   .ask-drawer { top: auto; right: 0; bottom: 0; left: 0; width: auto; max-height: 82dvh; border-width: 1px 0 0; border-radius: 8px 8px 0 0; box-shadow: 0 -10px 24px rgb(28 27 25 / 12%); }
-  @media (prefers-reduced-motion: no-preference) {
-    .ask-drawer { transform-origin: bottom center; animation-name: sheet-in; }
-    @keyframes sheet-in { from { opacity: 0; transform: translateY(24px); } }
-  }
 }
 @media (hover: none) { .shell[data-palette="ledger"] .ask-trigger kbd { display: none; } }
 
@@ -550,11 +518,6 @@
 .basis-sources .kicker { margin: 0 0 6px; }
 .basis-sources ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
 .basis-sources li::before { content: "· "; color: var(--graphite); }
-@media (prefers-reduced-motion: no-preference) {
-  .basis > summary { animation: stamp var(--motion-press) var(--spring) both; animation-delay: 220ms; }
-  @keyframes stamp { from { opacity: 0; transform: scale(1.06); } }
-  .basis[open] .basis-sources { animation: drawer-in var(--motion-arrive) var(--ease) both; }
-}
 
 
 /* Sprint 2 · mark grammar: the filled dot means "records disagree" only. NOW, NEW and "1 waiting" are words. */
@@ -594,10 +557,6 @@
 @media (width < 600px) {
   .mellow-note, .mellow-note[data-compact] { grid-template-columns: minmax(0, 1fr) auto auto; }
   .mellow-note > .kicker { grid-column: 1 / -1; }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .mellow-note { animation: settle var(--motion-arrive) var(--ease) both; }
-  .note-why[open] .note-why-body { animation: drawer-in var(--motion-arrive) var(--ease) both; }
 }
 
 .monitor-actions { display: flex; flex-wrap: wrap; gap: 8px; }

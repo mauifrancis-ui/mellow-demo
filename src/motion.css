@@ -1,17 +1,30 @@
-/* Motion v2: organic and unhurried. Things ease out like a sheet of paper
-   settling, never snap. Every movement still answers an action or a state
-   change, and reduced motion removes all timed movement. */
+/* Motion · the one source (sprint 5, E1 to E4). Nothing else in the app animates.
+   Principles (MELLOW_DESIGN_SPEC.md, "Motion"):
+   1. Every movement answers an action or a state change. Nothing moves to decorate.
+   2. Things arrive from just below and settle, like a sheet of paper laid down. They never snap or bounce.
+   3. Exits are quicker than entrances. Leaving shouldn't hold anyone up.
+   4. A spring is only for things that follow your hand: a press, the nav pill, a chevron.
+   5. Lists arrive in reading order, a beat apart, and never longer than a short pause.
+   6. Data draws once, when it first appears. Later changes cross-fade.
+   7. Reduced motion keeps every end state and removes all timed movement. */
 :root {
+  /* Easing */
   --ease: cubic-bezier(.22, 1, .36, 1);
   --ease-in-out: cubic-bezier(.65, 0, .35, 1);
   --ease-exit: cubic-bezier(.4, 0, 1, 1);
   --spring: cubic-bezier(.34, 1.36, .64, 1);
-  --motion-press: 160ms;
-  --motion-arrive: 260ms;
-  --motion-change: 340ms;
-  --motion-layout: 420ms;
+  /* Durations */
+  --motion-press: 160ms;   /* hover, press, a chevron */
+  --motion-exit: 180ms;    /* anything leaving */
+  --motion-arrive: 260ms;  /* a page, a note, a popover */
+  --motion-change: 340ms;  /* content that changes in place, disclosures */
+  --motion-layout: 420ms;  /* the panel, tabs, the nav pill */
+  --motion-draw: 560ms;    /* a chart drawing its data */
+  /* Rhythm */
+  --motion-stagger: 45ms;  /* between list items */
+  --motion-follow: 90ms;   /* Mellow's reply after your words */
+  --motion-settle: 220ms;  /* a stamp landing after its answer */
   --motion-travel: 8px;
-  --motion-stagger: 45ms;
 }
 @supports (transition-timing-function: linear(0, 1)) {
   :root {
@@ -21,6 +34,7 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* One definition of each movement. */
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes arrive { from { opacity: 0; } to { opacity: 1; } }
   @keyframes settle { from { opacity: 0; filter: blur(1.5px); } to { opacity: 1; filter: blur(0); } }
@@ -28,67 +42,96 @@
     from { opacity: 0; transform: translateY(var(--motion-travel)); filter: blur(2px); }
     to { opacity: 1; transform: none; filter: blur(0); }
   }
-  @keyframes tick { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  @keyframes drop { from { opacity: 0; transform: translateY(calc(var(--motion-travel) * -1)) scale(.985); filter: blur(1.5px); } }
+  @keyframes sheet { from { opacity: 0; transform: translateY(calc(var(--motion-travel) * 3)); } }
+  @keyframes tick { from { opacity: 0; transform: translateY(calc(var(--motion-travel) * -.75)); } to { opacity: 1; transform: none; } }
+  @keyframes stamp { from { opacity: 0; transform: scale(1.04); } }
   @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  @keyframes vt-out { to { opacity: 0; transform: translateY(-4px); filter: blur(1.5px); } }
+  @keyframes vt-in { from { opacity: 0; transform: translateY(6px); filter: blur(2px); } }
 
-  /* Hover and press: soft, a little slower than a click */
-  .chip, .tool, .ledger-button, .text-link, .queue-row, .answer-row, .references a, .decision-row,
-  .shell[data-palette="ledger"] .actions button, .masthead nav button {
+  /* 1 · Hover and press. Colors ease; the press itself springs, because it follows your hand. */
+  :where(button, summary, .upload, .queue-link, .next-record, .chip, .tool, .ledger-button, .text-link,
+    .queue-row, .answer-row, .decision-row, .quick-card, .composer, .composer textarea, .phone-next, .rule-entry a, .help-links a) {
     transition: background-color var(--motion-press) var(--ease), border-color var(--motion-press) var(--ease),
       color var(--motion-press) var(--ease), box-shadow var(--motion-press) var(--ease),
-      transform var(--motion-press) var(--spring);
+      text-decoration-color var(--motion-press) var(--ease), transform var(--motion-press) var(--spring), translate var(--motion-press) var(--spring);
   }
-  .chip:active, .tool:active, .ledger-button:active, .shell[data-palette="ledger"] .actions button:active { transform: scale(.98); }
-  .ledger-button.send:hover svg { transform: translateX(3px); transition: transform 260ms var(--spring); }
+  :where(.chip, .tool, .ledger-button, .phone-next, .shell[data-palette="ledger"] .actions button):active { transform: scale(.98); }
+  .ledger-button svg, .queue-row .chevron { transition: transform var(--motion-press) var(--spring); }
+  .ledger-button.send:hover svg { transform: translateX(3px); }
+  .queue-row[aria-current] .chevron { transform: translateX(2px); }
+  .quick-card:hover { translate: 0 -1px; }
 
-  /* Arrivals settle in */
+  /* 2 · Arrivals: a page, Mellow's voice, a note, the record. */
   .page { animation: arrive var(--motion-arrive) var(--ease) both; }
-  .mellow-voice { animation: settle 480ms var(--ease) both; }
-  .ledger-record-body { animation: reveal var(--motion-change) var(--ease) both; }
+  .mellow-voice, .mellow-note, .panel-body { animation: settle var(--motion-arrive) var(--ease) both; }
+  .ledger-record-body, .record-identity, .monitor-message, .answer { animation: reveal var(--motion-change) var(--ease) both; }
+  .feedback:not(:empty) { animation: arrive var(--motion-arrive) var(--ease) both; }
+  .phone-next { animation: reveal var(--motion-arrive) var(--ease) both; }
 
-  /* Conversation: your words land first, then Mellow's, then its rows one by one */
-  .turn-pair[data-latest] { animation: none; }
+  /* 3 · Conversation: your words land, then Mellow's reply, then its rows, then its stamp. */
   .turn-pair[data-latest] .turn:first-child { animation: reveal var(--motion-change) var(--ease) both; }
-  .turn-pair[data-latest] .turn:last-child { animation: reveal 420ms var(--ease) 90ms both; }
-  .turn-pair[data-latest] .answer-rows li,
-  .ledger-queue li, .decision-row, .term, .references li {
-    animation: reveal var(--motion-change) var(--ease) both;
-    animation-delay: calc(var(--i, 0) * var(--motion-stagger) + 120ms);
-  }
-  .ledger-queue li, .decision-row, .term, .references li { animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
-  .turn-pair[data-latest] .answer-next { animation: reveal var(--motion-change) var(--ease) 260ms both; }
+  .turn-pair[data-latest] .turn:last-child { animation: reveal var(--motion-change) var(--ease) var(--motion-follow) both; }
+  .turn-pair[data-latest] .answer-next { animation: reveal var(--motion-change) var(--ease) calc(var(--motion-follow) * 3) both; }
+  .basis > summary { animation: stamp var(--motion-press) var(--ease) var(--motion-settle) both; }
 
-  /* Chart columns grow on a soft spring */
-  .chart-column { animation: grow 560ms var(--spring) both; animation-delay: calc(var(--i, 0) * 36ms); }
-  .chart-tip { animation: reveal 200ms var(--ease) both; }
+  /* 4 · Lists arrive in reading order, a beat apart. */
+  .turn-pair[data-latest] .answer-rows li { animation: reveal var(--motion-change) var(--ease) both;
+    animation-delay: calc(var(--i, 0) * var(--motion-stagger) + var(--motion-follow) * 1.5); }
+  .ledger-queue li, .decision-row, .term, .rule-entry, .setup-steps li {
+    animation: reveal var(--motion-change) var(--ease) both; animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
+  .rule-entry:nth-child(2) { --i: 1; } .rule-entry:nth-child(3) { --i: 2; } .rule-entry:nth-child(4) { --i: 3; }
+  .rule-entry:nth-child(5) { --i: 4; } .rule-entry:nth-child(n+6) { --i: 5; }
+  .setup-steps li:nth-child(2) { --i: 1; } .setup-steps li:nth-child(3) { --i: 2; } .setup-steps li:nth-child(4) { --i: 3; }
 
-  /* Menus and disclosures open softly */
-  .shell[data-palette="ledger"] .dropdown[open] > .review-options-body { animation: reveal 220ms var(--ease) both; transform-origin: top left; }
-  .evidence-detail, .monitor-details[open] .monitor-detail-body, .handoff-notes details[open] pre { animation: reveal var(--motion-change) var(--ease) both; }
-  :is(.review-options, .monitor-details, .note) > summary::after { transition: transform var(--motion-change) var(--spring); }
-  .masthead .nav-pill { transition: transform var(--motion-layout) var(--spring), width var(--motion-layout) var(--spring); }
-  .count { animation: tick var(--motion-change) var(--spring) both; }
+  /* 5 · Disclosures, popovers and drawers open from where you tapped. */
+  .evidence, .evidence-detail, .review-options[open] .review-options-body, .monitor-details[open] .monitor-detail-body,
+  .handoff-notes details[open] pre, .note[open] textarea, .setup[open] .setup-body, .not-useful, .clear-confirm {
+    animation: reveal var(--motion-change) var(--ease) both; }
+  .shell[data-palette="ledger"] .dropdown[open] > .review-options-body { transform-origin: top left; }
+  .note-why[open] .note-why-body, .basis[open] .basis-sources { animation: drop var(--motion-arrive) var(--ease) both; }
+  :is(.review-options, .monitor-details, .note, .setup) > summary::after { transition: transform var(--motion-press) var(--spring); }
+  .ask-drawer { transform-origin: top right; animation: drop var(--motion-change) var(--ease) both; }
 
-  /* View transitions: panel changes, collapse and tab switches morph instead of cutting */
+  /* 6 · Dialogs rise onto a dimmed page. */
+  :is(.compare-dialog, .findings-dialog)[open] { animation: reveal var(--motion-change) var(--ease) both; }
+  :is(.compare-dialog, .findings-dialog)[open]::backdrop { animation: fade var(--motion-arrive) var(--ease) both; }
+
+  /* 7 · Data draws once; counts tick when they change. */
+  .chart-column { animation: grow var(--motion-draw) var(--ease) both; animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
+  .chart-column { transition: opacity var(--motion-press) var(--ease), translate var(--motion-press) var(--ease); }
+  .chart-slot[data-current] .chart-column { translate: 0 -2px; }
+  .chart-column [data-series] { transition: opacity var(--motion-change) var(--ease); }
+  .chart-tip { animation: reveal var(--motion-press) var(--ease) both; }
+  .chart-delayed { animation: fade var(--motion-change) var(--ease) both; }
+  .count { display: inline-block; animation: tick var(--motion-change) var(--ease) both; }
+
+  /* 8 · Layout: the nav pill follows your tap; the panel and tabs morph. */
+  .nav-pill, .masthead .nav-pill { transition: transform var(--motion-layout) var(--spring), width var(--motion-layout) var(--spring); }
+  .ledger:has(> .context-panel) { transition: grid-template-columns var(--motion-layout) var(--ease); }
   .masthead { view-transition-name: masthead; }
   .ledger-main { view-transition-name: ledger-main; }
   .ledger-side { view-transition-name: ledger-side; }
   ::view-transition-group(*) { animation-duration: var(--motion-layout); animation-timing-function: var(--ease); }
-  ::view-transition-old(root) { animation: 160ms var(--ease-exit) both vt-out; }
-  ::view-transition-new(root) { animation: var(--motion-arrive) var(--ease) 60ms both vt-in; }
-  ::view-transition-old(ledger-side), ::view-transition-old(ledger-main) { animation: 180ms var(--ease-exit) both vt-out; }
-  ::view-transition-new(ledger-side), ::view-transition-new(ledger-main) { animation: var(--motion-change) var(--ease) 80ms both vt-in; }
+  ::view-transition-old(root) { animation: var(--motion-exit) var(--ease-exit) both vt-out; }
+  ::view-transition-new(root) { animation: var(--motion-arrive) var(--ease) calc(var(--motion-follow) * .66) both vt-in; }
+  ::view-transition-old(ledger-side), ::view-transition-old(ledger-main) { animation: var(--motion-exit) var(--ease-exit) both vt-out; }
+  ::view-transition-new(ledger-side), ::view-transition-new(ledger-main) { animation: var(--motion-change) var(--ease) var(--motion-follow) both vt-in; }
   ::view-transition-old(masthead), ::view-transition-new(masthead) { animation: none; }
   /* Panel changes: the reading column holds still and only resizes; the panel morphs. */
   html[data-vt="panel"]::view-transition-old(root), html[data-vt="panel"]::view-transition-new(root) { animation: none; }
   html[data-vt="panel"]::view-transition-old(ledger-main) { display: none; }
   html[data-vt="panel"]::view-transition-new(ledger-main) { animation: none; inline-size: auto; block-size: auto; }
   html[data-vt="panel"]::view-transition-old(ledger-side), html[data-vt="panel"]::view-transition-new(ledger-side) { inline-size: auto; block-size: auto; overflow: clip; }
-  @keyframes vt-out { to { opacity: 0; transform: translateY(-4px); filter: blur(1.5px); } }
-  @keyframes vt-in { from { opacity: 0; transform: translateY(6px); filter: blur(2px); } }
-  /* When the browser morphs views itself, skip the older inline fades so nothing plays twice. */
+  /* When the browser morphs views itself, skip the inline fades so nothing plays twice. */
   @supports (view-transition-name: none) {
     .panel-body, .page { animation: none; }
     .ledger:has(> .context-panel) { transition: none; }
   }
+}
+
+/* The phone sheet rises from the bottom edge instead of dropping from the top. */
+@media (prefers-reduced-motion: no-preference) and (width < 900px) {
+  .ask-drawer { transform-origin: bottom center; animation-name: sheet; }
 }

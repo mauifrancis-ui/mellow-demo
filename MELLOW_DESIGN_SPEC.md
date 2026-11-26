@@ -436,3 +436,17 @@ Brand direction under review on the design canvas, page "Ask Mellow · AI brand"
 - **Clear this device's data** takes two steps, says what's stored, and moves focus to the confirm button.
 - **On a phone,** Today opens with "Your next package".
 - **Marks are for triage only** (2026-11-25). The filled vermilion dot, the vermilion ring and the ink ring appear only where a record still needs someone: the queue, answers and the handoff. Activity is history, so it states decisions in words, with no marks.
+
+## Motion (sprint 5) · one source, seven principles
+
+All motion lives in `src/motion.css`. A test fails if any other stylesheet animates, if any timing isn't a token, or if anything moves outside a reduced-motion "no-preference" block.
+
+1. Every movement answers an action or a state change. Nothing moves to decorate.
+2. Things arrive from just below and settle, like a sheet of paper laid down. They never snap or bounce.
+3. Exits (180ms) are quicker than entrances (260 to 340ms).
+4. A spring is only for things that follow your hand: a press, the nav pill, a chevron. Drawers, dialogs and data use the ease curve.
+5. Lists arrive in reading order, 45ms apart.
+6. Data draws once (560ms), when it first appears. Counts tick when they change.
+7. Reduced motion keeps every end state and removes all timed movement.
+
+Tokens: `--motion-press` 160, `--motion-exit` 180, `--motion-arrive` 260, `--motion-change` 340, `--motion-layout` 420, `--motion-draw` 560, `--motion-stagger` 45, `--motion-follow` 90, `--motion-settle` 220, `--motion-travel` 8px.
