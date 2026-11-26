@@ -407,3 +407,7 @@ The founder approved the release ("deploy it") after the Step 5a board session i
 - **Not yet reviewed:** controls by a regulatory expert. The founder checked the citations against the rule text.
 
 148 tests pass. Awaiting the founder's release decision.
+
+## v1.41 released · 2026-11-25
+
+The founder approved the release ("deploy my friend") after the sprint 6 Step 5a board session in DESIGN_BOARD.md.
