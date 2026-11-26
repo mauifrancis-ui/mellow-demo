@@ -1394,3 +1394,40 @@ Reviewed by every role in PRODUCT_TEAM.md.
 **Founder notes for the interviews:** send the production link ahead of each call. Ask questions 1 to 9 before the screen-share.
 
 **Founder decision (Step 3), 2026-11-26:** adopted as the hypothesis the V1 interviews test ("yes let's do both"). No build.
+
+## Sprint 7 retro · v1.42 · 2026-11-26 (Step 7)
+
+**The founder raised:** "Based on the new fake dataset, we should be able to have a more intelligent AI for the prototype interaction."
+
+**What the team found:**
+- **The 90 days isn't in the app yet.** The app loads only the day-0 slice (`src/sample/today.json`). The full history (`dataset.json`) is used by tests only. Ask can't answer anything about last week, a supplier's record or a second store, because it can't see them.
+- **Ask is a keyword router.** It has about 30 intents, each matched by phrasing the team planned for, and all about today's queue. A question phrased differently reaches the fallback ("That's outside what I can help with"), even when the records hold the answer.
+- **The dataset gives us something we didn't have: questions with known answers.** The answer key means any smarter Ask can be measured, not just demoed.
+
+**Where "more intelligent" can go, by role:**
+
+| Role | View |
+| --- | --- |
+| AI UX Designer/Engineer | Two separate upgrades. (1) **Answer more:** history, patterns and cross-store questions, computed from the 90 days. (2) **Understand more:** a language model reads the question and turns it into a structured query; Mellow computes the answer from records and renders it through the catalog. The model never states a fact. Mellow shows how it read the question ("I read this as: lot problems, River Store, last 30 days") so a person can correct it. |
+| Compliance and Risk | (1) is fine if patterns stay counts with their records: "29 of 353 packages from SAMPLE-W-1002 had a problem in 90 days". No risk scores, rankings or "likely to". (2) is a change to a founding rule (nothing non-deterministic). It's acceptable only if the model touches the question, never the answer, and the reading is shown. That's the founder's call. **Would block** a model that writes answer text. |
+| Research | The planted problems are random by design, so any supplier "pattern" in sample-v1 is an artifact. In the current data, SAMPLE-M-2002 has 5 problems in 274 packages and SAMPLE-W-1002 has 29 in 353, both by chance. If we demo patterns, the generator must plant them on purpose, labeled as assumptions. |
+| Engineer | (1) is front-end only: load the dataset (1.3 MB, or a trimmed 90-day file) and add query functions. (2) needs a server function on Vercel, an API key in server-side secret storage, cost and rate limits, and a fallback to the keyword router when the model is down. |
+| Content and Voice | Still "Mellow", never "AI". A model reading the question doesn't change the voice. |
+| Product Designer | History needs a home: a 90-day view per store, and a supplier view. Ask answers link into them instead of being dead ends. |
+| Product Lead | The interviews may change what's worth asking. Keep (1) small and useful for the demo; hold (2) until we know which questions operators actually ask. |
+| Accessibility | A "Mellow read this as" line must be read out before the answer, and be editable by keyboard. |
+
+**Other outcomes:**
+- **Worked:**
+  - The answer key turned "does it work?" into a number.
+  - The Step 5a board session caught the "2 files" stamp and the stale-workspace migration before release.
+  - The positioning check corrected an overstated claim before it went into the interview guide.
+- **Didn't work:**
+  - The founder got an unchecked strategic claim ("still mostly manual") in conversation before Research checked it. **Follow-up:** strategy answers to the founder cite a source or say they're unchecked.
+  - The dataset shipped but the app uses one day of it.
+  - Known gaps remain: compressed delivery times, and "Simulate a new check" still uses old rows.
+
+**Follow-ups for sprint 8 (Step 0):**
+1. **Answer more from records:** load the 90 days. New Ask questions for history ("has this package or supplier had problems before?"), cross-store and date ranges. A 90-day view. Patterns as counts only, with planted patterns labeled. Replace "Simulate a new check" with the next delivery from the dataset.
+2. **An Ask eval from the dataset:** around 50 questions in varied phrasing with answers computed from the answer key. It measures how many reach the right answer, and it's the bar for any future model.
+3. **Founder decision needed before planning (2):** may a language model read the question, if it never writes the answer and its reading is shown and correctable? If yes, it's a sprint 9 candidate measured against the eval from item 2.
