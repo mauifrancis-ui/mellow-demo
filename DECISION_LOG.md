@@ -396,3 +396,14 @@ v1.40 was brought to the founder before the board had seen the built work. The f
 ## v1.40 released · 2026-11-25
 
 The founder approved the release ("deploy it") after the Step 5a board session in DESIGN_BOARD.md.
+
+## v1.41 built · sprint 6 · 2026-11-25
+
+- **A2UI-shaped catalog and validator.** Every Ask answer conforms. The catalog is tested, not rendered.
+- **Inspection prep for Texas hemp retail:** 9 items, 2 counted from records, 7 "Can't check from these files", each with its rule, evidence and packages.
+- **The binder** opens from Activity and prints in the record mode.
+- **Ask:** a new inspection answer, and counts after the compliance refusal.
+- **Reviews:** Step 5a board session recorded, with one change made.
+- **Not yet reviewed:** controls by a regulatory expert. The founder checked the citations against the rule text.
+
+148 tests pass. Awaiting the founder's release decision.

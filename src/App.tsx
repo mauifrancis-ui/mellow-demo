@@ -9,6 +9,8 @@ import { ContextPanel, HandoffPanel, PackageTrail, SeriesList } from "./ContextP
 import { NoteLine } from "./NoteLine";
 import { FindingsDialog } from "./FindingsDialog";
 import { TrailDialog } from "./TrailDialog";
+import { BinderDialog, InspectionPrep } from "./InspectionPrep";
+import { checkControls } from "./controls";
 import { maxUploadBytes, maxUploadText } from "./limits";
 import { clearDevice } from "./device";
 import { defaultName, readSetup, setupKey, setupSteps, type Setup } from "./setup";
@@ -183,6 +185,7 @@ export default function App() {
   const fileSets = imported.sets;
   const [sharing, setSharing] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [binder, setBinder] = useState(false);
   const [setup, setSetup] = useState<Setup>(() => { try { return readSetup(localStorage); } catch { return { name: defaultName, shared: false }; } });
   const workspaceName = setup.name;
   const [confirmReset, setConfirmReset] = useState(false);
@@ -209,6 +212,7 @@ export default function App() {
     ? [...sampleComparison, ...extraRows].filter(({ packageId }) => !importedRows.some((row) => row.packageId === packageId)).concat(importedRows)
     : sampleComparison;
   const ordered = orderQueue(queue, comparison);
+  const prepResults = checkControls(comparison);
   const counts = ledgerCounts({ comparison, tasks: workspace.tasks, history: workspace.history, runs: posture.runs });
   const askContext = { queue, manager, comparison, runs: posture.runs, receiving: posture.receiving, fileSets, counts };
   const notes = notesFor({
@@ -552,6 +556,15 @@ export default function App() {
       const task = [...queue, ...manager].find((item) => item.id === action.id);
       if (task) openTask(task);
     } else if (action.kind === "tab") goTo(action.tab);
+    else if (action.kind === "prep" || action.kind === "binder") {
+      goTo("Activity");
+      if (action.kind === "binder") { setBinder(true); updateSetup({ shared: true }); }
+      else requestAnimationFrame(() => requestAnimationFrame(() => {
+        const node = document.getElementById("prep-title");
+        node?.scrollIntoView({ block: "start" });
+        (node as HTMLElement | null)?.focus({ preventScroll: true });
+      }));
+    }
     else if (action.kind === "rules") {
       goTo("Learn");
       requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -760,6 +773,9 @@ export default function App() {
         {tab === "Activity" && <ActivityPage history={workspace.history} latest={latest} handoff={handoff} open={queue.length}
           counts={counts} handoffStatus={handoffStatus}
           notes={noteLog} onExport={() => { setExporting(true); updateSetup({ shared: true }); }}
+          onPrep={() => onAsk({ kind: "prep" })}
+          prep={<InspectionPrep results={prepResults} onBinder={() => { setBinder(true); updateSetup({ shared: true }); }}
+            onOpenPackage={(id) => { const task = workspace.tasks.find(({ record }) => record === id); if (task) openTask(task); else goTo("Today", `Anything wrong with ${id}?`); }} />}
           onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} onShare={() => { setSharing(true); updateSetup({ shared: true }); }} />}
         {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)}
           onClearDevice={() => { try { clearDevice(localStorage); } catch { /* Nothing stored. */ } window.location.reload(); }} />}
@@ -772,6 +788,7 @@ export default function App() {
         ],
         decisions: workspace.history.slice(-8).map(({ task, decision, at }) => ({ record: task.record, decision, at })),
       }} />
+      <BinderDialog open={binder} results={prepResults} history={workspace.history} notes={noteLog} workspaceName={workspaceName} onClose={() => setBinder(false)} />
       <TrailDialog open={exporting} history={workspace.history} notes={noteLog} workspaceName={workspaceName} onClose={() => setExporting(false)} />
       {tab !== "Today" && askOpen && <aside className="ask-drawer" id="ask-drawer" role="dialog" aria-label="Talk with Mellow"
         onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); closeAsk(); } }}>

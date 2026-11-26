@@ -79,15 +79,16 @@
   /* 4 · Lists arrive in reading order, a beat apart. */
   .turn-pair[data-latest] .answer-rows li { animation: reveal var(--motion-change) var(--ease) both;
     animation-delay: calc(var(--i, 0) * var(--motion-stagger) + var(--motion-follow) * 1.5); }
-  .ledger-queue li, .decision-row, .term, .rule-entry, .setup-steps li {
+  .ledger-queue li, .decision-row, .term, .rule-entry, .setup-steps li, .prep-item {
     animation: reveal var(--motion-change) var(--ease) both; animation-delay: calc(var(--i, 0) * var(--motion-stagger)); }
   .rule-entry:nth-child(2) { --i: 1; } .rule-entry:nth-child(3) { --i: 2; } .rule-entry:nth-child(4) { --i: 3; }
   .rule-entry:nth-child(5) { --i: 4; } .rule-entry:nth-child(n+6) { --i: 5; }
+  .prep-item:nth-child(2) { --i: 1; } .prep-item:nth-child(3) { --i: 2; } .prep-item:nth-child(4) { --i: 3; } .prep-item:nth-child(n+5) { --i: 4; }
   .setup-steps li:nth-child(2) { --i: 1; } .setup-steps li:nth-child(3) { --i: 2; } .setup-steps li:nth-child(4) { --i: 3; }
 
   /* 5 · Disclosures, popovers and drawers open from where you tapped. */
   .evidence, .evidence-detail, .review-options[open] .review-options-body, .monitor-details[open] .monitor-detail-body,
-  .handoff-notes details[open] pre, .note[open] textarea, .setup[open] .setup-body, .not-useful, .clear-confirm {
+  .handoff-notes details[open] pre, .note[open] textarea, .setup[open] .setup-body, .not-useful, .clear-confirm, .prep-item details[open] .prep-body {
     animation: reveal var(--motion-change) var(--ease) both; }
   .shell[data-palette="ledger"] .dropdown[open] > .review-options-body { transform-origin: top left; }
   .note-why[open] .note-why-body, .basis[open] .basis-sources { animation: drop var(--motion-arrive) var(--ease) both; }

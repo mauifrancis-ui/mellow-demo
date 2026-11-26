@@ -122,6 +122,24 @@ Added in sprint 5. They run in `tests/ledger.test.mjs`, `tests/monitoring.test.m
 | A1, A6 | Stylesheets | Every font size is a type token, with nothing below 12px and form fields at 16px. Components use role tokens, never raw colors. The legacy hex count can only go down. |
 | O1 (browser) | Today | The record says "1 of N" and "sorted by what needs you most". "See all N" opens the queue and moves focus to it, on a phone and on a desk with the panel closed. "Next" names the next package and its issue, and deciding moves to that package. |
 
+## Inspection prep (I) and the catalog (K)
+
+Added in sprint 6. These run in `tests/prep.test.mjs` and `tests/catalog.test.mjs`.
+
+| # | Situation | Expected behavior |
+| --- | --- | --- |
+| I1 | Every counted item | On file + missing + disagree = packages compared, each package once. |
+| I2 | Batch disagreements | Counted on their own ("records disagree for N"), never as on file. |
+| I3 | Items the files can't show | They say "Can't check from these files", and every item cites a rule that's linked in Learn. |
+| I4 | Item text and labels | No verdict words (met, compliant, ready, readiness, posture, pass, fail, score). The expert-review label is present. |
+| I5 | "What will an inspector ask for?" | All 9 items with counts, "can count two; seven can't be checked", the review label, and a records stamp. |
+| I6 | "Are we ready for an inspection?" | It can't tell you whether you comply, then gives batch counts and "seven more can't be checked". No verdict. |
+| K1 | Every Ask answer from the eval questions | Validates against `src/a2ui/mellow-catalog.json`. Answers drawn from records carry a Stamp. |
+| K2, K6 | Inspection prep and the binder | Validate as catalog components: ControlCheck with StatusWord, and BinderSection. Items to have on hand are kept apart from counted ones. |
+| K3 | A verdict | Can't be rendered: no Verdict component, StatusWord is an enum, and verdict language is rejected. |
+| K4 | Proposed rules | Only inside a WhatIfSurface, and a WhatIfSurface can't hold a ControlCheck. |
+| K5 | An answer from records with no Stamp | Rejected. |
+
 ## Part 2 · Product Excellence Review (release gate)
 
 Added by the founder on 2026-11-25. The automated cases above prove Mellow says the right things. This review proves the product works well for people, end to end. **No release goes to production until it has run**, and its gate (below) is met.

@@ -1,0 +1,107 @@
+{
+  "catalogId": "https://auditready-demo-blond.vercel.app/a2ui/mellow/v0/catalog.json",
+  "x-status": "Draft (sprint 6, A7). Shaped after A2UI v1.0: a flat component list, children referenced by id, each component identified by a `component` const. Mellow isn't on the A2UI protocol yet; this catalog is the contract its answers are tested against.",
+  "instructions": "You are Mellow. Compare records; never judge them. Use only these components. Every answer drawn from records ends with a Stamp. Status is a StatusWord, never free text. There is no verdict component: never say compliant, ready, readiness, posture, a score, or that something will pass. A ProposedRule may appear only inside a WhatIfSurface, and a WhatIfSurface may not contain a ControlCheck.",
+  "x-forbidden": "\\b(is|are|you(’|')re|looks?) (compliant|legal|safe|ready)\\b|\\bwill pass\\b|\\blikely to pass\\b|\\breadiness\\b|\\bposture\\b|\\brisk score\\b",
+  "components": {
+    "Column": {
+      "type": "object",
+      "properties": { "component": { "const": "Column" }, "children": { "type": "array", "items": { "type": "string" } } },
+      "required": ["component", "children"]
+    },
+    "Answer": {
+      "type": "object",
+      "allowedChildren": ["RecordRow", "Action", "Stamp", "Chart"],
+      "properties": {
+        "component": { "const": "Answer" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "children": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["component", "title", "body"]
+    },
+    "RecordRow": {
+      "type": "object",
+      "allowedParents": ["Answer", "BinderSection"],
+      "properties": {
+        "component": { "const": "RecordRow" },
+        "label": { "type": "string" },
+        "detail": { "type": "string" },
+        "packageId": { "type": "string" },
+        "kind": { "enum": ["disagree", "gap", "other"] }
+      },
+      "required": ["component", "label", "detail"]
+    },
+    "Stamp": {
+      "type": "object",
+      "allowedParents": ["Answer", "ControlCheck"],
+      "properties": {
+        "component": { "const": "Stamp" },
+        "verified": { "type": "boolean" },
+        "label": { "type": "string" },
+        "sources": { "type": "array", "items": { "type": "string" } },
+        "at": { "type": "string" },
+        "atKind": { "enum": ["check", "compared"] }
+      },
+      "required": ["component", "verified", "label", "sources"]
+    },
+    "Action": {
+      "type": "object",
+      "allowedParents": ["Answer", "ControlCheck", "BinderSection"],
+      "properties": { "component": { "const": "Action" }, "label": { "type": "string" }, "action": { "type": "object" } },
+      "required": ["component", "label", "action"]
+    },
+    "Chart": {
+      "type": "object",
+      "allowedParents": ["Answer"],
+      "properties": { "component": { "const": "Chart" }, "series": { "enum": ["matched", "different", "missing"] } },
+      "required": ["component", "series"]
+    },
+    "StatusWord": {
+      "type": "object",
+      "allowedParents": ["ControlCheck"],
+      "properties": { "component": { "const": "StatusWord" }, "value": { "enum": ["On file", "Missing", "Can’t check from these files"] } },
+      "required": ["component", "value"]
+    },
+    "ControlCheck": {
+      "type": "object",
+      "allowedParents": ["Column", "BinderSection"],
+      "allowedChildren": ["StatusWord", "Stamp", "Action"],
+      "properties": {
+        "component": { "const": "ControlCheck" },
+        "controlId": { "type": "string" },
+        "title": { "type": "string" },
+        "citation": { "type": "string" },
+        "counts": { "type": "string" },
+        "reviewLabel": { "type": "string" },
+        "children": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["component", "controlId", "title", "citation", "counts", "reviewLabel", "children"]
+    },
+    "BinderSection": {
+      "type": "object",
+      "allowedParents": ["Column"],
+      "allowedChildren": ["ControlCheck", "RecordRow", "Action"],
+      "properties": {
+        "component": { "const": "BinderSection" },
+        "kind": { "enum": ["cover", "controls", "evidence", "decisions", "notes", "disclaimer"] },
+        "heading": { "type": "string" },
+        "text": { "type": "string" },
+        "children": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["component", "kind", "heading"]
+    },
+    "WhatIfSurface": {
+      "type": "object",
+      "allowedChildren": ["ProposedRule"],
+      "properties": { "component": { "const": "WhatIfSurface" }, "label": { "const": "Proposed, not law" }, "children": { "type": "array", "items": { "type": "string" } } },
+      "required": ["component", "label", "children"]
+    },
+    "ProposedRule": {
+      "type": "object",
+      "allowedParents": ["WhatIfSurface"],
+      "properties": { "component": { "const": "ProposedRule" }, "billId": { "type": "string" }, "status": { "type": "string" }, "textUrl": { "type": "string" } },
+      "required": ["component", "billId", "status", "textUrl"]
+    }
+  }
+}

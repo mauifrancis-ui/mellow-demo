@@ -1137,3 +1137,53 @@ Approved as planned ("approved for the next 3 sprints"):
 - A3 and A4 if there's room.
 
 The founder checked the C1 citations against the rule text ("I did it, it's done"), which clears the board's condition 11. Controls still carry "not reviewed by a regulatory expert".
+
+## Sprint 6 · v1.41 · implementation and preview review (Steps 4 and 5) · 2026-11-25
+
+Reviewed by the Engineer, Accessibility, Compliance and Risk, Content and Voice, AI UX, the Product Designer and the Design Director.
+
+- **Checks:** lint, type check and build pass. **148 tests pass**, including 23 catalog conformance cases (K1) and the I and K sections.
+- **Browser checks** at 1440px and 390px:
+  - with motion on and with reduced motion, and with a keyboard;
+  - Ask → "Open inspection prep" moves focus to the section heading;
+  - every item opens with Enter, and the binder closes with Escape.
+- **Results:** no console errors and no sideways scroll. The binder prints on one Letter page in the record mode. The full sprint 4 walkthrough still passes.
+
+| Area | Finding | Status |
+| --- | --- | --- |
+| Catalog (A7) | Every Ask answer validates. The catalog is a contract the answers are tested against. **The UI still renders with React, not from the catalog.** Rendering from it is future work, and we don't claim otherwise. | Closed · stated plainly |
+| Engine (C2) | H1 and H2 count from the files. H2 counts disagreements apart from on file. Seven items are "Can't check from these files". | Closed |
+| Evidence (C3) | Each item opens into the rule (linked), the evidence and where it lives, and the packages (missing and disagreeing ones open the record). | Closed |
+| Binder (C4) | On a phone the binder's table was mono in three cramped columns. It now stacks with labels, in sans. | Closed |
+| Ask (C5) | New "What will an inspector ask for?" answer. "Are we ready for an inspection?" keeps its refusal and adds counts. | Closed |
+| A3 and A4 | Not started (cut line). | Moved to sprint 7 |
+
+### Sprint 6 · board presentation of the built preview (Step 5a)
+
+**Decisions made during the build that weren't in the approved plan:**
+
+| # | Build decision | Board call | Lens and reasoning |
+| --- | --- | --- | --- |
+| 1 | Inspection prep sits in **Activity, below the decision history**, rather than in its own view. | **Changes** | Product Designer and Norman: at the bottom of a long history it's buried. Zhuo: the binder should open from the trail, so Activity is the right home for now. **Change:** a "Before an inspection" block in Activity's side column, with "Go to inspection prep", plus the Ask action. **Done and rechecked.** Its own view is a sprint 7 candidate. |
+| 2 | Each item's status is the **worst word that applies**: 50 of 53 on file shows "Missing", with the counts beside it. | **Backs, with a note** | Morris: honest; an inspector asks about the three, not the fifty. Kare: the status is ink, not vermilion, so it informs without alarming. |
+| 3 | H2 counts **"records disagree"** separately, beside the three status words. | **Backs** | Vignelli: it's the existing term for the filled dot, so no new vocabulary. Compliance: the note says no rule requires agreement. |
+| 4 | The section is titled **"What an inspector may ask to see"**. | **Backs** | Content and Voice: "may" is honest; Mellow doesn't know what a given inspector will ask. |
+| 5 | The export is titled **"Inspection prep binder"**, with the review label at the top and the disclaimer at the end. | **Backs** | Compliance and Risk: "prep" keeps it from reading as an official record; the trail stays "Mellow decision trail". |
+| 6 | The binder says **"Who decided: Mellow can't record who made each decision yet."** | **Backs** | Morris raised this in sprint 4. Saying so beats leaving a silent gap. |
+| 7 | The compliance answer now **adds counts** after the refusal. | **Backs** | Norman: a refusal with something useful after it is the right shape. |
+| 8 | The catalog is **tested, not rendered**. | **Backs** | AI UX and Eames: the contract comes first; the renderer follows when Mellow goes on the protocol. |
+
+**Board recommendation:** release v1.41 for founder decision, with change 1 made.
+
+### Product Excellence Review · v1.41 · synthetic
+
+- **New CUJ walked: "Get ready for an inspection"** (Priya, compliance; Jo, owner-operator).
+- **The path:** Ask "Are we ready for an inspection?" → refusal plus counts → Open inspection prep → open H1 → open PKG-443 → decide → Make the binder → Print.
+- **Scores:**
+  - Use moves from Good to **Good+** (the binder is a real artifact).
+  - **Expand stays Not served** (sprint 7).
+  - The other stages are unchanged.
+- **Provocations:**
+  - **Jo:** "Can it learn my COA column?" H3 and H4 become checkable when files carry those columns. This is a sprint 7 candidate.
+  - **Priya:** "I'd hand this to my attorney." That's the right next step, and the binder says so.
+- **Gate:** met for a prototype.

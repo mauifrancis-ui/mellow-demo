@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import type { LedgerCounts } from "./ledger-math";
+import type { ReactNode } from "react";
 import type { Decision, Entry, Task } from "./workspace";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -31,8 +32,10 @@ function dayLabel(iso: string) {
   return date.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" });
 }
 
-export function ActivityPage({ history, latest, handoff, counts, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare, onExport }: {
+export function ActivityPage({ history, latest, handoff, counts, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare, onExport, prep, onPrep }: {
   onShare?: () => void;
+  onPrep?: () => void;
+  prep?: ReactNode;
   onExport?: () => void;
   history: Entry[];
   notes?: { id: string; text: string; trigger: string; at: string; dismissedAt?: string; feedback?: string }[];
@@ -116,6 +119,7 @@ export function ActivityPage({ history, latest, handoff, counts, handoffStatus, 
           </ul>
         </div>)}
       </section>
+      {prep}
     </div>
 
     <aside className="ledger-side" aria-label="Today at a glance">
@@ -128,6 +132,11 @@ export function ActivityPage({ history, latest, handoff, counts, handoffStatus, 
         <p className="kicker">Keep a record</p>
         <p>Every decision with its evidence, and what Mellow said first. CSV or print.</p>
         <button type="button" className="ledger-button" data-variant="line" onClick={onExport}>Export decision trail</button>
+      </section>}
+      {onPrep && <section className="share-block">
+        <p className="kicker">Before an inspection</p>
+        <p>What your records show for Texas hemp rules, and what to have on hand. No verdicts.</p>
+        <button type="button" className="ledger-button" data-variant="line" onClick={onPrep}>Go to inspection prep</button>
       </section>}
       {notes.length > 0 && <section className="mellow-events" aria-labelledby="notes-title">
         <h2 id="notes-title" className="kicker">Mellow notes today · {notes.length}</h2>

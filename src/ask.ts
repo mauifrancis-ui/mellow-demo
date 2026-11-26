@@ -1,6 +1,7 @@
 import type { LotCheck } from "./comparison.ts";
 import type { Run } from "./monitoring.ts";
 import { checksToday } from "./monitoring.ts";
+import { checkControls, controlLabel, countLine, prepSummary } from "./controls.ts";
 import type { LedgerCounts } from "./ledger-math.ts";
 import { checkedText, currentRules, effectiveText, rulesScope } from "./rules-tx.ts";
 
@@ -12,6 +13,8 @@ export type AskAction =
   | { kind: "open"; id: string }
   | { kind: "tab"; tab: "Activity" | "Learn" }
   | { kind: "rules" }
+  | { kind: "prep" }
+  | { kind: "binder" }
   | { kind: "compare" }
   | { kind: "series"; series: Series }
   | { kind: "delay" }
@@ -41,7 +44,7 @@ export type AskContext = {
 
 export type AskAnswer = {
   intent: "package" | "unknown-package" | "next" | "list" | "label" | "gaps" | "differences" | "matched" | "compare"
-    | "handoff" | "source" | "summary" | "learn" | "rule" | "bill" | "compliance" | "judgment" | "decision" | "self" | "capabilities" | "explain" | "order" | "fallback";
+    | "handoff" | "source" | "summary" | "learn" | "rule" | "bill" | "compliance" | "prep" | "judgment" | "decision" | "self" | "capabilities" | "explain" | "order" | "fallback";
   title: string;
   body: string;
   items?: { label: string; detail: string; id?: string; title?: string; kind?: Issue["kind"] }[];
@@ -127,6 +130,12 @@ const count = (n: number) => words[n] ?? String(n);
 
 export type Brief = { greeting: string; headline: string; message: string; focusId?: string; chips: string[] };
 
+/** One line of inspection-prep counts for the compliance answer. Counts only, never a verdict. */
+function prepLine(context: AskContext) {
+  const [h1, h2] = checkControls(context.comparison);
+  return `Batch ID ${countLine(h1).toLowerCase()}; received batch matches listed batch ${countLine(h2).replace(/^On file for/, "for").toLowerCase()}. Seven more items can’t be checked from these files.`;
+}
+
 export function brief(context: AskContext, now = new Date()): Brief {
   const hour = now.getHours();
   const greeting = hour < 12 ? "Good morning." : hour < 17 ? "Good afternoon." : "Good evening.";
@@ -196,6 +205,9 @@ export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefin
   }
   if (answer.intent === "bill") {
     return { verified: false, label: "Mellow doesn’t track bills", sources: ["Mellow doesn’t track bills or predict outcomes", "Bills aren’t law until enacted"] };
+  }
+  if (answer.intent === "prep") {
+    return { verified: true, label: `${plural(context.comparison.length, "package")} · 9 items`, sources: ["Inventory and receiving batch numbers on this device", controlLabel, rulesScope] };
   }
   if (answer.intent === "compliance") {
     return { verified: true, label: "Open records and decisions on this device", sources: ["Open records in To check", "Decisions saved on this device", rulesScope] };
@@ -292,10 +304,23 @@ function answerFor(input: string, context: AskContext): AskAnswer {
       body: [
         "That’s a decision for a person who knows your license and the rules. Here’s what’s on file and what’s missing on this device.",
         `${plural(context.queue.length, "record")} still open${decided ? `, and ${decided} waiting on a manager` : ""}.`,
+        prepLine(context),
         "For a decision about your business, talk to a licensed attorney.",
       ].join(" "),
       items: orderQueue(context.queue, context.comparison).map(({ task, issue }) => ({ label: task.record, id: task.id, kind: issue.kind, title: issue.label, detail: compact(task, context.comparison) })),
-      actions: [{ label: "Open Texas hemp rules", action: { kind: "rules" } }, { label: "Get help", action: { kind: "tab", tab: "Learn" } }],
+      actions: [{ label: "Open inspection prep", action: { kind: "prep" } }, { label: "Open Texas hemp rules", action: { kind: "rules" } }, { label: "Get help", action: { kind: "tab", tab: "Learn" } }],
+    };
+  }
+
+  if (has(text, /\b(inspect\w*|binder|what (will|would|does|do) (an? )?(inspector|dshs|tabc)|evidence (to|on) (have|hand))\b/)) {
+    const results = checkControls(context.comparison);
+    const summary = prepSummary(results);
+    return {
+      intent: "prep",
+      title: "What an inspector may ask to see",
+      body: `Here’s what your files show for each item. I can count ${count(summary.counted).toLowerCase()} from your records; ${count(summary.cantCheck).toLowerCase()} I can’t check from these files, so they’re listed for you to have on hand. ${controlLabel}.`,
+      items: results.map((result) => ({ label: result.control.id, title: result.control.title, detail: `${countLine(result)} · ${result.control.citation}` })),
+      actions: [{ label: "Open inspection prep", action: { kind: "prep" } }, { label: "Make the binder", action: { kind: "binder" } }],
     };
   }
 
@@ -530,7 +555,8 @@ export function followUps(answer: AskAnswer, context: AskContext): string[] {
     learn: ["What counts as a gap?", ...all],
     rule: ["What can you do?", "What needs me right now?"],
     bill: ["Show me the Texas hemp rules", "What can you do?"],
-    compliance: [...all, "Show me the Texas hemp rules"],
+    compliance: [...all, "What will an inspector ask for?"],
+    prep: ["Show me the Texas hemp rules", "What needs me right now?"],
     judgment: ["What do I check on the label?", "What needs me right now?"],
     decision: ["What needs me right now?", "What do I check on the label?"],
     self: ["What can you do?", "What needs me right now?"],
