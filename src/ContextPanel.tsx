@@ -99,7 +99,7 @@ export function SeriesList({ series, rows, open, latest, matched, activeId, onOp
   activeId?: string;
   onOpen: (task: Task) => void;
 }) {
-  if (series === "matched") return <p className="trail-note">{matched} packages matched today. Matching records stay quiet, so there’s nothing to check.</p>;
+  if (series === "matched") return <p className="trail-note">{matched} packages matched. Matching records stay quiet, so there’s nothing to check.</p>;
   const shown = rows.filter(({ state }) => state === series);
   return <section className="ledger-queue" aria-label={series === "missing" ? "Packages with a gap" : "Packages where the records disagree"}>
     <div className="queue-head"><h3 className="kicker">{series === "missing" ? "Gaps" : "Disagreements"} · {shown.length}</h3></div>

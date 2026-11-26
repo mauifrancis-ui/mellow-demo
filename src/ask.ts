@@ -1,5 +1,7 @@
 import type { LotCheck } from "./comparison.ts";
 import type { Run } from "./monitoring.ts";
+import { checksToday } from "./monitoring.ts";
+import type { LedgerCounts } from "./ledger-math.ts";
 import { checkedText, currentRules, effectiveText, rulesScope } from "./rules-tx.ts";
 
 // Ask Mellow, local edition. Matches everyday receiving language against the
@@ -31,6 +33,8 @@ export type AskContext = {
   receiving: "current" | "delayed";
   /** Files the person compared, so provenance names the right sources for each package. */
   fileSets?: FileSet[];
+  /** The one source for counts (ledger-math.ts). */
+  counts?: LedgerCounts;
   /** Mellow's previous answer in this conversation, so "how do you know?" can explain it. */
   previous?: AskAnswer;
 };
@@ -128,8 +132,8 @@ export function brief(context: AskContext, now = new Date()): Brief {
   const greeting = hour < 12 ? "Good morning." : hour < 17 ? "Good afternoon." : "Good evening.";
   const ordered = orderQueue(context.queue, context.comparison);
   const open = ordered.length;
-  const matched = context.runs.reduce((sum, run) => sum + run.matched, 0);
-  const checks = context.runs.length;
+  const matched = context.comparison.filter(({ state }) => state === "match").length;
+  const checks = checksToday(context.runs, now).length;
   const managerCount = context.manager.length;
   const headline = open ? `${count(open)} package${open === 1 ? "" : "s"} need${open === 1 ? "s" : ""} you before close.` : "You’re caught up.";
   const parts: string[] = [];
@@ -145,8 +149,8 @@ export function brief(context: AskContext, now = new Date()): Brief {
     }
   }
   if (managerCount) parts.push(`${count(managerCount)} ${managerCount === 1 ? "is" : "are"} waiting on a manager.`);
-  if (checks) parts.push(open ? `The other ${matched} from today’s ${checks} checks matched, and I left them alone.`
-    : `All ${matched} matched packages from today’s ${checks} checks are settled.`);
+  if (matched) parts.push(open ? `${count(matched)} more matched, and I left them alone.`
+    : `All ${matched} matched packages are settled${checks ? ` after ${plural(checks, "check")} today` : ""}.`);
   const chips = [
     focus ? "What do I check on the label?" : "How did receiving go today?",
     ...(open > 1 ? [`Walk me through all ${count(open).toLowerCase()}`] : []),
@@ -465,12 +469,13 @@ function answerFor(input: string, context: AskContext): AskAnswer {
   }
 
   if (has(text, /\b(today|summary|overview|status|so far|totals?|how('s| is| are| did)|recap|report|numbers)\b/)) {
-    const total = context.runs.reduce((sum, run) => sum + run.checked, 0);
-    const flagged = context.runs.reduce((sum, run) => sum + run.exceptions, 0);
+    const total = context.comparison.length;
+    const flagged = context.comparison.filter(({ state }) => state !== "match").length;
+    const checks = checksToday(context.runs).length;
     return {
       intent: "summary",
-      title: `${plural(total, "package")} compared today`,
-      body: `${plural(context.runs.length, "check")} so far. ${total - flagged} matched and ${flagged} had a difference or a gap. ${plural(context.queue.length, "record")} still open. Earlier checks are sample data.`,
+      title: `${plural(total, "package")} compared`,
+      body: `${plural(checks, "check")} today. ${total - flagged} matched and ${flagged} had a difference or a gap. ${plural(context.queue.length, "record")} still open${context.manager.length ? `, and ${context.manager.length} with a manager` : ""}. The sample checks are fictional.`,
       actions: [{ label: "Show gaps", action: { kind: "series", series: "missing" } }, { label: "Show differences", action: { kind: "series", series: "different" } }],
     };
   }

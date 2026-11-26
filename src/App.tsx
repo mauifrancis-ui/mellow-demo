@@ -17,7 +17,8 @@ import { panelFor, queueView, sameView, type PanelView } from "./panel";
 import { addTurn, ask, type FileSet, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-import { monitorReceiving, sampleHistory } from "./monitoring";
+import { monitorReceiving, samplePosture } from "./monitoring";
+import { checkFor, ledgerCounts } from "./ledger-math";
 import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
 
 import {
@@ -155,10 +156,7 @@ export default function App() {
   const [workspace, setWorkspace] = useState(() => {
     try { return readWorkspace(); } catch { return initial; }
   });
-  const [posture, setPosture] = useState(() => {
-    const now = new Date().toISOString();
-    return monitorReceiving(undefined, sampleComparison, "current", now, sampleHistory(now));
-  });
+  const [posture, setPosture] = useState(() => samplePosture(new Date().toISOString()));
   const [focusSeries, setFocusSeries] = useState<Series | null>(null);
   const [panelView, setPanelView] = useState<PanelView>(queueView);
   const [panelCollapsed, setPanelCollapsed] = useState(initialCollapsed);
@@ -197,7 +195,8 @@ export default function App() {
     ? [...sampleComparison, ...extraRows].filter(({ packageId }) => !importedRows.some((row) => row.packageId === packageId)).concat(importedRows)
     : sampleComparison;
   const ordered = orderQueue(queue, comparison);
-  const askContext = { queue, manager, comparison, runs: posture.runs, receiving: posture.receiving, fileSets };
+  const counts = ledgerCounts({ comparison, tasks: workspace.tasks, history: workspace.history, runs: posture.runs });
+  const askContext = { queue, manager, comparison, runs: posture.runs, receiving: posture.receiving, fileSets, counts };
   const notes = notesFor({
     checks: posture.runs.map((entry) => entry.checkedAt), newIssues, receiving: posture.receiving, restoredAt,
     lastGoodAt: posture.lastSuccessfulRun?.checkedAt,
@@ -461,7 +460,7 @@ export default function App() {
     const tasks = comparisonTasks(fresh, "Sample inventory export", "Sample receiving log");
     if (!save((current) => ({ ...current, tasks: [...current.tasks, ...tasks.filter(({ id }) => !current.tasks.some((task) => task.id === id))] }))) return;
     setExtraRows((current) => [...current, ...fresh]);
-    setPosture((current) => monitorReceiving(current, [...comparison, ...fresh], "current", time));
+    setPosture((current) => monitorReceiving(current, fresh, "current", time));
     setNewIssues((current) => [...current, ...tasks.map((task, i) => ({ taskId: task.id, record: task.record, kind: fresh[i].state === "different" ? "different" as const : "missing" as const, at: time }))]);
     setRestoredAt(null);
   }
@@ -476,7 +475,8 @@ export default function App() {
 
   function queueRow(task: Task, kind: string, label: string, index = 0) {
     const foundIn = newIssues.find((issue) => issue.taskId === task.id)?.at;
-    const time = foundIn ? clock(foundIn) : task.sample && posture.lastSuccessfulRun ? clock(posture.lastSuccessfulRun.checkedAt) : "Import";
+    const foundBy = checkFor(posture.runs, task.record);
+    const time = foundIn ? clock(foundIn) : foundBy ? clock(foundBy.checkedAt) : "Import";
     return <li key={task.id} style={{ "--i": index } as CSSProperties}>
       <button className="queue-row" data-kind={kind} aria-current={active?.id === task.id ? "true" : undefined} onClick={() => openTask(task)}>
         <span className="queue-mark" aria-hidden="true" />
@@ -504,7 +504,7 @@ export default function App() {
     setRestoredAt(posture.receiving === "delayed" ? time : null);
     setSources((current) => [...current, posture.receiving === "delayed"
       ? { kind: "restored", at: time } : { kind: "delayed", at: time, lastGoodAt: posture.lastSuccessfulRun?.checkedAt }]);
-    setPosture((current) => monitorReceiving(current, comparison, current.receiving === "current" ? "delayed" : "current", time));
+    setPosture((current) => monitorReceiving(current, [], current.receiving === "current" ? "delayed" : "current", time));
   }
 
   function onAsk(action: AskAction) {
@@ -710,14 +710,14 @@ export default function App() {
             {panelView.kind === "series" && <>
               <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} />
               <SeriesList series={panelView.series} rows={comparison} open={[...queue, ...manager]} latest={latest}
-                matched={posture.runs.reduce((sum, run) => sum + run.matched, 0)} activeId={active?.id} onOpen={openTask} />
+                matched={counts.matched} activeId={active?.id} onOpen={openTask} />
             </>}
             {panelView.kind === "summary" && <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} />}
             {panelView.kind === "handoff" && <HandoffPanel handoff={handoff} status={handoffStatus} onCopy={() => void copyHandoff()} onOpen={openTask} />}
           </ContextPanel>
         </div>}
         {tab === "Activity" && <ActivityPage history={workspace.history} latest={latest} handoff={handoff} open={queue.length}
-          flaggedToday={posture.runs.reduce((sum, run) => sum + run.exceptions, 0)} handoffStatus={handoffStatus}
+          counts={counts} handoffStatus={handoffStatus}
           notes={noteLog} onExport={() => { setExporting(true); updateSetup({ shared: true }); }}
           onReopen={(task) => decide(task, "Reopened")} onOpen={openTask} onCopy={() => void copyHandoff()} onShare={() => { setSharing(true); updateSetup({ shared: true }); }} />}
         {tab === "Learn" && <LearnPage issues={ordered.map(({ issue }) => issue)} query={query} onQuery={setQuery} onAsk={(question) => goTo("Today", question)}

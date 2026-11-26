@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { addTurn, ask, suggestions } from "../src/ask.ts";
 import { sampleComparison } from "../src/comparison.ts";
-import { monitorReceiving, sampleHistory } from "../src/monitoring.ts";
+import { samplePosture } from "../src/monitoring.ts";
 
 const at = "2026-11-24T20:00:00Z";
-const posture = monitorReceiving(undefined, sampleComparison, "current", at, sampleHistory(at));
+const posture = samplePosture(at);
 const queue = ["PKG-221", "PKG-443", "PKG-552"].map((id) => ({ id, record: id }));
 const context = { queue, manager: [], comparison: sampleComparison, runs: posture.runs, receiving: "current" };
 const intent = (input, extra = {}) => ask(input, { ...context, ...extra }).intent;
@@ -68,8 +68,9 @@ test("the briefing leads with what needs a person, from live data", async () => 
   assert.equal(result.focusId, "PKG-443", "a disagreement outranks gaps");
   assert.match(result.message, /^Start with PKG-443\. Inventory has no lot number\. Receiving has SAMPLE-6\./);
   assert.match(result.message, /Two more are missing a lot or a record\./);
-  const matched = posture.runs.reduce((sum, run) => sum + run.matched, 0);
-  assert.match(result.message, new RegExp(`The other ${matched} from today’s 8 checks matched`));
+  const matched = sampleComparison.filter(({ state }) => state === "match").length;
+  assert.equal(matched, posture.runs.reduce((sum, run) => sum + run.matched, 0), "the checks and the rows agree");
+  assert.match(result.message, new RegExp(`${matched} more matched, and I left them alone\\.`));
   for (const chip of result.chips) assert.notEqual(ask(chip, context).intent, "fallback", chip);
   assert.deepEqual(orderQueue(queue, sampleComparison).map(({ issue }) => issue.label),
     ["Records disagree", "No lot in either record", "No receiving record"]);

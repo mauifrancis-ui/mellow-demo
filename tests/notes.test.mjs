@@ -89,5 +89,6 @@ test("The Activity trail keeps every note, even after a later note replaces it",
     sources: [{ kind: "delayed", at: t(15, 40), lastGoodAt: t(15, 30) }, { kind: "restored", at: t(15, 50) }],
     waiting: [], now: t(16),
   });
-  assert.deepEqual(trail.map((note) => note.kind), ["new", "new", "batch", "delayed", "restored"]);
+  // One finding is one entry (sprint 5, D-d): the 15:13 check logs its briefing note, not a second row note.
+  assert.deepEqual(trail.map((note) => note.kind), ["new", "batch", "delayed", "restored"]);
 });

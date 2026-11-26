@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ask } from "../src/ask.ts";
 import { sampleComparison } from "../src/comparison.ts";
-import { monitorReceiving, sampleHistory } from "../src/monitoring.ts";
+import { samplePosture } from "../src/monitoring.ts";
 import { panelFor, panelLabel, queueView, sameView } from "../src/panel.ts";
 
 const at = "2026-11-24T20:00:00Z";
-const posture = monitorReceiving(undefined, sampleComparison, "current", at, sampleHistory(at));
+const posture = samplePosture(at);
 const queue = ["PKG-221", "PKG-443", "PKG-552"].map((id) => ({ id, record: id }));
 const context = { queue, manager: [], comparison: sampleComparison, runs: posture.runs, receiving: "current" };
 const view = (input) => panelFor(ask(input, context));

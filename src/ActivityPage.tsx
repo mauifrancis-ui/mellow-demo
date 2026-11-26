@@ -1,4 +1,5 @@
 import { useState, type CSSProperties } from "react";
+import type { LedgerCounts } from "./ledger-math";
 import type { Decision, Entry, Task } from "./workspace";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -30,7 +31,7 @@ function dayLabel(iso: string) {
   return date.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" });
 }
 
-export function ActivityPage({ history, latest, handoff, open, flaggedToday, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare, onExport }: {
+export function ActivityPage({ history, latest, handoff, counts, handoffStatus, notes = [], onReopen, onOpen, onCopy, onShare, onExport }: {
   onShare?: () => void;
   onExport?: () => void;
   history: Entry[];
@@ -38,7 +39,7 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
   latest: Map<string, Decision>;
   handoff: { task: Task; summary: string; text: string }[];
   open: number;
-  flaggedToday: number;
+  counts: LedgerCounts;
   handoffStatus: string;
   onReopen: (task: Task) => void;
   onOpen: (task: Task) => void;
@@ -137,11 +138,11 @@ export function ActivityPage({ history, latest, handoff, open, flaggedToday, han
         </li>)}</ul>
       </section>}
       <section aria-labelledby="numbers-title">
-        <h2 id="numbers-title" className="kicker">Today in numbers</h2>
+        <h2 id="numbers-title" className="kicker">In this workspace</h2>
         <dl className="day-numbers">
-          <div><dt>flagged</dt><dd>{flaggedToday}</dd></div>
-          <div><dt>decided</dt><dd>{today.length}</dd></div>
-          <div data-open={open > 0 || undefined}><dt>still open</dt><dd>{open}</dd></div>
+          <div><dt>flagged</dt><dd>{counts.flagged}</dd></div>
+          <div><dt>decided</dt><dd>{counts.decided}</dd></div>
+          <div data-open={counts.open > 0 || undefined}><dt>still open</dt><dd>{counts.open}</dd></div>
         </dl>
       </section>
       <section className="ledger-queue" aria-labelledby="handoff-title">

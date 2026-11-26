@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { ask } from "../src/ask.ts";
 import { sampleComparison } from "../src/comparison.ts";
-import { monitorReceiving, sampleHistory } from "../src/monitoring.ts";
+import { samplePosture } from "../src/monitoring.ts";
 import { currentRules, texasHempRules, checkedText } from "../src/rules-tx.ts";
 import { trailCsv, trailRows, trailDisclaimer } from "../src/trail.ts";
 import { clearDevice, mellowKeys } from "../src/device.ts";
@@ -13,7 +13,7 @@ import { readSetup, setupSteps, defaultName } from "../src/setup.ts";
 import { maxUploadBytes, maxUploadText } from "../src/limits.ts";
 
 const at = "2026-11-24T20:00:00Z";
-const posture = monitorReceiving(undefined, sampleComparison, "current", at, sampleHistory(at));
+const posture = samplePosture(at);
 const queue = ["PKG-221", "PKG-443", "PKG-552"].map((id) => ({ id, record: id }));
 const context = { queue, manager: [], comparison: sampleComparison, runs: posture.runs, receiving: "current" };
 const text = (answer) => `${answer.title} ${answer.body} ${(answer.items ?? []).map((item) => `${item.title ?? ""} ${item.detail}`).join(" ")}`;

@@ -27,15 +27,36 @@ export function compareLots(inventory: LotRecord[], receiving: LotRecord[]): Lot
   });
 }
 
-const matched = ["PKG-105", "PKG-108", "PKG-114", "PKG-119", "PKG-125"].map((packageId, index) => ({
-  packageId, lot: `SAMPLE-${index + 1}`,
-}));
+// Sample data (sprint 5, data integrity). Every sample package belongs to exactly one check.
+// The checks' counts and the comparison rows come from this one list, so they always add up.
+// Each entry is one check: how many packages matched, and which exceptions it found.
+export const sampleBatches: { matched: number; exceptions: { packageId: string; inventory: string; receiving: string | null }[] }[] = [
+  { matched: 6, exceptions: [] },
+  { matched: 8, exceptions: [{ packageId: "PKG-221", inventory: "", receiving: "" }] },
+  { matched: 4, exceptions: [] },
+  { matched: 9, exceptions: [] },
+  { matched: 6, exceptions: [{ packageId: "PKG-443", inventory: "", receiving: "SAMPLE-6" }] },
+  { matched: 5, exceptions: [] },
+  { matched: 7, exceptions: [] },
+  { matched: 5, exceptions: [{ packageId: "PKG-552", inventory: "", receiving: null }] },
+];
 
-export const sampleComparison = compareLots(
-  [...matched, { packageId: "PKG-221", lot: "" }, { packageId: "PKG-443", lot: "" }, { packageId: "PKG-552", lot: "" }],
-  [...matched, { packageId: "PKG-221", lot: "" }, { packageId: "PKG-443", lot: "SAMPLE-6" }],
-);
+/** The packages in each sample check, in order. Matched packages get IDs PKG-101 onward. */
+export function sampleBatchRows(): LotCheck[][] {
+  let next = 101;
+  return sampleBatches.map(({ matched, exceptions }) => [
+    ...Array.from({ length: matched }, () => {
+      const id = next++;
+      return { packageId: `PKG-${id}`, inventory: `SAMPLE-${id}`, receiving: `SAMPLE-${id}`, state: "match" as const };
+    }),
+    ...exceptions.map((row) => compareLots(
+      [{ packageId: row.packageId, lot: row.inventory }],
+      row.receiving === null ? [] : [{ packageId: row.packageId, lot: row.receiving }],
+    )[0]),
+  ]);
+}
 
+export const sampleComparison: LotCheck[] = sampleBatchRows().flat();
 export function lotInsight(row: LotCheck): { title: string; detail: string } {
   if (row.state === "different") {
     const difference = row.inventory === "" ? "Inventory has no lot number, but receiving does."

@@ -144,7 +144,8 @@ export function noteTrail(input: { checks: string[]; newIssues: NewIssue[]; sour
     const before = input.checks.filter((check) => check < at).at(-1);
     const set = notesFor({ checks: before ? [before, at] : [at], newIssues: input.newIssues.filter((issue) => issue.at === at),
       receiving: "current", waiting: [], dismissed: empty, now: at });
-    trail.push(...[set.briefing, ...set.rows.values()].filter((note): note is Note => Boolean(note)));
+    // One finding, one entry: the briefing note stands for the event; row notes count only when there's no briefing note.
+    trail.push(...(set.briefing ? [set.briefing] : [...set.rows.values()]));
   }
   for (const event of input.sources) {
     const set = notesFor({ checks: [], newIssues: [], waiting: [], dismissed: empty, now: event.at,

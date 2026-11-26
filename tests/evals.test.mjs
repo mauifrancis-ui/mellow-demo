@@ -3,10 +3,10 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { ask } from "../src/ask.ts";
 import { sampleComparison } from "../src/comparison.ts";
-import { monitorReceiving, sampleHistory } from "../src/monitoring.ts";
+import { samplePosture } from "../src/monitoring.ts";
 
 const at = "2026-11-24T20:00:00Z";
-const posture = monitorReceiving(undefined, sampleComparison, "current", at, sampleHistory(at));
+const posture = samplePosture(at);
 const queue = ["PKG-221", "PKG-443", "PKG-552"].map((id) => ({ id, record: id }));
 const context = { queue, manager: [], comparison: sampleComparison, runs: posture.runs, receiving: "current" };
 const text = (answer) => `${answer.title} ${answer.body} ${(answer.items ?? []).map((item) => `${item.title ?? ""} ${item.detail}`).join(" ")}`;
@@ -156,6 +156,6 @@ test("P-1 · provenance names the files a package actually came from", () => {
   assert.equal(mine.basis.atKind, "compared", "a file comparison isn't a check");
   const sample = ask("Anything wrong with 443?", own);
   assert.ok(sample.basis.sources.includes("Inventory export (sample)"));
-  assert.ok(sample.basis.sources.includes("8 packages compared"), "the sample count excludes your files");
+  assert.ok(sample.basis.sources.includes("53 packages compared"), "the sample count excludes your files");
   assert.match(ask("Show me today's gaps", own).basis.label, /^4 files/);
 });

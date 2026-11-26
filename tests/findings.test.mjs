@@ -9,7 +9,7 @@ const verdicts = /\b(compliant|non-?compliant|violation|safe|ready|passed?|faile
 
 test("S1 · the summary counts what was compared and lists disagreements first", () => {
   const summary = findingsSummary(input);
-  assert.equal(summary.title, "3 of 8 packages need a person");
+  assert.equal(summary.title, "3 of 53 packages need a person");
   assert.deepEqual(summary.rows.map((row) => row.packageId), ["PKG-443", "PKG-221", "PKG-552"]);
   assert.equal(summary.rows[0].finding, "Records disagree");
   assert.equal(summary.rows[2].receiving, "(no record)");

@@ -32,8 +32,8 @@ test("briefing identifies which record is missing or disagrees", () => {
 
 test("skim prioritizes a mismatch over gaps and stays quiet on matching records", () => {
   const summary = summarizeLots(sampleComparison);
-  assert.equal(summary.checked, 8);
-  assert.equal(summary.matched, 5);
+  assert.equal(summary.checked, 53);
+  assert.equal(summary.matched, 50);
   assert.equal(summary.different.length, 1);
   assert.equal(summary.missing.length, 2);
   assert.equal(summary.first.packageId, "PKG-443");
