@@ -1283,3 +1283,12 @@ Reviewed by every role in PRODUCT_TEAM.md.
 **Board recommendation:**
 - **Approve** the dataset proposal and the cadence gate.
 - **Recommend holding "What if" bills** until the segment decision. That's the founder's call.
+
+### Sprint 7 · founder decision (Step 3) · 2026-11-26
+
+The founder approved all three ("yes let's do all 3"):
+1. **Sprint 7 scope:** the prototype dataset (DB1 to DB4) and the market validation kit (V1).
+2. **Segment:** the lead hypothesis is now **retail receiving in tracked states** (Metrc-style). Texas hemp is a watched segment; its Rules and inspection prep stay as built. "What if" (2027 bills) is **on hold** until the segment decision is revisited.
+3. **Process:** the evidence-of-need gate is adopted in AGENTS.md, Step 0.
+
+**Evidence of need for sprint 7 (the gate's first use):** in `research/market-analysis.md` §1, track-and-trace errors account for about half of 2024's cannabis violations (secondary source), and states require reconciliation (Colorado daily; Missouri documented investigation). Confidence is moderate; V1 gathers primary evidence.

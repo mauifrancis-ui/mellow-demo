@@ -15,6 +15,7 @@ Mellow is the product's enduring intelligence layer. The application owns authen
 Every product, design or brand change runs this sequence. Don't skip a step because a request says "build it" or "deploy". Ask the founder before skipping anything. Roles, remits and required outputs for each step are in [PRODUCT_TEAM.md](PRODUCT_TEAM.md).
 
 0. **Sprint planning.** The founder sets the goal. The Product Lead writes the problem and scope, and names the Universal Experiences journey stages it touches (see PRODUCT_TEAM.md).
+   **Evidence-of-need gate (founder rule, 2026-11-26).** The plan cites the evidence that the target segment needs this work (`research/market-analysis.md` or newer research). If there's none, the sprint's first item is getting it. Research keeps the market file current every sprint.
 1. **Proposal review (team).** Every role in PRODUCT_TEAM.md reviews the proposal and records findings with a severity. Compliance and Risk can block.
 2. **Board pass.** Apply the [DESIGN_BOARD.md](DESIGN_BOARD.md) lenses to the proposal and the team findings. Record what each lens backs, changes or rejects.
 3. **Founder decision on the proposal.** Build only what the founder approves.

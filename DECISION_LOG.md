@@ -411,3 +411,9 @@ The founder approved the release ("deploy it") after the Step 5a board session i
 ## v1.41 released · 2026-11-25
 
 The founder approved the release ("deploy my friend") after the sprint 6 Step 5a board session in DESIGN_BOARD.md.
+
+## Segment and process decisions · 2026-11-26
+
+- **Lead segment:** retail receiving in tracked states. Texas hemp is watched; "What if" is on hold.
+- **Evidence-of-need gate** adopted in Step 0.
+- **Sprint 7 approved:** the prototype dataset with an answer key, two stores, new findings, an accuracy eval, and a market validation kit.
