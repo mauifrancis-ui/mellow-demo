@@ -37,6 +37,20 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
 
 - Fixed after the v1.39 production check: the site still said the stamp shows "Compared" and "which rows". It now says "which files, which package, and when", and that answers not drawn from your records say so. This is site copy only.
 
+## Sprint 5 candidates from the founder's walkthrough · 2026-11-25
+
+- **Today shows one package but says 9 (Use).** This was the founder's most basic confusion. Showing one task with a compact queue is deliberate (decision 003), but it doesn't explain itself to someone arriving cold. Options for the team and board:
+  - say "1 of 9 · sorted by what needs you most", with "See all 9" in place;
+  - show the next one quietly ("Next: PKG-552 · no receiving record");
+  - remember an opened list.
+- **Design system tokens (audit 2026-11-25).**
+  - Color: primitives are tokens and swap by palette (`data-palette`). A semantic layer exists (`--signal`, `--surface`, `--focus`) but components mostly use primitives directly.
+  - Type: families are tokens, but sizes aren't. About ten hard-coded sizes from 11 to 18px caused today's two font bugs.
+  - Spacing: not tokenized.
+  - The legacy `styles.css` has 37 hard-coded colors and the global input rule behind the radio bug.
+  - Context: the system adapts by width, reduced motion and print. It doesn't adapt by use case.
+  - Proposal: primitive, semantic and component tiers; a type and spacing scale; context modes for the floor (phone), the desk and print or export; marks and status words as semantic tokens.
+
 ## Texas roadmap (team decision 2026-11-25)
 
 - Sprint 4: the regulation source registry (references only), plus the binder skeleton.
