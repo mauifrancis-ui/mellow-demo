@@ -417,3 +417,15 @@ The founder approved the release ("deploy my friend") after the sprint 6 Step 5a
 - **Lead segment:** retail receiving in tracked states. Texas hemp is watched; "What if" is on hold.
 - **Evidence-of-need gate** adopted in Step 0.
 - **Sprint 7 approved:** the prototype dataset with an answer key, two stores, new findings, an accuracy eval, and a market validation kit.
+
+## v1.42 built · sprint 7 · 2026-11-26
+
+- **The prototype dataset sample-v1:** fictional, seeded, 2 stores, 90 days, 1,915 packages, with an answer key.
+- **Shipment comparison** across manifest, receiving and inventory.
+- **Accuracy eval:** 100%, a correctness check, not a product claim.
+- **Store-scoped sample** with a switcher (Expand).
+- **H3 to H5** countable from batch details.
+- **The V1 validation kit**, for the founder to send.
+- **Migration:** old sample decisions are retired; decisions about your own files are kept.
+
+The Step 5a board session is recorded. 167 tests pass. Awaiting the founder's release decision.

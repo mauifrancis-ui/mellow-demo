@@ -1292,3 +1292,54 @@ The founder approved all three ("yes let's do all 3"):
 3. **Process:** the evidence-of-need gate is adopted in AGENTS.md, Step 0.
 
 **Evidence of need for sprint 7 (the gate's first use):** in `research/market-analysis.md` §1, track-and-trace errors account for about half of 2024's cannabis violations (secondary source), and states require reconciliation (Colorado daily; Missouri documented investigation). Confidence is moderate; V1 gathers primary evidence.
+
+## Sprint 7 · v1.42 · implementation and preview review (Steps 4 and 5) · 2026-11-26
+
+Reviewed by the Engineer, Accessibility, Compliance and Risk, Content and Voice, AI UX, Research, the Product Designer and the Design Director.
+
+- **Checks:** lint, type check and build pass. **167 tests pass**, including D1 to D5 and S1 to S4. Accuracy on sample-v1 is 100% precision and recall for all five shipment issue types.
+- **Browser checks** at 1440px and 390px:
+  - the full sprint 4 walkthrough;
+  - switching stores, with each store keeping its own decisions;
+  - migrating an old saved sample workspace (own-file decisions kept; old fictional sample tasks retired);
+  - inspection prep counting H1 to H5.
+- **Results:** no console errors and no sideways scroll.
+
+| Area | Finding | Status |
+| --- | --- | --- |
+| Engineer | The full dataset (1.3 MB) stays out of the app. The app imports only today's slice (28 KB). The full set lives in `data/sample-v1/` for tests and evals. | Closed |
+| Engineer | A saved workspace from the old sample pointed at packages that no longer exist. Fixed with a migration that keeps your own files' tasks and decisions. | Closed |
+| Content and Voice | The record said "Only the import is available" above three records. The stamp said "2 files" and "in both files". Both now speak of three records, and next steps are specific to each finding (for example "Recount the package…"). | Closed |
+| Compliance and Risk | New finding words checked for blame: "Quantities disagree", "Not on the manifest", "No receiving record". S4 guards against theft, fraud or error language. | Closed |
+| AI UX | The 100% accuracy is a correctness check on planted data. The dictionary and the eval doc both say it isn't a product claim. | Closed |
+| Accessibility | The store switcher is a native select with a screen-reader label. The three evidence columns stack under 900px. | Closed |
+| Research | The planted rates are assumptions. V1's interview guide is ready for the founder to send. | Open · founder |
+| Product Designer | "Simulate a new check" still adds the old two-record rows. | Follow-up (sprint 8): simulate the next delivery from the dataset |
+
+### Sprint 7 · board presentation of the built preview (Step 5a)
+
+| # | Build decision not in the plan | Board call | Lens and reasoning |
+| --- | --- | --- | --- |
+| 1 | **Old sample decisions are retired** on upgrade; your own files' tasks and decisions are kept. | **Backs** | Morris: the retired decisions were about fictional packages that no longer exist; keeping them would point at nothing. Compliance: records about real files are untouched, which honors "preserve stored records". Logged in DECISION_LOG. |
+| 2 | **Switching stores reloads the page.** | **Backs, for the prototype** | Eames: one clean state per store beats half-swapped state. Rams: a full reload is honest about what's happening. A cross-fade can come with real accounts. |
+| 3 | The first store keeps the original storage keys; the second gets scoped keys. | **Backs** | Engineer: no one's existing data moves. |
+| 4 | Today's deliveries **are fitted before the current time** if you open the demo earlier than the sample's last delivery. | **Backs** | Norman: a check "in the future" would break the briefing. The times are fictional either way. |
+| 5 | Day 0 is a **staged shift** with more problems than the base rate. It's labeled in the dictionary and the answer key, not in the app. | **Backs, with a condition** | Morris: fine for a demo, but anyone quoting rates must use the base rate. The app's "Fictional records" line covers it. |
+| 6 | Evidence shows **three records**: Manifest, Receiving record, Inventory record. | **Backs** | Vignelli: same type and structure, one more column. Zhuo: an operator recognizes it instantly. |
+| 7 | **Next steps are specific** per finding, including "A corrected manifest may be needed; a manager can follow up." | **Backs** | Norman: specific next steps reduce hesitation. Morris: they're suggestions; the person still decides. |
+| 8 | Inspection prep now **counts five items** (H1 to H5) on the sample, because the data carries batch and COA details. | **Backs** | Zhuo: that's the payoff of realistic data. |
+| 9 | The store switcher sits **inline in the masthead's date line**. | **Backs** | Product Designer: it's where "which store am I in" is read. Wroblewski: verified visible and tappable at 390px. |
+| 10 | "Simulate a new check" still uses old-style rows. | **Backs as a known gap** | Rams: ship the honest version now; fix it next sprint. |
+
+**Board recommendation:** release v1.42 for founder decision. No changes required.
+
+### Product Excellence Review · v1.42 · synthetic
+
+| Stage | v1.41 | v1.42 | Evidence |
+| --- | --- | --- | --- |
+| Try | Good | **Good+** | The demo now looks like a real receiving day: manifests, quantities, lot numbers, two stores. Marcus (multi-site): "That's my morning." |
+| Use | Good+ | Good+ | Three records side by side; specific next steps. |
+| **Expand** | Not served | **Good for a prototype** | A second store with its own queue and decisions. |
+| End use | Good | Good | The binder now counts five items on the sample. |
+
+**Provocation (Priya):** "Show me the 90 days, not just today." History views are a sprint 8 candidate. **Gate:** met for a prototype.

@@ -51,7 +51,22 @@ const workspaceKey = scoped(storageKey);
 const storeSample = sampleFor(currentStore());
 const sampleComparison = storeSample.comparison;
 const sampleStart = sampleWorkspace(storeSample);
-const readStoreWorkspace = () => readWorkspace(workspaceKey, sampleStart);
+/**
+ * Read this store's workspace. Sprint 7 replaced the sample data, so a workspace saved with the old
+ * sample packages keeps everything from your own files and decisions about them, and swaps in the
+ * new sample packages. Old sample decisions were about fictional packages that no longer exist.
+ */
+const readStoreWorkspace = () => {
+  const saved = readWorkspace(workspaceKey, sampleStart);
+  const current = new Set(sampleStart.tasks.map(({ id }) => id));
+  if (!saved.tasks.some((task) => task.sample && !current.has(task.id))) return saved;
+  const stale = (task: Task) => task.sample && !current.has(task.id);
+  return {
+    tasks: [...sampleStart.tasks, ...saved.tasks.filter((task) => !task.sample)],
+    drafts: Object.fromEntries(Object.entries(saved.drafts).filter(([id]) => !saved.tasks.some((task) => task.id === id && stale(task)))),
+    history: saved.history.filter((entry) => !stale(entry.task)),
+  };
+};
 type Imported = { rows: LotCheck[]; sets: FileSet[] };
 function readImported(): Imported {
   try {

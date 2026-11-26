@@ -140,6 +140,22 @@ Added in sprint 6. These run in `tests/prep.test.mjs` and `tests/catalog.test.mj
 | K4 | Proposed rules | Only inside a WhatIfSurface, and a WhatIfSurface can't hold a ControlCheck. |
 | K5 | An answer from records with no Stamp | Rejected. |
 
+## The prototype dataset (D) and the store sample (S)
+
+Added in sprint 7. These run in `tests/dataset.test.mjs` and `tests/store.test.mjs`.
+
+| # | Situation | Expected behavior |
+| --- | --- | --- |
+| D1 | Every table | Keys hold, and package labels are unique. |
+| D2 | Licenses and links | All visibly fictional (`SAMPLE-` licenses, `example.com` links). |
+| D3 | Scale | Two stores, 90 days, about 1,900 packages. The base issue rate is within the stated 2 to 4% assumption. |
+| D4 | The app's slice | Today's slice equals day 0 of the full set. |
+| D5 | Accuracy against the answer key | 100% precision and recall per shipment issue type, over every package. This proves the logic is correct on a known set. It's **not** a product claim about real data. |
+| S1 | Each store, at several times of day | Every check is today and before now. The checks add up to the rows. Nothing flagged is untracked. |
+| S2 | Each store | Every finding has plain words, and every answer validates against the catalog. |
+| S3 | Storage | The first store keeps the original keys; the second store's are scoped. |
+| S4 | Quantity and manifest findings | They read as facts: no theft, fraud, error or blame words. |
+
 ## Part 2 · Product Excellence Review (release gate)
 
 Added by the founder on 2026-11-25. The automated cases above prove Mellow says the right things. This review proves the product works well for people, end to end. **No release goes to production until it has run**, and its gate (below) is met.
