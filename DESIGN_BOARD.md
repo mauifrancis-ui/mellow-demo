@@ -901,3 +901,88 @@ Reviewed by the Product Lead, Design Director, Research, Engineer, Accessibility
 - A first-time person can say why they see one package and how to see the rest, without help.
 - No hard-coded colors or font sizes are added.
 - Every inspection-prep check opens into rule, evidence and records, with an expert-review label.
+
+## Sprints 5 to 7 · sizing and plan (Step 0) · 2026-11-25
+
+The founder asked to "size and plan all 3": the foundation (tokens and the A2UI catalog), one-of-nine, and inspection prep.
+
+**Sizes:** S = about 1 day, M = 2 to 3 days, L = 4 to 5 days. A sprint is about 10 working days.
+
+The measured scope behind the token items, from today's CSS:
+- 191 font declarations, about ten distinct sizes;
+- 314 direct uses of raw color variables;
+- 44 hex values in the legacy `styles.css`;
+- 392 hard-coded spacing values.
+
+### A · Foundation: tokens, context modes, A2UI catalog
+
+| # | Item | Size |
+| --- | --- | --- |
+| A1 | Type scale: six steps from 12 to 28px, as tokens. Migrate all 191 font declarations. | M (2d) |
+| A2 | Role tokens: `signal-disagree`, `signal-gap`, `signal-manager`, `text-primary`, `text-secondary`, `text-voice`, `surface-*`, `rule-*`. Migrate the 314 raw color uses. | M (1.5d) |
+| A3 | Spacing scale on a 4px base. Migrate the components touched this sprint; the rest migrate as they're touched. | S (1d) |
+| A4 | Retire the legacy `styles.css`: its 44 hex values and the global input rule. | S (1d) |
+| A5 | Context modes `data-context="floor" \| "desk" \| "record"`. Floor is phone-first and shows one task. Desk is denser, with the queue open. Record formalizes today's print styles. | M (2d) |
+| A6 | Guard test: it fails if a hex value or a raw font size appears outside the tokens file. | S (0.5d) |
+| A7 | **A2UI catalog draft:** Answer, Stamp (required on record answers), RecordRow (kind enum), StatusWord (enum: On file / Missing / Can't check), Action, Chart, plus ControlCheck and BinderSection for sprint 6. There's no verdict component. `ProposedRule` is barred from current-check surfaces. A conformance test checks that every `ask()` answer validates against the catalog. The spec version is checked at build (v0.9 and v1.0 candidate are both live). | M (2.5d) |
+
+**Total: about 10.5 days.**
+
+### B · One package, but it says 9
+
+| # | Item | Size |
+| --- | --- | --- |
+| B1 | "1 of 9 · sorted by what needs you most" with "See all 9" in place | S (0.5d) |
+| B2 | "Next: PKG-552 · no receiving record" under the current record | S (0.5d) |
+| B3 | Desk mode opens the queue by default at 1200px and wider; floor mode keeps one task. The opened or closed state is already remembered (`mellow.panel`). | S (0.5d, on A5) |
+| B4 | Evaluation case and a first-time comprehension check in the Product Excellence Review | S (0.5d) |
+
+**Total: about 2 days.**
+
+### C · Inspection prep for Texas hemp, current law
+
+| # | Item | Size |
+| --- | --- | --- |
+| C1 | Research and Compliance read 25 TAC ch. 300 and HSC ch. 443 and draft the controls that can be checked from records, each with an exact citation. Most will honestly be "Can't check from these files" (for example ID checks and labels). Compliance can block. *This isn't engineering work, so it can run in sprint 5.* | M (2d, Research) |
+| C2 | Control engine: deterministic checks from records give On file, Missing or Can't check from these files, shown as counts. Each opens into rule, evidence and records. Labeled "Drafted from the rule text · not reviewed by a regulatory expert". | M (2.5d) |
+| C3 | Evidence on file per control: what an inspector would ask to see, and where it lives | M (2d) |
+| C4 | The binder opens from the decision trail: cover, scope, controls, evidence, decisions, disclaimer, and "who decided" (it says it can't tell until there are accounts). Print, PDF and phone, using the record mode. | M (2.5d) |
+| C5 | Ask intents and evaluation cases: no "met"; every count traces to its controls; "Am I ready?" gets the on-file and missing answer. | S (1d) |
+
+**Total: about 10 days**, of which C1 (2 days) can run earlier.
+
+### Totals and the plan
+
+All three come to about 22.5 days, more than two sprints of capacity. The team proposes:
+
+| Sprint | Dates (about) | Scope | Fit |
+| --- | --- | --- | --- |
+| **5 · Foundation and clarity** | Nov 30 to Dec 11 | A1 to A7, B1 to B4, plus **C1 run by Research in parallel** | About 12.5 days of engineering. **Cut line:** A3 then A4 slip to sprint 6 first. |
+| **6 · Inspection prep (Texas hemp)** | Dec 14 to Jan 8 (holiday weeks) | C2 to C5, built from the catalog's ControlCheck and BinderSection components and the record mode | About 8 days. Holiday slack. |
+| **7 · What if, and Expand** | Jan 11 to 22 | The 2027 session bills view (opt-in, `ProposedRule`), and a second store | Lands as the session convenes (2027-01-12) |
+
+**The trade-off for the founder.** Putting the foundation first means inspection prep ships one sprint later than the sequence approved earlier today, which had it in sprint 5. The alternative is inspection prep first, with the foundation in sprint 6. That ships Texas value sooner, but builds about six new components on untokenized styles. They'd be reworked in sprint 6, and the visual-drift bugs from sprint 4 would repeat.
+
+### Team review (Step 1)
+
+Reviewed by the Product Lead, Design Director, Product Designer, Engineer, AI UX, Research, Compliance and Risk, Accessibility, and Content and Voice.
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Engineer | Migrating 191 font and 314 color uses risks visual regressions. | High | Take screenshots of every page in both modes before and after, and compare them. A6 stops regressions coming back. |
+| Product Designer | Context modes are the IA answer to one-of-nine. B depends on A5. | Info | Keep B in the same sprint as A5. |
+| AI UX | The catalog conformance test turns today's honesty tests into structure. A verdict can't be rendered if it isn't in the catalog. | Info | Build A7 before C2, so controls are catalog components from the start. |
+| Research | C1 needs the full rule text, not summaries. Fetching the official pages works. Some provisions may not be checkable from two CSVs at all. | Medium | Say so plainly. A control list that's mostly "Can't check from these files" is still honest and useful. |
+| Compliance and Risk | C2 can't ship without C1's citations and the expert-review label. The binder needs counsel review of its disclaimer before any real business uses it. | Blocks C2 without C1 | The order is right: C1 runs in sprint 5. |
+| Accessibility | The type scale is the chance to fix minimum sizes. Nothing below 12px, and 14px minimum on the floor. | Medium | Bake it into A1. |
+| Content and Voice | "1 of 9 · sorted by what needs you most" is plain. Don't say "prioritized". | Info | None. |
+
+### Board pass (Step 2)
+
+- **Rams, Vignelli:** foundation first. A system you can't trust to hold can't carry a compliance binder.
+- **Norman:** B is the cheapest, highest-value item on the page. It's the first ten seconds.
+- **Zhuo:** the binder is still the hero. Don't let the foundation sprint drift; hold the cut line.
+- **Morris:** the catalog makes the guardrails enforceable. That's worth a sprint.
+- **Wroblewski:** the floor mode decides whether the phone experience is right. Test it on a real phone at the back door.
+
+**Board recommendation:** approve the team's plan (foundation first). The founder decides the trade-off.
