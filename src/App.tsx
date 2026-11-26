@@ -56,6 +56,19 @@ function readDismissed(): NoteEvent[] {
   try { return JSON.parse(localStorage.getItem(dismissedKey) ?? "[]") as NoteEvent[]; } catch { return []; }
 }
 
+/** Context mode (sprint 5, A5): "floor" on a phone, one task at a time; "desk" with room for the queue. Print is the "record" mode. */
+function useContextMode() {
+  const query = "(width < 700px)";
+  const [floor, setFloor] = useState(() => { try { return window.matchMedia(query).matches; } catch { return false; } });
+  useEffect(() => {
+    const media = window.matchMedia(query);
+    const update = () => setFloor(media.matches);
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+  return floor ? "floor" : "desk";
+}
+
 function initialCollapsed() {
   try {
     const saved = localStorage.getItem(panelKey);
@@ -151,6 +164,7 @@ function SourceComparison({ task, review }: { task: Task; review: ReturnType<typ
 
 export default function App() {
   const [tab, setTab] = useState<Tab>("Today");
+  const contextMode = useContextMode();
   const nav = useRef<HTMLElement>(null);
   const [pill, setPill] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [workspace, setWorkspace] = useState(() => {
@@ -221,7 +235,11 @@ export default function App() {
     .filter(({ entry }) => entry && new Date(entry.at).toDateString() === new Date().toDateString());
   const active = [...queue, ...manager].find((task) => task.id === activeId) ?? ordered[0]?.task;
   const activeIssue = active ? issueOf(active, comparison) : undefined;
-  const following = active && nextRecord(workspace.tasks, queue, active.id);
+  // "Next" follows the same order as "1 of N": what needs you most first (sprint 5, B2).
+  const following = active ? (ordered.map(({ task }) => task).find((task, index, list) => index > list.findIndex(({ id }) => id === active.id) && task.id !== active.id)
+    ?? ordered.map(({ task }) => task).find(({ id }) => id !== active.id) ?? nextRecord(workspace.tasks, queue, active.id)) : undefined;
+  const followingIssue = following ? issueOf(following, comparison) : undefined;
+  const position = active ? ordered.findIndex(({ task }) => task.id === active.id) + 1 : 0;
   const draft = active ? workspace.drafts[active.id] ?? emptyDraft : emptyDraft;
   const review = active ? prepareReview(active) : undefined;
   const hasManualEvidence = Boolean(draft.reference || draft.excerpt)
@@ -335,7 +353,13 @@ export default function App() {
         : savedDraft;
       const next = recordDecision(current, task, decision, evidence);
       changed = next !== current;
-      if (changed && decision !== "Reopened") nextId = nextRecord(next.tasks, workQueue(next), task.id)?.id ?? "";
+      if (changed && decision !== "Reopened") {
+        // Advance in the same order as "1 of N": the next one after this, by what needs you most.
+        const remaining = orderQueue(workQueue(next), comparison).map(({ task: item }) => item);
+        const before = ordered.map(({ task: item }) => item.id);
+        const here = before.indexOf(task.id);
+        nextId = (remaining.find(({ id }) => before.indexOf(id) > here) ?? remaining[0])?.id ?? "";
+      }
       return next;
     });
     if (saved && changed) {
@@ -412,6 +436,22 @@ export default function App() {
   function closeAsk() {
     setAskOpen(false);
     requestAnimationFrame(() => askButton.current?.focus());
+  }
+
+  /** "See all": open the queue where it lives (the panel on a desk, the list below on a phone) and move focus to it. */
+  function showQueue() {
+    const focusQueue = (tries = 0) => {
+      const node = document.getElementById("work-queue");
+      if (node && node.offsetParent !== null) {
+        node.scrollIntoView({ block: "start" });
+        node.focus({ preventScroll: true });
+      } else if (tries < 30) requestAnimationFrame(() => focusQueue(tries + 1));
+    };
+    if (panelCollapsed) {
+      try { localStorage.setItem(panelKey, "open"); } catch { /* Kept for this visit. */ }
+      smooth(() => { setPanelView(queueView); setPanelCollapsed(false); }, "panel");
+      focusQueue();
+    } else { if (!sameView(panelView, queueView)) setPanelView(queueView); focusQueue(); }
   }
 
   function togglePanel() {
@@ -557,7 +597,7 @@ export default function App() {
   }, [tab]);
 
   return (
-    <div className="shell" data-palette="ledger">
+    <div className="shell" data-palette="ledger" data-context={contextMode}>
       <header className="masthead"><div className="masthead-inner">
         <div className="wordmark">mellow<span aria-hidden="true">.</span></div>
         <nav aria-label="Main navigation" ref={nav} data-pill={pill ? "" : undefined}>
@@ -620,14 +660,15 @@ export default function App() {
               note={notes.briefing ? <NoteLine key={notes.briefing.id} note={notes.briefing} onDismiss={dismissNote} onNotUseful={markNotUseful} /> : undefined}
               aside={<ReceivingCheck onCompared={addComparison} onImport={importCsv} openRequest={compareRequest} />} />
             <section className="primary ledger-record" aria-labelledby="task-title">
-              <p className="record-marker" data-manager={pendingManager || undefined} aria-hidden="true">{active ? (pendingManager ? "With manager" : "Now") : ""}</p>
+              <p className="record-marker" data-manager={pendingManager || undefined}>{active ? (pendingManager ? "With a manager"
+                : position ? <span className="record-position">{position} of {ordered.length}</span> : "Now") : ""}</p>
               <div className="ledger-record-body">
                 <div className="review-heading">
                   <div key={active?.id} className="record-identity">
-                    {active && <p className="eyebrow">{active.sample ? "Sample package" : "Imported record"}</p>}
+                    {active && <p className="eyebrow">{active.sample ? "Sample package" : "Imported record"}{position && !pendingManager ? " · sorted by what needs you most" : ""}</p>}
                     <h2 id="task-title" tabIndex={-1} ref={editor} aria-describedby={status ? "review-feedback" : undefined}>{active ? `${active.record} · ${activeIssue?.label.toLowerCase()}` : "You’re caught up"}</h2>
                   </div>
-                  <a className="queue-link" href="#work-queue">View queue</a>
+                  {ordered.length > 1 && (panelCollapsed || contextMode === "floor") && <button type="button" className="queue-link" onClick={showQueue}>See all {ordered.length}</button>}
                 </div>
                 {error && <p className="error review-feedback" role="alert">{error}</p>}
                 {active && review ? <>
@@ -669,7 +710,7 @@ export default function App() {
                         {!needsRationale && <DecisionNote note={draft.note} onChange={(value) => updateDraft("note", value)} />}
                       </Dropdown>
                     </div>
-                    {following && <button className="next-record" onClick={() => openTask(following)}>Next record <span className="next-id">{following.record}</span></button>}
+                    {following && <button className="next-record" onClick={() => openTask(following)}>Next <span className="next-id">{following.record}</span>{followingIssue && <span className="next-issue"> · {followingIssue.label}</span>}</button>}
                   </div>
                 </> : <div className="completion">
                   <p>{manager.length ? "Your checks are done. The next shift can see what still needs a manager." : "Everything in the queue has been checked. Your decisions are saved in Activity."}</p>

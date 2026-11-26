@@ -106,6 +106,22 @@ Added in sprint 4. These run in `tests/sprint4.test.mjs`.
 | W4 | The site's upload limit | It matches the code (retro follow-up). |
 | N1 | "Not useful" on a note (browser check) | You must pick a reason. The note is dismissed and logged with the reason on this device, and the reason appears in Activity and the trail. |
 
+## Numbers add up (M), motion (E), tokens (A) and where you are (O)
+
+Added in sprint 5. They run in `tests/ledger.test.mjs`, `tests/monitoring.test.mjs`, `tests/motion.test.mjs` and `tests/tokens.test.mjs`.
+
+| # | Situation | Expected behavior |
+| --- | --- | --- |
+| M1 | Sample checks | All on today's date. Each package is in exactly one check, and the checks add up to the comparison rows. |
+| M2 | A new check | It counts only the packages it adds. The window isn't capped, so a ninth check counts. |
+| M3 | Any state | flagged = open + decided; decided = recorded + not an issue + with a manager; packages = matched + exceptions; every exception has a task. |
+| M4 | Any state | The checks add up to the rows compared. The number of checks equals the checks since midnight. |
+| M5 | Any state | The briefing, the summary answer and "What matched?" use the same numbers as `ledger-math.ts`. |
+| M6 | One finding | It's one entry in the notes log. |
+| E1, E2 | Stylesheets | Only `motion.css` animates. Every timing is a token, each keyframe is defined once, and nothing moves outside a reduced-motion "no-preference" block. |
+| A1, A6 | Stylesheets | Every font size is a type token, with nothing below 12px and form fields at 16px. Components use role tokens, never raw colors. The legacy hex count can only go down. |
+| O1 (browser) | Today | The record says "1 of N" and "sorted by what needs you most". "See all N" opens the queue and moves focus to it, on a phone and on a desk with the panel closed. "Next" names the next package and its issue, and deciding moves to that package. |
+
 ## Part 2 · Product Excellence Review (release gate)
 
 Added by the founder on 2026-11-25. The automated cases above prove Mellow says the right things. This review proves the product works well for people, end to end. **No release goes to production until it has run**, and its gate (below) is met.

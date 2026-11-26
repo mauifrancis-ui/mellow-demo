@@ -716,3 +716,10 @@
 .decision-word { font: var(--type-ui)/1.3 var(--sans); white-space: nowrap; }
 .evidence-toggle, .evidence-none { font: var(--type-meta)/1.3 var(--sans); }
 .evidence-toggle { text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 4px; }
+
+/* One of nine (sprint 5, B1 and B2): where you are in the queue, and what's next. */
+.record-marker:has(.record-position) { color: var(--text-secondary); }
+.record-position { color: var(--text-primary); }
+.record-marker[data-manager] .record-position { color: inherit; }
+.shell[data-palette="ledger"] button.queue-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; font: 500 var(--type-ui) var(--sans); color: var(--text-primary); text-decoration: underline; text-underline-offset: 4px; cursor: pointer; }
+.next-issue { font: var(--type-ui) var(--sans); color: var(--text-secondary); }

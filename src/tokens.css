@@ -18,3 +18,16 @@
   --type-display-md: clamp(28px, 4.3vw, 50px);
   --type-display-lg: clamp(36px, 5.5vw, 60px);
 }
+
+/* Context modes (sprint 5, A5). Same components, tuned for where the person is. */
+/* Floor: a phone at the back door. Bigger secondary text, one task at a time. */
+.shell[data-context="floor"] {
+  --type-meta: 14px;
+  --type-ui: 15px;
+  --type-body: 16px;
+}
+/* Desk: room for the queue beside the record. The defaults above. */
+/* Record: what prints or exports for whoever signs off. Ink on paper, nothing interactive. */
+@media print {
+  :root { --type-body: 11pt; --type-ui: 10pt; --type-meta: 9pt; --type-label: 8pt; --type-title: 16pt; --type-heading: 18pt; }
+}
