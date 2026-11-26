@@ -377,3 +377,14 @@ The founder approved the release (Step 6): "Let's deploy the best most up to dat
 ## Activity marks and type released · 2026-11-25
 
 The founder approved the release ("ok re-deploy"). Activity has no marks; decision words are 14px.
+
+## v1.40 built · sprint 5 · 2026-11-25
+
+Built as approved for sprint 5:
+- **Data integrity:** one source for counts; incremental, same-day checks; sample data from one batch list; one note per finding.
+- **Motion:** one file, seven principles, token-only timings.
+- **Tokens:** type scale, role tokens, floor, desk and record context modes, guard tests.
+- **One of nine:** "1 of N", sorted by what needs you most; See all; Next with its issue; advancing in sorted order.
+- **Research:** C1 draft controls.
+
+A3 and A4 move to sprint 6 under the cut line. 114 tests pass. Awaiting the founder's release decision.

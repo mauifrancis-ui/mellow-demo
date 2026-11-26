@@ -1038,3 +1038,37 @@ The founder asked to "make sure that all the data and math add up correctly on e
 - **Morris:** numbers that don't add up are a trust failure, not a bug. They come before features.
 - **Rams:** motion defined once, in one place.
 - **Norman:** motion is how people tell what changed. Consistency is comprehension.
+
+## Sprint 5 · v1.40 · implementation and preview review (Steps 4 and 5) · 2026-11-25
+
+Reviewed by the Engineer, Accessibility, Design Director, Product Designer, Content and Voice, AI UX, and Compliance and Risk.
+
+- **Checks:** lint, type check and build pass. **114 tests pass**, including the new M, E, A and O cases.
+- **Browser walkthroughs** at 1440px and 390px:
+  - with motion on and with reduced motion;
+  - with a keyboard;
+  - with remembered columns, Ask (rules, bills, compliance), the trail export and clearing the device.
+- **Results:** no console errors and no sideways scroll.
+- **Visual regression:** before-and-after screenshots of Today, Ask, Activity and Learn at both widths.
+  - The type-token migration changed layout by 0 to 55px of page height, from 15/16/17/19px collapsing onto the scale.
+  - The color-role migration is **pixel-identical** (0.000 to 0.019% of pixels differ, and those are clock times).
+
+| Area | What changed | Finding | Status |
+| --- | --- | --- | --- |
+| Data (D1 to D3) | Counts come from `ledger-math.ts`; checks are incremental and same-day. | Activity now reads flagged 4 = decided 1 + still open 3, matching Today. "Today in numbers" became "In this workspace", because the counts aren't limited to today. | Closed |
+| Motion (E1 to E4) | One file; tokens only. | Sprint 4 surfaces arrive with the same reveal as the rest. The ask drawer and dialogs now ease instead of spring (principle 4). One 50ms frame showed during a busy check plus an answer in headless Chrome; no frames dropped with reduced motion. | Closed · watch on real phones |
+| Tokens (A1, A2, A5, A6) | Type scale, role tokens, floor, desk and record modes, guard tests | Mellow's voice is 18px (was 19). Floor mode raises secondary text to 14 to 16px. Form fields are 16px. | Closed |
+| One of nine (B1 to B4) | "1 of 3" in the gutter; "Sample package · sorted by what needs you most"; "See all 3" when the queue is hidden; "Next PKG-221 · No lot in either record" | "Next" used to follow file order (PKG-552) while the briefing listed by need. Next and the auto-advance after a decision now follow the same order as "1 of N". | Closed |
+| Research (C1) | `research/texas-hemp-controls.md` | Two controls can be counted from today's files, two more when the files carry a batch date or COA link, and five are honestly "Can't check from these files". Citations were read through a summarizing tool and **need a person to check them against the PDF** before sprint 6. | Open · founder or an expert |
+| Cut line | A3 (spacing scale) and A4 (legacy stylesheet) | Not started. The guard stops new hex values (ceiling 45). | Moved to sprint 6 |
+
+### Product Excellence Review · v1.40 · synthetic, plus the founder's walkthrough finding
+
+| Stage | v1.39 | v1.40 | Evidence |
+| --- | --- | --- | --- |
+| Use | Good (synthetic), confusing in the founder's walkthrough | **Good** | The founder's confusion ("one package but it says 9") is answered on the record itself: where you are, why this one, how to see the rest, and what's next. Dana (floor) sees "1 of 3" and Next with its reason. Marcus (desk) sees "See all 3" only when the queue is hidden. |
+| Get help | Good+ | Good+ | Unchanged |
+| End use | Good | Good | The trail and "In this workspace" counts now agree with Today. |
+| Others | | Unchanged | |
+
+**Provocation (Norman):** test "1 of 3" with a real person on a phone before calling it solved. **Gate:** met for a prototype. Every number reconciles.
