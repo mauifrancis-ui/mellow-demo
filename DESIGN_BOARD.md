@@ -1187,3 +1187,99 @@ Reviewed by the Engineer, Accessibility, Compliance and Risk, Content and Voice,
   - **Jo:** "Can it learn my COA column?" H3 and H4 become checkable when files carry those columns. This is a sprint 7 candidate.
   - **Priya:** "I'd hand this to my attorney." That's the right next step, and the binder says so.
 - **Gate:** met for a prototype.
+
+## Sprint 6 retro · v1.41 · 2026-11-26 (Step 7)
+
+**The founder raised:** "Has our researcher and/or PM done market analysis? Is it being done too late? To simulate AI, can we create a database … with enough data to represent a true prototype."
+
+**Answer:**
+- **No.** In six sprints, Research produced fictional archetypes and Texas rule research. Nobody tested need, buyers or competitors. It ran now: `research/market-analysis.md`.
+- **Was it late?** Yes. Validation belongs before the first build. It isn't fatal, because most of what was built (honesty rules, data integrity, design system, catalog, evals) carries to any segment.
+
+**What the analysis changes:**
+- **The pain is real in tracked cannabis markets.** About half of 2024's roughly 2,500 violations were tied to track-and-trace errors (secondary source).
+- **Texas hemp retail, our first segment, is contracting fast,** faces a federal ban, has low enforcement pull (12 DSHS cases in FY26) and has no state tracking system to reconcile against.
+- **The platform space is crowded.** Mellow's difference is a stance: evidence-first, no verdicts, sitting on top of other tools. That makes the A2UI path strategic, not decorative.
+
+**Other outcomes:**
+- **Worked:** inspection prep shipped with every count traceable. The catalog caught nothing because nothing was wrong, and that's the point.
+- **Didn't work:** sprint 6 built depth into a segment nobody had validated. The process had no "is this worth building?" gate.
+
+**Follow-ups:**
+1. **New cadence gate (proposed for founder approval):** Step 0 must cite the evidence of need for the segment. If there is none, the sprint's first item is getting it.
+2. **Research owns a living market file** (`research/market-analysis.md`), updated each sprint.
+3. **A prototype dataset to simulate real operations** (proposal below).
+
+## Sprint 7 · proposal: a prototype dataset · Step 0 (planning)
+
+**Problem.** Mellow's demo runs on 53 hand-made rows with two columns. It can't show:
+- the errors operators actually hit: wrong quantity, a package left off, an expired COA;
+- a second store;
+- whether Mellow finds what's really there.
+
+**Goal.** A synthetic dataset, clearly fictional, generated from a seed and reproducible, with realistic tables and an answer key. It does three things:
+1. it makes the demo feel like a real shift;
+2. it lets us **measure** Mellow's findings against known truth (precision and recall: "simulating AI" honestly, with no model involved);
+3. it unlocks Expand (a second store) and the H3 and H4 controls.
+
+**Shape**, modeled on how tracked states record packages, manifests and receiving. It's Metrc-*like*, not Metrc data.
+
+| Table | Key columns |
+| --- | --- |
+| facilities | license_number, name, type (retail), city, state |
+| suppliers | license_number, name, license_type |
+| items | item_id, name, category, unit_of_measure |
+| batches | batch_id, item_id, supplier_license, batch_date, coa_url, coa_issued, coa_expires, lab_testing_state |
+| manifests | manifest_number, shipper_license, recipient_license, departed_at, arrived_at |
+| manifest_lines | manifest_number, package_label, item_id, batch_id, shipped_quantity, unit |
+| receiving_log | received_at, facility, package_label, manifest_number, batch_id_recorded, received_quantity, unit, received_by_role, note |
+| inventory | facility, package_label, item_id, batch_id_listed, quantity_on_hand, unit, location, last_counted_at |
+| **answer_key** | package_label, facility, issue (lot_mismatch, missing_lot, missing_receipt, left_off_manifest, quantity_variance, coa_missing, coa_expired), injected_by |
+
+**Scale:** two stores, 90 days, about 1,800 packages. Seeded issue rates (**assumptions, labeled as such**) are 2 to 4% overall, mirroring the error types in Metrc's transfer bulletins.
+
+**Deliverables:**
+- a generator script;
+- CSV and JSON outputs;
+- a data dictionary;
+- integrity tests (keys, totals that reconcile);
+- the app loading it as the sample workspace (two stores, a store switcher);
+- **an accuracy eval**: Mellow's findings vs the answer key.
+
+| # | Item | Size |
+| --- | --- | --- |
+| DB1 | Generator, dictionary, integrity tests | M (2.5d) |
+| DB2 | App loads the dataset; two stores; Expand (a second store) | M (2.5d) |
+| DB3 | New findings: quantity variance and left-off-manifest. H3 and H4 become countable when COA columns exist. | M (2d) |
+| DB4 | Accuracy eval against the answer key (precision and recall per issue type) | S (1d) |
+| V1 | Market validation: interview guide and outreach drafts for five operators in a tracked state (the founder sends; Mellow never does) | S (1d, Research) |
+
+**Total: about 9 days. Cut line:** DB3's left-off-manifest slips first.
+
+### Team review (Step 1)
+
+Reviewed by every role in PRODUCT_TEAM.md.
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Compliance and Risk | Synthetic data that looks real can be mistaken for real operator data in screenshots or the binder. | High | Every surface says "Sample data · fictional". License numbers use a reserved fictional prefix (`SAMPLE-`). The binder footer names the dataset version. |
+| Research | Issue rates are assumptions. We don't have real error rates. | Medium | Label them in the dictionary and replace them with interview data in V1. Don't claim accuracy numbers transfer to real data. |
+| AI UX | The answer key is the first real measure of Mellow's usefulness: precision and recall per issue type. | High value | Publish the scores in the eval report. Never show them as a product claim. |
+| Engineer | 1,800 packages in the browser are fine. Keep the generator deterministic (seeded) so tests are stable. | Info | Generate at build time and commit the outputs. |
+| Product Designer | Two stores need a store switcher and "all stores" views. This is Expand's first real design. | Medium | Keep the switcher in the masthead. Queue, counts and the binder are per store. |
+| Accessibility | Larger queues need virtualization or paging that's screen-reader friendly. | Medium | Page the queue at 25 per page with announced counts. |
+| Content and Voice | "Simulate AI" must not leak into copy. Mellow still compares; it doesn't predict. | Rule | No change to voice. |
+| Product Lead | Holding "What if" bills means sprint 7 changes from the approved plan. | Founder decision | Present both options. |
+
+### Board pass (Step 2)
+
+- **Norman:** realistic data reveals real interaction problems; 53 rows hide them.
+- **Morris:** an answer key is how you earn trust honestly. Measure, then speak.
+- **Zhuo:** this makes the demo something an operator recognizes in ten seconds.
+- **Rams:** keep the dataset boring and correct. No dramatic sample stories.
+- **Eames:** the constraint, fictional and labeled, is the design.
+- **Wroblewski:** test the 1,800-package queue on a phone before calling it done.
+
+**Board recommendation:**
+- **Approve** the dataset proposal and the cadence gate.
+- **Recommend holding "What if" bills** until the segment decision. That's the founder's call.
