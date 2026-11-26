@@ -1343,3 +1343,54 @@ Reviewed by the Engineer, Accessibility, Compliance and Risk, Content and Voice,
 | End use | Good | Good | The binder now counts five items on the sample. |
 
 **Provocation (Priya):** "Show me the 90 days, not just today." History views are a sprint 8 candidate. **Gate:** met for a prototype.
+
+## Positioning hypothesis · Step 0 (planning) · 2026-11-26
+
+**Founder question:** what makes Mellow desirable above other offerings?
+
+**Problem.** The market analysis found a crowded space and the risk that Mellow reads as a feature. Before more features, the team needs a hypothesis about Mellow's edge that the V1 interviews can confirm or kill.
+
+**Evidence of need (the gate):** `research/market-analysis.md` §1 and §4, plus a new desk check on 2026-11-26.
+- Metrc requires a reason and a note on every adjustment.
+- Cova, Flowhub, Treez and Meadow already detect discrepancies and sync corrections.
+- Ohio, Nevada, Maryland and Missouri ask licensees to keep supporting records or investigate.
+
+**Scope.** Documents only, with no product change:
+- `research/positioning.md`: the hypothesis, what isn't different, kill criteria and a decision rule;
+- interview guide questions 4 to 9 and a kill-criteria capture;
+- an update to the market file.
+
+**Journey stages touched:** Discovery and Evaluation (how an operator first judges Mellow against their POS).
+
+**Correction to the founder conversation.** The first verbal answer said building the investigation record was "still mostly manual". The desk check showed Metrc and POS tools already cover detection, the correction and the note. The hypothesis was narrowed to **the evidence behind the note**, with **the three-record receiving check** and **working across any stack** as support.
+
+### Team review (Step 1)
+
+Reviewed by every role in PRODUCT_TEAM.md.
+
+| Role | Finding | Severity | Recommendation |
+| --- | --- | --- | --- |
+| Compliance and Risk | "The record you'd show an inspector" can be read as an attestation, or a promise that the record will satisfy an inspector. A drafted adjustment note is text that ends up in a state system. | High | No "inspection-ready", "audit-ready" or "compliant" in any copy or outreach. If the drafted note is ever built: filled in only from the records, it says "cause not in these records" when the records don't show it, a person edits and submits it, and Mellow never submits. Adopted in positioning.md. |
+| Research | Vendor pages show what's sold, not what operators use. Five interviews is a signal, not proof. Asking "would you want…" invites polite yeses. | High | Ask about past behavior only; questions before the demo; record contradictions first. Adopted in the guide. |
+| Product Lead | The 3-of-5 decision rule is arbitrary at this sample size. | Medium | Keep it as a tripwire for the founder's decision, not an automatic verdict. Stated in positioning.md. |
+| AI UX Designer/Engineer | A drafted note is new Mellow behavior: it writes text someone else will rely on. | Medium (future) | If proposed, it needs eval cases first: no invented cause, no blame, no quantity not in the records. Logged for a later Step 0. |
+| Content and Voice | The hypothesis must not leak into outreach. The current outreach draft doesn't pitch, and that's right. | Rule | Outreach unchanged. The guide tells the founder not to mention the hypothesis. |
+| Product Designer | The decision record already exists as an object (decision, evidence, actor, time). An export per correction is a new view of it, not a new object. | Info | No system change implied yet. |
+| Engineer | No code. A templated note would be deterministic and testable. | Info | Nothing to build now. |
+| Accessibility | Interviews screen-share the demo; some operators will join from a phone. | Low | Send the production link ahead so they can follow on their own device. Added to the founder's notes below. |
+| Design Director | The founder has a real choice: test this edge, or pick a different one. | Info | Present it as a hypothesis with kill criteria, not a strategy. |
+
+### Board pass (Step 2)
+
+- **Morris:** backs it. "A person edits and submits" keeps agency where the law puts it. Rejects any version where Mellow submits to the state.
+- **Zhuo:** backs it. The outcome is concrete: the operator can answer an inspector's question about a discrepancy. Measure that in the interviews (question 8), not interest.
+- **Eames:** backs it. Evidence passing from the dock to the manager to the inspector is the real workflow; the note is one step in it.
+- **Maeda:** changes it. The Metrc note is the simplified form; Mellow's value is the context the note throws away. Say that plainly in positioning.md. Adopted ("The note is one line").
+- **Rams:** backs it, with nothing built until the interviews say so.
+- **Norman:** backs the kill criteria. Write down what would prove you wrong before you go looking.
+
+**Board recommendation:** adopt `research/positioning.md` as the hypothesis the V1 interviews test. Build nothing from it until interview evidence passes a new Step 0.
+
+**Founder notes for the interviews:** send the production link ahead of each call. Ask questions 1 to 9 before the screen-share.
+
+**Awaiting the founder's decision (Step 3).**

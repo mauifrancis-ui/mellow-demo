@@ -429,3 +429,12 @@ The founder approved the release ("deploy my friend") after the sprint 6 Step 5a
 - **Migration:** old sample decisions are retired; decisions about your own files are kept.
 
 The Step 5a board session is recorded. 167 tests pass. Awaiting the founder's release decision.
+
+## Positioning hypothesis · Step 0 to 2 · 2026-11-26
+
+- **What:** `research/positioning.md`. The lead hypothesis is that Mellow keeps the evidence behind every correction: the three records, who decided and when. It could also draft the adjustment note for a person to submit. Supporting: the three-record check at the dock, and working on top of any stack.
+- **Not different:** detection, the correction and the Metrc note. Metrc and the major POS systems already cover these.
+- **Also changed:** the interview guide (questions 4 to 9, kill-criteria capture) and the market file.
+- **Reviews:** team review and board pass recorded. The board recommends adopting it as the interview hypothesis, with no build. No app change.
+
+Awaiting the founder's decision.

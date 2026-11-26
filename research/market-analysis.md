@@ -50,6 +50,12 @@ There are 15 licenses at most (HB 46), vertically integrated, with the state reg
 
 That's a stance the platforms don't take. **The risk** is that it reads as a feature, not a product. The A2UI catalog points to a credible path: Mellow as an explainable intelligence layer that renders inside other tools, rather than another app to open.
 
+**Update, 2026-11-26 (positioning check).** Detection and correction are covered more fully than §4 implied:
+- Metrc requires a reason code and a note on every adjustment.
+- Cova, Flowhub, Treez and Meadow all offer discrepancy reports or true-ups that sync the reason and note to Metrc.
+
+What remains open is the supporting evidence that Ohio, Nevada, Maryland and Missouri ask licensees to keep behind a correction. See `research/positioning.md`.
+
 ## 5 · Market size
 
 Syndicated estimates for "cannabis compliance/industry software" range from about $1.5B to $3.2B (2025), from firms whose methods aren't public. **The team shouldn't use these for decisions.** A bottom-up estimate, licensed retailers in tracked states × willingness to pay, needs real interviews.
