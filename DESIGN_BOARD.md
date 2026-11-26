@@ -1393,4 +1393,4 @@ Reviewed by every role in PRODUCT_TEAM.md.
 
 **Founder notes for the interviews:** send the production link ahead of each call. Ask questions 1 to 9 before the screen-share.
 
-**Awaiting the founder's decision (Step 3).**
+**Founder decision (Step 3), 2026-11-26:** adopted as the hypothesis the V1 interviews test ("yes let's do both"). No build.

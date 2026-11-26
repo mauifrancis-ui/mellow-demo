@@ -436,5 +436,8 @@ The Step 5a board session is recorded. 167 tests pass. Awaiting the founder's re
 - **Not different:** detection, the correction and the Metrc note. Metrc and the major POS systems already cover these.
 - **Also changed:** the interview guide (questions 4 to 9, kill-criteria capture) and the market file.
 - **Reviews:** team review and board pass recorded. The board recommends adopting it as the interview hypothesis, with no build. No app change.
+- **Founder decision:** adopted as the interview hypothesis ("yes let's do both").
 
-Awaiting the founder's decision.
+## v1.42 released · 2026-11-26
+
+The founder approved the release ("yes let's do both") after the sprint 7 Step 5a board session in DESIGN_BOARD.md ("Sprint 7 · board presentation of the built preview"). The release includes the positioning documents, which make no app change.
