@@ -392,3 +392,7 @@ A3 and A4 move to sprint 6 under the cut line. 114 tests pass. Awaiting the foun
 ## Process correction · 2026-11-25
 
 v1.40 was brought to the founder before the board had seen the built work. The founder asked, again, whether it had passed review and the board. AGENTS.md now has Step 5a, a board presentation of the built preview, listing every decision made during the build. The board session for v1.40 is in DESIGN_BOARD.md. Release requests must name the board session that cleared them.
+
+## v1.40 released · 2026-11-25
+
+The founder approved the release ("deploy it") after the Step 5a board session in DESIGN_BOARD.md.
