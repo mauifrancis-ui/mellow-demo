@@ -1,6 +1,7 @@
 import type { LotCheck } from "./comparison.ts";
 import type { Run } from "./monitoring.ts";
 import { checksToday } from "./monitoring.ts";
+import { shipmentIssue, type ShipmentCheck } from "./shipments.ts";
 import { checkControls, controlLabel, countLine, prepSummary } from "./controls.ts";
 import type { LedgerCounts } from "./ledger-math.ts";
 import { checkedText, currentRules, effectiveText, rulesScope } from "./rules-tx.ts";
@@ -108,6 +109,9 @@ export function issueOf(task: QueueItem, comparison: LotCheck[]): Issue {
       state: task.lotComparison.different ? "different" : "missing" }
     : comparison.find(({ packageId }) => packageId === task.id);
   if (!row) return { kind: "other", label: "Check the imported record", detail: task.observation ?? "Only the import is available." };
+  // Shipment rows (sprint 7) carry their own reasons: quantities, manifests, receiving.
+  const shipment = "reasons" in row ? shipmentIssue(row as ShipmentCheck) : undefined;
+  if (shipment) return { kind: row.state === "different" ? "different" : "missing", label: shipment.label, detail: shipment.detail };
   const detail = row.inventory === "" && row.receiving === "" ? "Neither record has a lot number."
     : `Inventory has ${lotText(row.inventory)}. Receiving has ${lotText(row.receiving)}.`;
   if (row.state === "different") return { kind: "different", label: "Records disagree", detail };
@@ -132,8 +136,11 @@ export type Brief = { greeting: string; headline: string; message: string; focus
 
 /** One line of inspection-prep counts for the compliance answer. Counts only, never a verdict. */
 function prepLine(context: AskContext) {
-  const [h1, h2] = checkControls(context.comparison);
-  return `Batch ID ${countLine(h1).toLowerCase()}; received batch matches listed batch ${countLine(h2).replace(/^On file for/, "for").toLowerCase()}. Seven more items can’t be checked from these files.`;
+  const results = checkControls(context.comparison);
+  const [h1, h2] = results;
+  const rest = results.length - 2;
+  const cantCheck = results.filter(({ checkable }) => !checkable).length;
+  return `Batch ID ${countLine(h1).toLowerCase()}; received batch matches listed batch ${countLine(h2).replace(/^On file for/, "for").toLowerCase()}. ${cantCheck === rest ? `${count(rest)} more items can’t be checked from these files.` : `${count(rest - cantCheck)} more items are counted in inspection prep, and ${count(cantCheck).toLowerCase()} can’t be checked from these files.`}`;
 }
 
 export function brief(context: AskContext, now = new Date()): Brief {
@@ -180,7 +187,9 @@ const fromRecords = new Set<AskAnswer["intent"]>(["package", "unknown-package", 
 
 export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefined {
   const last = context.runs.at(-1);
-  const sample = ["Inventory export (sample)", "Receiving log (sample)"];
+  const shipments = context.comparison.some((row) => "reasons" in row);
+  const sample = shipments ? ["Manifests (sample)", "Receiving log (sample)", "Inventory export (sample)"] : ["Inventory export (sample)", "Receiving log (sample)"];
+  const inAll = shipments ? "in all three records" : "in both files";
   const sets = context.fileSets ?? [];
   const setFor = (id?: string) => (id ? sets.find(({ packageIds }) => packageIds.includes(id)) : undefined);
   const usesSample = context.comparison.some(({ packageId }) => !setFor(packageId));
@@ -190,7 +199,7 @@ export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefin
   const at = focusSet ? focusSet.at : last?.checkedAt;
   if (answer.intent === "explain") return context.previous?.basis;
   if (answer.intent === "judgment") {
-    return answer.focusId ? { verified: true, label: `${files.length} files · ${answer.focusId}`, sources: [`${answer.focusId} in both files`, ...files], at, atKind: focusSet ? "compared" : "check" } : undefined;
+    return answer.focusId ? { verified: true, label: `${files.length} files · ${answer.focusId}`, sources: [`${answer.focusId} ${focusSet ? "in both files" : inAll}`, ...files], at, atKind: focusSet ? "compared" : "check" } : undefined;
   }
   if (answer.intent === "handoff") {
     return { verified: true, label: "Your decisions on this device", sources: ["Decisions saved in Activity on this device", "Nothing was sent anywhere"] };
@@ -218,10 +227,10 @@ export function basisOf(answer: AskAnswer, context: AskContext): Basis | undefin
     : answer.focusId ? context.comparison.filter(({ packageId }) => !inSet(packageId)).length : context.comparison.length;
   const rows = `${plural(count, "package")} compared`;
   const sources = answer.intent === "summary"
-    ? [`${plural(context.runs.length, "check")} today, earlier ones are sample data`, ...files]
+    ? [`${plural(context.runs.length, "check")} today · the sample checks are fictional`, ...files]
     : answer.intent === "source"
       ? ["Receiving source status at the last check", ...files]
-      : answer.focusId ? [`${answer.focusId} in both files`, ...files, rows] : [...files, rows];
+      : answer.focusId ? [`${answer.focusId} ${focusSet ? "in both files" : inAll}`, ...files, rows] : [...files, rows];
   const label = answer.intent === "summary" ? `${plural(context.runs.length, "check")} · ${plural(last?.checked ?? 0, "package")} last`
     : answer.focusId ? `${files.length} files · ${answer.focusId}` : `${files.length} files · ${context.comparison.length} packages`;
   return { verified: true, label, sources, at: answer.intent === "summary" ? last?.checkedAt : at, atKind: focusSet && answer.intent !== "summary" ? "compared" : "check" };

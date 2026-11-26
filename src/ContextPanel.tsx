@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { panelLabel, type PanelView } from "./panel";
 import { issueOf, type Series } from "./ask";
-import { sampleComparison, type LotCheck } from "./comparison";
+import type { LotCheck } from "./comparison";
 import { lotValueLabel, taskReference, type Decision, type Entry, type Task } from "./workspace";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
@@ -48,7 +48,8 @@ const decisionText: Record<Decision, string> = {
   Approved: "Issue recorded", Dismissed: "Marked not an issue", "Manager review requested": "Left for a manager", Reopened: "Reopened",
 };
 
-export function PackageTrail({ id, task, row, queued, decision, entries, lastCheck, isActive, onOpen }: {
+export function PackageTrail({ id, task, row, queued, decision, entries, lastCheck, isActive, onOpen, comparison = [] }: {
+  comparison?: LotCheck[];
   id: string;
   task?: Task;
   row?: LotCheck;
@@ -67,7 +68,7 @@ export function PackageTrail({ id, task, row, queued, decision, entries, lastChe
         : row?.state === "match" ? "Matched" : "Not in today’s records";
   const checked = lastCheck ? clock(lastCheck) : "latest";
   const flagged = task?.sample ? `Flagged on the ${checked} check` : task ? "Added from an imported file" : row ? `Compared on the ${checked} check` : "";
-  const issue = task ? issueOf(task, sampleComparison) : undefined;
+  const issue = task ? issueOf(task, comparison) : undefined;
   return <section className="package-trail" aria-labelledby="trail-title">
     <div className="trail-head">
       <h2 id="trail-title" className="queue-id">{id}</h2>

@@ -1,0 +1,131 @@
+package_label,facility,day,issue,injected_by
+PKG-10061,SAMPLE-R-0002,-87,quantity_variance,base rate
+PKG-10098,SAMPLE-R-0002,-85,left_off_manifest,base rate
+PKG-10195,SAMPLE-R-0002,-80,lot_mismatch,base rate
+PKG-10198,SAMPLE-R-0002,-80,missing_lot,base rate
+PKG-10255,SAMPLE-R-0002,-77,lot_mismatch,base rate
+PKG-10263,SAMPLE-R-0001,-76,left_off_manifest,base rate
+PKG-10308,SAMPLE-R-0001,-74,quantity_variance,base rate
+PKG-10333,SAMPLE-R-0002,-73,quantity_variance,base rate
+PKG-10335,SAMPLE-R-0002,-73,missing_receipt,base rate
+PKG-10391,SAMPLE-R-0001,-70,missing_lot,base rate
+PKG-10457,SAMPLE-R-0001,-67,left_off_manifest,base rate
+PKG-10463,SAMPLE-R-0001,-67,lot_mismatch,base rate
+PKG-10464,SAMPLE-R-0001,-67,quantity_variance,base rate
+PKG-10465,SAMPLE-R-0002,-67,quantity_variance,base rate
+PKG-10474,SAMPLE-R-0001,-66,lot_mismatch,base rate
+PKG-10490,SAMPLE-R-0002,-66,missing_receipt,base rate
+PKG-10497,SAMPLE-R-0001,-65,quantity_variance,base rate
+PKG-10618,SAMPLE-R-0002,-60,left_off_manifest,base rate
+PKG-10630,SAMPLE-R-0002,-59,missing_lot,base rate
+PKG-10640,SAMPLE-R-0002,-59,missing_lot,base rate
+PKG-10693,SAMPLE-R-0002,-56,quantity_variance,base rate
+PKG-10707,SAMPLE-R-0001,-55,lot_mismatch,base rate
+PKG-10728,SAMPLE-R-0001,-54,lot_mismatch,base rate
+PKG-10769,SAMPLE-R-0001,-52,left_off_manifest,base rate
+PKG-10813,SAMPLE-R-0002,-51,quantity_variance,base rate
+PKG-10815,SAMPLE-R-0001,-50,quantity_variance,base rate
+PKG-10837,SAMPLE-R-0001,-49,quantity_variance,base rate
+PKG-10929,SAMPLE-R-0002,-45,missing_receipt,base rate
+PKG-10949,SAMPLE-R-0001,-44,missing_lot,base rate
+PKG-10959,SAMPLE-R-0002,-44,missing_receipt,base rate
+PKG-10974,SAMPLE-R-0002,-43,left_off_manifest,base rate
+PKG-10977,SAMPLE-R-0002,-43,coa_missing,batch
+PKG-10978,SAMPLE-R-0002,-43,coa_missing,batch
+PKG-10981,SAMPLE-R-0002,-43,coa_missing,batch
+PKG-10984,SAMPLE-R-0001,-42,missing_receipt,base rate
+PKG-10992,SAMPLE-R-0001,-42,coa_missing,batch
+PKG-11001,SAMPLE-R-0002,-42,coa_missing,batch
+PKG-11009,SAMPLE-R-0001,-41,coa_missing,batch
+PKG-11011,SAMPLE-R-0001,-41,coa_missing,batch
+PKG-11013,SAMPLE-R-0001,-41,coa_missing,batch
+PKG-11018,SAMPLE-R-0002,-41,coa_missing,batch
+PKG-11028,SAMPLE-R-0001,-40,coa_missing,batch
+PKG-11032,SAMPLE-R-0001,-40,coa_missing,batch
+PKG-11033,SAMPLE-R-0001,-40,coa_missing,batch
+PKG-11042,SAMPLE-R-0002,-40,quantity_variance,base rate
+PKG-11058,SAMPLE-R-0002,-39,coa_missing,batch
+PKG-11077,SAMPLE-R-0001,-38,coa_missing,batch
+PKG-11088,SAMPLE-R-0001,-37,coa_missing,batch
+PKG-11090,SAMPLE-R-0001,-37,missing_receipt,base rate
+PKG-11096,SAMPLE-R-0001,-37,quantity_variance,base rate
+PKG-11097,SAMPLE-R-0001,-37,missing_lot,base rate
+PKG-11117,SAMPLE-R-0001,-36,coa_missing,batch
+PKG-11126,SAMPLE-R-0002,-36,coa_missing,batch
+PKG-11131,SAMPLE-R-0001,-35,missing_lot,base rate
+PKG-11147,SAMPLE-R-0002,-35,coa_missing,batch
+PKG-11156,SAMPLE-R-0002,-35,coa_missing,batch
+PKG-11157,SAMPLE-R-0002,-35,coa_missing,batch
+PKG-11159,SAMPLE-R-0001,-34,coa_missing,batch
+PKG-11166,SAMPLE-R-0001,-34,coa_missing,batch
+PKG-11199,SAMPLE-R-0001,-32,coa_missing,batch
+PKG-11201,SAMPLE-R-0001,-32,coa_missing,batch
+PKG-11218,SAMPLE-R-0001,-31,coa_missing,batch
+PKG-11219,SAMPLE-R-0001,-31,coa_missing,batch
+PKG-11230,SAMPLE-R-0002,-31,quantity_variance,base rate
+PKG-11234,SAMPLE-R-0002,-31,coa_missing,batch
+PKG-11235,SAMPLE-R-0002,-31,coa_missing,batch
+PKG-11252,SAMPLE-R-0001,-30,quantity_variance,base rate
+PKG-11252,SAMPLE-R-0001,-30,coa_missing,batch
+PKG-11257,SAMPLE-R-0002,-30,coa_missing,batch
+PKG-11262,SAMPLE-R-0001,-29,missing_lot,base rate
+PKG-11278,SAMPLE-R-0002,-29,coa_missing,batch
+PKG-11285,SAMPLE-R-0001,-28,missing_receipt,base rate
+PKG-11301,SAMPLE-R-0001,-27,lot_mismatch,base rate
+PKG-11304,SAMPLE-R-0001,-27,coa_missing,batch
+PKG-11305,SAMPLE-R-0001,-27,coa_missing,batch
+PKG-11309,SAMPLE-R-0001,-27,coa_missing,batch
+PKG-11330,SAMPLE-R-0001,-26,coa_missing,batch
+PKG-11341,SAMPLE-R-0002,-26,lot_mismatch,base rate
+PKG-11359,SAMPLE-R-0002,-25,coa_missing,batch
+PKG-11438,SAMPLE-R-0002,-21,coa_missing,batch
+PKG-11439,SAMPLE-R-0002,-21,left_off_manifest,base rate
+PKG-11457,SAMPLE-R-0001,-20,lot_mismatch,base rate
+PKG-11462,SAMPLE-R-0002,-20,coa_missing,batch
+PKG-11473,SAMPLE-R-0001,-19,lot_mismatch,base rate
+PKG-11474,SAMPLE-R-0001,-19,missing_receipt,base rate
+PKG-11475,SAMPLE-R-0001,-19,coa_missing,batch
+PKG-11537,SAMPLE-R-0001,-16,coa_missing,batch
+PKG-11542,SAMPLE-R-0001,-16,coa_missing,batch
+PKG-11544,SAMPLE-R-0001,-16,coa_missing,batch
+PKG-11560,SAMPLE-R-0001,-15,coa_missing,batch
+PKG-11561,SAMPLE-R-0001,-15,missing_lot,base rate
+PKG-11569,SAMPLE-R-0002,-15,coa_missing,batch
+PKG-11571,SAMPLE-R-0002,-15,coa_missing,batch
+PKG-11573,SAMPLE-R-0002,-15,left_off_manifest,base rate
+PKG-11589,SAMPLE-R-0001,-14,coa_missing,batch
+PKG-11615,SAMPLE-R-0001,-13,coa_missing,batch
+PKG-11621,SAMPLE-R-0002,-13,coa_missing,batch
+PKG-11622,SAMPLE-R-0002,-13,coa_missing,batch
+PKG-11651,SAMPLE-R-0001,-11,quantity_variance,base rate
+PKG-11658,SAMPLE-R-0001,-11,coa_missing,batch
+PKG-11662,SAMPLE-R-0002,-11,coa_missing,batch
+PKG-11664,SAMPLE-R-0002,-11,lot_mismatch,base rate
+PKG-11665,SAMPLE-R-0002,-11,coa_missing,batch
+PKG-11680,SAMPLE-R-0001,-10,lot_mismatch,base rate
+PKG-11680,SAMPLE-R-0001,-10,coa_missing,batch
+PKG-11681,SAMPLE-R-0001,-10,coa_missing,batch
+PKG-11682,SAMPLE-R-0001,-10,coa_missing,batch
+PKG-11691,SAMPLE-R-0002,-10,coa_missing,batch
+PKG-11694,SAMPLE-R-0002,-10,quantity_variance,base rate
+PKG-11697,SAMPLE-R-0002,-10,coa_missing,batch
+PKG-11714,SAMPLE-R-0002,-9,coa_missing,batch
+PKG-11716,SAMPLE-R-0002,-9,missing_receipt,base rate
+PKG-11726,SAMPLE-R-0001,-8,coa_missing,batch
+PKG-11743,SAMPLE-R-0002,-8,coa_missing,batch
+PKG-11745,SAMPLE-R-0002,-8,coa_missing,batch
+PKG-11763,SAMPLE-R-0002,-7,coa_missing,batch
+PKG-11770,SAMPLE-R-0001,-6,missing_receipt,base rate
+PKG-11772,SAMPLE-R-0001,-6,coa_missing,batch
+PKG-11824,SAMPLE-R-0002,-4,quantity_variance,base rate
+PKG-11834,SAMPLE-R-0001,-3,lot_mismatch,base rate
+PKG-11876,SAMPLE-R-0002,-1,lot_mismatch,base rate
+PKG-11883,SAMPLE-R-0001,0,lot_mismatch,staged shift
+PKG-11884,SAMPLE-R-0001,0,missing_lot,staged shift
+PKG-11885,SAMPLE-R-0001,0,missing_receipt,staged shift
+PKG-11890,SAMPLE-R-0001,0,quantity_variance,staged shift
+PKG-11891,SAMPLE-R-0001,0,left_off_manifest,staged shift
+PKG-11900,SAMPLE-R-0002,0,quantity_variance,staged shift
+PKG-11901,SAMPLE-R-0002,0,lot_mismatch,staged shift
+PKG-11902,SAMPLE-R-0002,0,missing_lot,staged shift
+PKG-11903,SAMPLE-R-0002,0,missing_receipt,staged shift

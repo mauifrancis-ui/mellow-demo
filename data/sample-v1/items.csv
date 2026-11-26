@@ -1,0 +1,20 @@
+item_id,name,category,unit_of_measure
+ITM-001,Blue Dream 3.5g,Flower,Grams
+ITM-002,Sour Diesel 3.5g,Flower,Grams
+ITM-003,OG Kush 7g,Flower,Grams
+ITM-004,Gelato 3.5g,Flower,Grams
+ITM-005,Wedding Cake 1g,Flower,Grams
+ITM-006,Classic Pre-roll 1g,Pre-roll,Each
+ITM-007,Mini Pre-roll 5-pack,Pre-roll,Each
+ITM-008,Infused Pre-roll 1g,Pre-roll,Each
+ITM-009,Citrus Gummies 10pk,Edible,Each
+ITM-010,Dark Chocolate Bar,Edible,Each
+ITM-011,Sleep Gummies 20pk,Edible,Each
+ITM-012,Mint Tablets 20pk,Edible,Each
+ITM-013,Hybrid Cartridge 0.5g,Vape,Each
+ITM-014,Indica Cartridge 1g,Vape,Each
+ITM-015,Disposable 0.3g,Vape,Each
+ITM-016,Live Resin 1g,Concentrate,Grams
+ITM-017,Shatter 1g,Concentrate,Grams
+ITM-018,Relief Balm 50ml,Topical,Each
+ITM-019,Body Lotion 100ml,Topical,Each

@@ -19,12 +19,14 @@ import { panelFor, queueView, sameView, type PanelView } from "./panel";
 import { addTurn, ask, type FileSet, brief, issueOf, orderQueue, type AskAction, type AskAnswer, type Series, type Turn } from "./ask";
 
 const clock = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-import { monitorReceiving, samplePosture } from "./monitoring";
+import { monitorReceiving, type ReceivingPosture } from "./monitoring";
 import { checkFor, ledgerCounts } from "./ledger-math";
-import { comparisonTasks, sampleComparison, type LotCheck } from "./comparison";
+import { comparisonTasks, type LotCheck } from "./comparison";
+import { shipmentNextStep, type ShipmentCheck } from "./shipments";
+import { currentStore, sampleFor, sampleWorkspace, scoped, storeKey, stores } from "./sample/store";
 
 import {
-  emptyDraft, hasEvidence, initial, inspectRow, latestDecisions, lotValueLabel, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, taskReference, workQueue,
+  emptyDraft, hasEvidence, inspectRow, latestDecisions, lotValueLabel, nextRecord, parseCsv, prepareReview, readWorkspace, recordDecision, shiftHandoff, storageKey, taskReference, workQueue,
   type Decision, type Draft, type Task, type Workspace,
 } from "./workspace";
 
@@ -42,9 +44,14 @@ function smooth(update: () => void, kind: "page" | "panel" = "page") {
 
 const tabs = ["Today", "Activity", "Learn"] as const;
 const panelKey = "mellow.panel";
-const dismissedKey = "mellow.notes.dismissed";
+const dismissedKey = scoped("mellow.notes.dismissed");
 /** Rows and files from the person's own comparisons, kept with the queue they created so Mellow can still explain them after a reload. */
-const importedKey = "mellow.imported";
+const importedKey = scoped("mellow.imported");
+const workspaceKey = scoped(storageKey);
+const storeSample = sampleFor(currentStore());
+const sampleComparison = storeSample.comparison;
+const sampleStart = sampleWorkspace(storeSample);
+const readStoreWorkspace = () => readWorkspace(workspaceKey, sampleStart);
 type Imported = { rows: LotCheck[]; sets: FileSet[] };
 function readImported(): Imported {
   try {
@@ -144,8 +151,33 @@ function evidenceExamples(task: Task) {
   return examples.length ? [...new Set(examples)].join(", or ") : "a receiving log, package label, or inventory record";
 }
 
+const qtyText = (value: number | null, unit: string) => value === null ? "" : ` · ${value} ${unit === "Each" ? (value === 1 ? "unit" : "units") : unit.toLowerCase()}`;
+
 function SourceComparison({ task, review }: { task: Task; review: ReturnType<typeof prepareReview> }) {
   const sample = task.sample ? sampleComparison.find(({ packageId }) => task.id === packageId) : undefined;
+  // Shipment rows (sprint 7): three records side by side, the manifest, receiving and inventory.
+  if (sample && "reasons" in sample) {
+    const row = sample as ShipmentCheck;
+    return <section className="comparison" aria-label="Evidence">
+      <div className="comparison-grid" data-three>
+        <div className="comparison-source">
+          <span className="source-label"><ReviewDrawing kind="receipt" />Manifest</span>
+          <strong>{row.onManifest ? `${lotValueLabel(row.manifestLot)}${qtyText(row.shipped, row.unit)}` : "Not on the manifest"}</strong>
+          <small>{row.manifest ?? "No manifest"}{row.item ? ` · ${row.item}` : ""}</small>
+        </div>
+        <div className="comparison-source">
+          <span className="source-label"><ReviewDrawing kind="receipt" />Receiving record</span>
+          <strong>{row.receiving === null ? "No receiving record" : `${lotValueLabel(row.receiving)}${qtyText(row.received, row.unit)}`}</strong>
+          <small>Sample receiving log</small>
+        </div>
+        <div className="comparison-source">
+          <span className="source-label"><ReviewDrawing kind="package" />Inventory record</span>
+          <strong>{lotValueLabel(row.inventory)}</strong>
+          <small>{taskReference(task)}</small>
+        </div>
+      </div>
+    </section>;
+  }
   const comparison = task.lotComparison ?? sample;
   const secondSource = review.source || comparison;
   return <section className="comparison" aria-label="Evidence">
@@ -170,9 +202,9 @@ export default function App() {
   const nav = useRef<HTMLElement>(null);
   const [pill, setPill] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [workspace, setWorkspace] = useState(() => {
-    try { return readWorkspace(); } catch { return initial; }
+    try { return readStoreWorkspace(); } catch { return sampleStart; }
   });
-  const [posture, setPosture] = useState(() => samplePosture(new Date().toISOString()));
+  const [posture, setPosture] = useState<ReceivingPosture>(() => ({ receiving: "current", runs: storeSample.runs, lastSuccessfulRun: storeSample.runs.at(-1) ?? null, delayedAt: null }));
   const [focusSeries, setFocusSeries] = useState<Series | null>(null);
   const [panelView, setPanelView] = useState<PanelView>(queueView);
   const [panelCollapsed, setPanelCollapsed] = useState(initialCollapsed);
@@ -255,7 +287,9 @@ export default function App() {
   const pendingManager = Boolean(active && latest.get(active.id) === "Manager review requested");
   const primaryAction = editing || canApprove ? "record"
     : hasManualEvidence || !review?.requiresRationale || pendingManager ? "evidence" : "manager";
+  const shipmentRow = active?.sample ? sampleComparison.find(({ packageId }) => packageId === active.id) : undefined;
   const instruction = pendingManager ? "Already in the manager handoff."
+    : shipmentRow && "reasons" in shipmentRow && !hasManualEvidence ? shipmentNextStep(shipmentRow as ShipmentCheck)
     : hasManualEvidence ? "Check the evidence you added before recording this issue."
       : review?.evidence ? "If neither record lists a lot number, record the issue."
         : active?.lotComparison ? review?.nextStep
@@ -271,8 +305,8 @@ export default function App() {
 
   function save(update: (current: Workspace) => Workspace) {
     try {
-      const next = update(readWorkspace());
-      localStorage.setItem(storageKey, JSON.stringify(next));
+      const next = update(readStoreWorkspace());
+      localStorage.setItem(workspaceKey, JSON.stringify(next));
       setWorkspace(next);
       setError("");
       return true;
@@ -488,7 +522,7 @@ export default function App() {
 
   function resetSample() {
     try {
-      localStorage.removeItem(storageKey);
+      localStorage.removeItem(workspaceKey);
       localStorage.removeItem(dismissedKey);
       localStorage.removeItem(importedKey);
     } catch { /* Nothing stored to clear. */ }
@@ -617,7 +651,14 @@ export default function App() {
           {pill && <span className="nav-pill" aria-hidden="true" style={{ width: pill.width, transform: `translate(${pill.x}px, ${pill.y + pill.height - 2}px)` }} />}
           {tabs.map((item) => <button key={item} aria-current={tab === item ? "page" : undefined} onClick={() => goTo(item)}>{item}</button>)}
         </nav>
-        <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · {workspaceName}</p>
+        <p className="local-label">{new Date().toLocaleDateString([], { weekday: "short", day: "numeric", month: "short" })} · {workspaceName} ·{" "}
+          <label className="store-switch"><span className="sr-only">Store</span>
+            <select value={storeSample.store} onChange={(event) => {
+              try { localStorage.setItem(storeKey, event.target.value); } catch { /* Can't remember the store. */ }
+              window.location.reload();
+            }}>{stores.map((store) => <option key={store.id} value={store.id}>{store.name}</option>)}</select>
+          </label>
+        </p>
         <button ref={askButton} type="button" className="ask-trigger" onClick={openAsk} aria-keyshortcuts="/"
           aria-expanded={tab === "Today" ? undefined : askOpen} aria-controls={tab === "Today" ? "ask-input" : "ask-drawer"}
           data-open={tab !== "Today" && askOpen ? "" : undefined} title="Ask Mellow (/)">
@@ -760,7 +801,7 @@ export default function App() {
             {panelView.kind === "package" && <PackageTrail id={panelView.id} task={[...queue, ...manager, ...workspace.tasks].find((item) => item.id === panelView.id)}
               row={comparison.find(({ packageId }) => packageId === panelView.id)} queued={queue.some((item) => item.id === panelView.id)}
               decision={latest.get(panelView.id)} entries={workspace.history.filter((entry) => entry.task.id === panelView.id)}
-              lastCheck={posture.lastSuccessfulRun?.checkedAt} isActive={active?.id === panelView.id} onOpen={openTask} />}
+              lastCheck={posture.lastSuccessfulRun?.checkedAt} isActive={active?.id === panelView.id} onOpen={openTask} comparison={comparison} />}
             {panelView.kind === "series" && <>
               <ReceivingMonitor posture={posture} open={queue.length} focusSeries={focusSeries} onFocusSeries={setFocusSeries} />
               <SeriesList series={panelView.series} rows={comparison} open={[...queue, ...manager]} latest={latest}

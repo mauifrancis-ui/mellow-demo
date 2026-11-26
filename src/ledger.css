@@ -765,3 +765,12 @@
   .binder-table td, .binder-table th { padding: 2px 0; border: 0; }
   .binder-table td[data-label]::before { content: attr(data-label) " · "; font: 500 var(--type-label) var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-secondary); }
 }
+
+/* Store switcher (sprint 7, Expand). Each store keeps its own queue and decisions on this device. */
+.store-switch select { appearance: none; min-height: 32px; padding: 0 18px 0 6px; border: 0; border-bottom: 1px solid var(--border-strong); border-radius: 0;
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%235A5650' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 2px center;
+  font: inherit; color: var(--text-primary); cursor: pointer; }
+.store-switch select:focus-visible { outline: 2px solid var(--border-ink); outline-offset: 2px; }
+
+.shell[data-palette="ledger"] .comparison-grid[data-three] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (width < 900px) { .shell[data-palette="ledger"] .comparison-grid[data-three] { grid-template-columns: 1fr; } }

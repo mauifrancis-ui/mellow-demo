@@ -27,11 +27,11 @@ export const texasHempControls: Control[] = [
     evidence: "Matching batch numbers in your inventory and your receiving log", where: "In your files",
     note: "No rule requires two records to agree. Agreement makes a batch traceable if there's a recall." },
   { id: "H3", title: "Each batch has a batch date on file", citation: "25 TAC §300.402(a)(2); HSC §443.205(a)", ruleId: "tx-25tac-300",
-    evidence: "The batch date on each product label", where: "Outside Mellow" },
+    evidence: "The batch date on each product label", where: "Outside Mellow", note: "Countable when your files include batch details." },
   { id: "H4", title: "Each batch has a certificate of analysis link", citation: "25 TAC §300.402(a)(6); HSC §443.205(a)", ruleId: "tx-25tac-300",
-    evidence: "A working link to each batch’s certificate of analysis", where: "Outside Mellow" },
+    evidence: "A working link to each batch’s certificate of analysis", where: "Outside Mellow", note: "Countable when your files include a COA link. Mellow doesn’t open or judge the certificate." },
   { id: "H5", title: "Certificates of analysis aren’t expired", citation: "25 TAC §300.301(f)", ruleId: "tx-25tac-300",
-    evidence: "The date on each certificate of analysis", where: "Outside Mellow" },
+    evidence: "The date on each certificate of analysis", where: "Outside Mellow", note: "Countable when your files include the COA's expiry date. Missing links count as missing here too." },
   { id: "H6", title: "Records are kept on site for three years", citation: "25 TAC §300.203(a), (c)", ruleId: "tx-25tac-300",
     evidence: "Your records, on site, going back three years", where: "Outside Mellow",
     note: "Mellow only knows this device. The decision trail export is something you can keep." },
@@ -69,6 +69,19 @@ export function checkControls(rows: LotCheck[], controls: Control[] = texasHempC
         onFile: rows.filter((row) => present(row.inventory) && present(row.receiving) && row.inventory === row.receiving).map(({ packageId }) => packageId),
         missing: rows.filter((row) => !present(row.inventory) || !present(row.receiving)).map(({ packageId }) => packageId),
         disagree: rows.filter((row) => present(row.inventory) && present(row.receiving) && row.inventory !== row.receiving).map(({ packageId }) => packageId) };
+    }
+    // Sprint 7: when the records carry batch details (a batch date, a COA link and its expiry), H3 to H5 can be counted.
+    const withBatch = rows.filter((row) => (row as { batch?: unknown }).batch);
+    const batchOf = (row: LotCheck) => (row as { batch?: { batchDay: number; coaUrl: string; coaExpired: boolean } }).batch;
+    if (withBatch.length && ["H3", "H4", "H5"].includes(control.id)) {
+      const has = (row: LotCheck) => {
+        const batch = batchOf(row);
+        if (!batch) return false;
+        return control.id === "H3" ? Number.isFinite(batch.batchDay) : control.id === "H4" ? Boolean(batch.coaUrl) : Boolean(batch.coaUrl) && !batch.coaExpired;
+      };
+      return { ...empty, checkable: true,
+        onFile: rows.filter(has).map(({ packageId }) => packageId),
+        missing: rows.filter((row) => !has(row)).map(({ packageId }) => packageId) };
     }
     return empty;
   });

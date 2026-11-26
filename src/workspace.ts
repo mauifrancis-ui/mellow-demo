@@ -18,9 +18,9 @@ export const initial: Workspace = {
   drafts: {}, history: [],
 };
 
-export function readWorkspace(): Workspace {
-  const saved = localStorage.getItem(storageKey);
-  return saved ? JSON.parse(saved) as Workspace : initial;
+export function readWorkspace(key = storageKey, fallback: Workspace = initial): Workspace {
+  const saved = localStorage.getItem(key);
+  return saved ? JSON.parse(saved) as Workspace : fallback;
 }
 
 export function parseCsv(text: string): Row[] {
