@@ -1,0 +1,20 @@
+/* Field Ledger tokens · tier 1 and 2 (sprint 5, A1 and A2). Components use these names, never raw values.
+   Tier 1 (raw values) lives under .shell[data-palette="ledger"] in ledger.css. This file names roles. */
+:root {
+  /* Type scale. Nothing below 12px; form fields 16px so phones don't zoom; floor text 14px or more. */
+  --type-label: 12px;     /* kickers, mono labels, captions */
+  --type-meta: 13px;      /* secondary lines, times */
+  --type-ui: 14px;        /* rows, buttons, controls */
+  --type-body: 15px;      /* reading text */
+  --type-input: 16px;     /* form fields */
+  --type-lead: 18px;      /* Mellow's voice, questions */
+  --type-subtitle: 21px;
+  --type-title: 24px;     /* answer and dialog titles */
+  --type-heading: 28px;   /* page section headings, a record */
+  --type-numeral: 44px;   /* counts */
+  --type-figure: 80px;    /* the chart's headline number */
+  --type-figure-compact: 64px;
+  --type-display: clamp(34px, 4vw, 46px);       /* page headlines */
+  --type-display-md: clamp(28px, 4.3vw, 50px);
+  --type-display-lg: clamp(36px, 5.5vw, 60px);
+}

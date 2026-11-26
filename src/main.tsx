@@ -6,6 +6,7 @@ import "@fontsource-variable/newsreader/opsz-italic.css";
 import "@fontsource-variable/instrument-sans";
 import "@fontsource/ibm-plex-mono/400.css";
 import "@fontsource/ibm-plex-mono/500.css";
+import "./tokens.css";
 import "./styles.css";
 import "./ledger.css";
 import "./motion.css";
