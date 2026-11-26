@@ -1,6 +1,6 @@
 # Texas hemp · draft controls for inspection prep (sprint 5, C1)
 
-**Status: drafted from the rule text · not reviewed by a regulatory expert.** This is a working list for sprint 6. It isn't legal advice, and nothing here ships until Compliance and Risk sign off.
+**Status: drafted from the rule text · citations checked against the rule text by the founder (2026-11-25) · not reviewed by a regulatory expert.** This is a working list for sprint 6. It isn't legal advice, and nothing here ships until Compliance and Risk sign off.
 
 - **Prepared by:** Research, with Compliance and Risk.
 - **Sources** (opened 2026-11-25):

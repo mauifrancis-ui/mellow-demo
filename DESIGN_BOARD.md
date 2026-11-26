@@ -1103,3 +1103,37 @@ Reviewed by the Engineer, Accessibility, Design Director, Product Designer, Cont
 **Board recommendation:** release v1.40 to the founder for decision, with change 6 made (it is) and the condition in 11 carried into sprint 6.
 
 **Rechecked after change 6:** 114 tests pass, lint and build pass, and the phone card reads "Your next package · 1 of 3 | PKG-443 | Records disagree".
+
+## Sprint 5 retro · v1.40 · 2026-11-25 (Step 7)
+
+**Outcomes:**
+- **Every number reconciles.** Tests M1 to M6 hold, and Activity matches Today in production.
+- **Motion and tokens each have one source,** and guard tests hold them there.
+- **The founder's most basic confusion is answered on the record:** "1 of N", why this one, See all, and Next.
+- **The research draft exists.** The founder checked its citations against the rule text the same evening, which clears the board's sprint 6 condition.
+
+**What worked:**
+- Auditing before sizing. The data and motion audits found real defects ("flagged 12", conflicting animations) before anyone argued about scope.
+- Pixel diffs proved the color-role migration safe.
+
+**What didn't:**
+- **v1.40 reached the founder before the board saw the built work.** That's the third time the founder has had to ask about review. Fixed structurally with Step 5a and the rule that release requests name their board session.
+- **A screenshot from an earlier draft** was sent to the founder and had to be corrected.
+
+**Follow-ups:**
+1. Every release request names its Step 5a session.
+2. Screenshots sent to the founder are taken after the last change, from the build being proposed.
+
+**Sprint 6 measures:**
+- Every inspection-prep count traces to its control, rule and packages.
+- No verdict words reach the screen or the binder.
+- Every Ask answer validates against Mellow's catalog.
+
+## Sprint 6 · founder decision (Step 3) · 2026-11-25
+
+Approved as planned ("approved for the next 3 sprints"):
+- the A2UI catalog (A7);
+- inspection prep C2 to C5, built from the catalog's ControlCheck and BinderSection components;
+- A3 and A4 if there's room.
+
+The founder checked the C1 citations against the rule text ("I did it, it's done"), which clears the board's condition 11. Controls still carry "not reviewed by a regulatory expert".
