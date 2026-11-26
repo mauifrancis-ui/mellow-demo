@@ -388,3 +388,7 @@ Built as approved for sprint 5:
 - **Research:** C1 draft controls.
 
 A3 and A4 move to sprint 6 under the cut line. 114 tests pass. Awaiting the founder's release decision.
+
+## Process correction · 2026-11-25
+
+v1.40 was brought to the founder before the board had seen the built work. The founder asked, again, whether it had passed review and the board. AGENTS.md now has Step 5a, a board presentation of the built preview, listing every decision made during the build. The board session for v1.40 is in DESIGN_BOARD.md. Release requests must name the board session that cleared them.

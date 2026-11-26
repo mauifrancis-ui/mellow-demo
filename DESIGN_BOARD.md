@@ -1072,3 +1072,34 @@ Reviewed by the Engineer, Accessibility, Design Director, Product Designer, Cont
 | Others | | Unchanged | |
 
 **Provocation (Norman):** test "1 of 3" with a real person on a phone before calling it solved. **Gate:** met for a prototype. Every number reconciles.
+
+### Sprint 5 · board presentation of the built preview (Step 5a) · 2026-11-25
+
+**Why this session exists.** The founder asked whether v1.40 had passed review and gone to the board before coming to him. It hadn't. The board approved the *plan* (sprints 5 to 7), and the team ran implementation and preview checks, but the board never saw the *built* work. Several decisions were made during the build without review. This session corrects that, and AGENTS.md now makes it Step 5a, so it can't be skipped again.
+
+**Presented:** today at 1440px and 390px, the record header, Activity, Ask, Learn, motion with and without reduced motion, the before-and-after screenshots, and the data audit before and after.
+
+**Decisions made during the build, for the board:**
+
+| # | Build decision | Board call | Lens and reasoning |
+| --- | --- | --- | --- |
+| 1 | Activity's "Today in numbers" became **"In this workspace"**. | **Backs** | Morris: the counts cover every task in the workspace, not just today, so the old label was untrue. |
+| 2 | The briefing's **"The other 55 from today's 8 checks matched"** became **"50 more matched, and I left them alone."** The number of checks now lives in the chart and the summary. | **Backs** | Norman and Content and Voice: one number per sentence, and it's the one that's true. Vignelli: starting a sentence with a numeral is acceptable above ten. |
+| 3 | **Next** and the auto-advance after a decision follow the "1 of N" order, not file order. | **Backs** | Norman: "sorted by what needs you most" has to be true of what happens next, or it's a broken promise. |
+| 4 | **"1 of 3" in the gutter**; "sorted by what needs you most" moved to the eyebrow line, because the full phrase wrapped badly in the 72px gutter on a desk. | **Backs, with a note** | Vignelli and Kare: the gutter holds a short label; the explanation sits with the record. Maeda asked whether the phrase needs to repeat on every record. Norman: yes, because people open records out of order. Kept. |
+| 5 | **"See all 3"** shows only when the queue is hidden (the panel closed on a desk, or on a phone). | **Backs** | Rams: no control for a list that's already in view. |
+| 6 | On a phone, the **"Your next package"** card and the record both say where you are, and they didn't match. | **Changes** | Clark and Wroblewski: two different signals at the top of a phone is noise. The card now reads "Your next package · 1 of 3". **Done and rechecked.** |
+| 7 | Mellow's voice went from **19px to 18px** (type scale). | **Backs** | Ive: line length on a desk improved slightly; no loss of presence. Accessibility: 18px italic serif reads well on the floor. |
+| 8 | The Ask drawer and dialogs now **ease instead of spring** (motion principle 4). | **Backs** | Eames: springs are for things in your hand; a drawer you summon should arrive calmly. |
+| 9 | Restoring a delayed source **records no new check** when nothing new arrived. | **Backs** | Morris: a check that compared nothing shouldn't count. Engineer: the restored note still says receiving is back. |
+| 10 | The floor mode raises secondary text to 14 to 16px. | **Backs** | Wroblewski: arm's length, bad light, gloves. |
+| 11 | The C1 research is a document, not UI, and its citations are unverified. | **Backs, with a condition** | Morris: nothing from C1 reaches the screen until a person checks the citations against the PDF. That blocks sprint 6 C2. |
+
+**Lens notes on the whole:**
+- **Zhuo:** this sprint's hero is trust: the numbers add up. Say that first in the release note.
+- **Norman:** "1 of 3" still needs a real person on a phone (as noted in the Product Excellence Review).
+- **Rams:** motion in one file, tokens in one file. The system is finally legible.
+
+**Board recommendation:** release v1.40 to the founder for decision, with change 6 made (it is) and the condition in 11 carried into sprint 6.
+
+**Rechecked after change 6:** 114 tests pass, lint and build pass, and the phone card reads "Your next package · 1 of 3 | PKG-443 | Records disagree".

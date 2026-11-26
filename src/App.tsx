@@ -622,7 +622,7 @@ export default function App() {
         {tab === "Today" && <div className="ledger">
           <div className="ledger-main">
             {active && <a className="phone-next" href="#task-title" onClick={(event) => { event.preventDefault(); openTask(active); }}>
-              <span className="kicker">Your next package</span>
+              <span className="kicker">Your next package{position && !pendingManager ? ` · ${position} of ${ordered.length}` : ""}</span>
               <span className="phone-next-id">{active.record}</span>
               <span className="phone-next-issue">{activeIssue?.label}</span>
             </a>}
