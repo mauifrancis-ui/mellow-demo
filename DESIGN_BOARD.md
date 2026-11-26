@@ -986,3 +986,55 @@ Reviewed by the Product Lead, Design Director, Product Designer, Engineer, AI UX
 - **Wroblewski:** the floor mode decides whether the phone experience is right. Test it on a real phone at the back door.
 
 **Board recommendation:** approve the team's plan (foundation first). The founder decides the trade-off.
+
+### Added to planning · data integrity and motion · 2026-11-25
+
+The founder asked to "make sure that all the data and math add up correctly on every page, and that every piece of motion feels natural and flows organically consistently." Before sizing, the team audited the build.
+
+**Data audit.** Sample workspace, desk width. The fresh state, after leaving one for a manager, and after a simulated check were compared across Today, the queue, Ask, the briefing and Activity.
+
+| # | Finding | Where | Severity |
+| --- | --- | --- | --- |
+| D-a | "Today's 8 checks" stays 8 after a new check. Runs are capped at 8 (`HISTORY = 8`), so the oldest is dropped silently and the briefing says "today" about a rolling window. | Briefing, summary answer, chart | High |
+| D-b | "Matched" adds up each run's matched count. A simulated check re-runs the whole comparison, so packages already counted are counted again. The total is plausible, but it isn't a count of packages. | Briefing ("The other 55…"), summary answer | High |
+| D-c | Activity's "Today in numbers · flagged 12" adds up exceptions across runs. Today shows 3 open and 1 with a manager. The same package flagged in several runs is counted each time, so the two pages disagree. | Activity | High |
+| D-d | Each new check logs two notes for one event: the briefing note and the row note. The Activity notes count shows 2 for one finding. | Activity "Mellow notes today" | Medium |
+| D-e | There's no single source for the numbers. Each page derives its counts on its own: `brief()`, the panel, Activity and the findings summary. | Architecture | High (root cause) |
+
+**Motion audit** (`motion.css`, `ledger.css`, `styles.css`).
+
+| # | Finding | Severity |
+| --- | --- | --- |
+| E-a | The same element is animated in two or three files with different values. The cascade decides which wins, not the design. For example: `.mellow-voice` is 480ms in one file and 340ms in another; `.count`, `.nav-pill` and `.chart-column` use a spring in one file and ease in another; the latest turn has `none` in one and `settle` in another. | High |
+| E-b | Some timings are hard-coded outside the motion tokens: 480, 560, 200, 220 and 90ms, and two different stagger values (36 and 28ms). | Medium |
+| E-c | None of the sprint 4 surfaces has an arrival motion: Rules entries, Help, the setup checklist, the trail dialog, "Not useful", "Your next package", and the clear-data confirm. | Medium |
+| E-d | Stale selectors (`.references li`, `.references a`) still animate an element that no longer exists. | Low |
+
+**Added scope:**
+
+| # | Item | Size |
+| --- | --- | --- |
+| D1 | One source for counts, `ledger-math.ts`: unique packages; open, with a manager, decided and matched; runs today (not a rolling window); notes counted per event. Every page reads from it. | M (2d) |
+| D2 | Reconciliation tests, the new evaluation section M: for every state, open + with a manager + decided + matched = total unique packages. Every number on Today, the panel, Ask, Activity, the findings summary and the trail must equal its value from `ledger-math.ts`. A browser check also reads the numbers off each page and compares them. | M (1.5d) |
+| D3 | Copy honesty: "today's checks" counts checks since midnight, or says "the last 8 checks" if it's a window. | S (0.5d) |
+| E1 | One motion source. Move every animation into `motion.css` and remove the duplicates in `ledger.css` and `styles.css`. Each element is defined once. | M (1.5d) |
+| E2 | Motion tokens for everything: arrive, change, layout, press, stagger and spring. No hard-coded durations, and a guard test enforces it (part of A6). | S (0.5d) |
+| E3 | Motion for the sprint 4 surfaces, using the existing vocabulary (reveal, settle, stagger), plus a review recorded at 60fps for each. | S (1d) |
+| E4 | Motion principles written into the spec: what moves, why, how long. For example: things arrive from below and settle, exits are faster than entrances, a spring only for direct manipulation, and reduced motion removes all timed movement. | S (0.5d) |
+
+**Total added: about 7.5 days.**
+
+### Revised plan (replaces the table above)
+
+| Sprint | Dates (about) | Scope | Engineering days |
+| --- | --- | --- | --- |
+| **5 · Foundation, truth and clarity** | Nov 30 to Dec 11 | Type scale and role tokens (A1, A2), context modes (A5), guard test (A6), **data integrity (D1 to D3)**, **motion (E1 to E4)**, one-of-nine (B1 to B4). **C1** rules research runs in parallel. | About 13.5 days. **Cut line:** E3 and E4 slip first. |
+| **6 · Catalog and inspection prep** | Dec 14 to Jan 8 | A2UI catalog (A7), then inspection prep (C2 to C5) built as catalog components. Spacing and legacy cleanup (A3, A4) if there's room. | About 14.5 days. Holiday weeks, so **C4 (the binder) is at risk.** |
+| **7 · What if, and Expand** | Jan 11 to 22 | The 2027 bills view, a second store, and the binder if it slipped | |
+
+**Why data integrity comes first.** Inspection prep is made of counts: on file, missing, can't check. If the counts on today's pages don't reconcile, a binder built on the same math would put wrong numbers in front of an inspector. Compliance and Risk would block C2 without D1 and D2.
+
+**Board:**
+- **Morris:** numbers that don't add up are a trust failure, not a bug. They come before features.
+- **Rams:** motion defined once, in one place.
+- **Norman:** motion is how people tell what changed. Consistency is comprehension.

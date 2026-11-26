@@ -58,6 +58,9 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
 
     Appearance lives in role tokens the renderer resolves per context mode. The first catalog draft comes from today's answer shapes (title, body, items with a kind, actions, basis).
 
+- **Data integrity (audit 2026-11-25):** "8 checks" never grows, "matched" double-counts, Activity "flagged 12" vs 4 on Today, duplicate notes per event. There's no single source for counts. Sprint 5: D1 to D3.
+- **Motion consistency (audit 2026-11-25):** duplicate definitions across three files with conflicting timings, hard-coded durations, no motion on sprint 4 surfaces, stale selectors. Sprint 5: E1 to E4.
+
 ## Texas roadmap (team decision 2026-11-25)
 
 - Sprint 4: the regulation source registry (references only), plus the binder skeleton.
