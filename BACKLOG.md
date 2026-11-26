@@ -50,6 +50,13 @@ From the v1.37 Product Excellence Review (DESIGN_BOARD.md). The founder picks at
   - The legacy `styles.css` has 37 hard-coded colors and the global input rule behind the radio bug.
   - Context: the system adapts by width, reduced motion and print. It doesn't adapt by use case.
   - Proposal: primitive, semantic and component tiers; a type and spacing scale; context modes for the floor (phone), the desk and print or export; marks and status words as semantic tokens.
+  - **Framing (founder, 2026-11-25): A2UI.** Field Ledger becomes Mellow's A2UI catalog. Meaning lives in components and enums:
+    - status is an enum;
+    - a Stamp is required on every answer from records;
+    - there's no verdict component;
+    - `ProposedRule` can't be placed in a current-check surface.
+
+    Appearance lives in role tokens the renderer resolves per context mode. The first catalog draft comes from today's answer shapes (title, body, items with a kind, actions, basis).
 
 ## Texas roadmap (team decision 2026-11-25)
 

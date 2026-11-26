@@ -869,3 +869,35 @@ Reviewed by the Product Designer, the Design Director, Content and Voice, Access
 - **Morris:** the exported trail and the screen must say the same thing. Words do.
 
 **Decision (team, under the founder's delegation):** Activity shows no marks. Decision words are 14px and evidence is 13px. The shift-handoff list keeps its ink ring, which already means "with a manager". Recorded in MELLOW_DESIGN_SPEC.md.
+
+## Sprint 4 retro · v1.39 · 2026-11-25 (Step 7)
+
+Reviewed by the Product Lead, Design Director, Research, Engineer, Accessibility, Compliance and Risk, and Content and Voice. The founder's walkthrough was the main input.
+
+### Outcomes against the brief
+
+| Measure | Result |
+| --- | --- |
+| Get started, Use and End use reach Good in the Product Excellence Review | **Met (synthetic).** The founder's own walkthrough still found Use confusing at the most basic level ("one package, but it says 9"). |
+| Every Rules entry has all six fields and a source link | **Met.** Vetting against the official pages found four errors: a broken statute link, an unsupported USDA citation, a TABC rule's link and scope, and a missing injunction note. All fixed before release. |
+| New evaluation cases (R, T, W) pass | **Met.** 92 tests pass. |
+
+### What worked
+- **Vetting sources before release.** Reopening each official page caught claims we had written from memory.
+- **The founder's walkthrough** found what synthetic review couldn't: the radio buttons, the Activity type, the marks, and one-of-nine.
+- **Delegating to the team within the design system.** The marks question was settled by the system's own rule (marks are for triage only) and shipped the same day.
+
+### What didn't
+- **Preview review tested behavior, not appearance.** Two visual bugs reached production, both from type and input styles that aren't tokenized.
+- **Site claims drifted again.** The stamp copy said "Compared" and "which rows". The claims test only covers the upload limit.
+- **Marks had been misused in Activity for several versions** without anyone noticing. Rules in the spec aren't enough when components use raw colors.
+
+### Follow-ups
+1. Preview review screenshots every new or changed control at 390px and 1440px, and a person looks at it.
+2. A claims checklist for the site: each sentence on the site maps to a feature or a test before release.
+3. Tokens: a type scale first, so no new hard-coded sizes go in. This is in the sprint 5 candidates.
+
+### What sprint 5 should measure
+- A first-time person can say why they see one package and how to see the rest, without help.
+- No hard-coded colors or font sizes are added.
+- Every inspection-prep check opens into rule, evidence and records, with an expert-review label.
