@@ -561,7 +561,7 @@ export default function App() {
       if (action.kind === "binder") { setBinder(true); updateSetup({ shared: true }); }
       else requestAnimationFrame(() => requestAnimationFrame(() => {
         const node = document.getElementById("prep-title");
-        node?.scrollIntoView({ block: "start" });
+        node?.closest("section")?.scrollIntoView({ block: "start" });
         (node as HTMLElement | null)?.focus({ preventScroll: true });
       }));
     }

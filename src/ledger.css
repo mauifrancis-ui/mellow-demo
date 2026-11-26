@@ -725,7 +725,7 @@
 .next-issue { font: var(--type-ui) var(--sans); color: var(--text-secondary); }
 
 /* Inspection prep (sprint 6, C2 to C4). Status is a word; counts trace to packages. */
-.prep { margin-top: 48px; padding-top: 20px; border-top: 2px solid var(--border-ink); display: grid; gap: 10px; }
+.prep { scroll-margin-top: 88px; margin-top: 48px; padding-top: 20px; border-top: 2px solid var(--border-ink); display: grid; gap: 10px; }
 .prep-title { margin: 0; font: 400 var(--type-heading)/1.15 var(--serif); }
 .prep-title:focus-visible { outline: 2px solid var(--border-ink); outline-offset: 4px; }
 .prep-lead { margin: 0; font: italic var(--type-lead)/1.45 var(--serif); color: var(--text-voice); max-width: 62ch; }
